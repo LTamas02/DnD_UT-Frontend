@@ -83,51 +83,48 @@ function hashPassword(password, salt) {
 
 
 const handleLoginSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Send email and password directly as required by the API
-    const response = await api.post("api/Auth/login", {
-      email,
-      password
-    });
+    e.preventDefault();
+    try {
+        const response = await api.post("api/Auth/login", {
+            email: email,
+            password: password
+        });
 
-    // Store the JWT token returned by the API
-    const token = response.data?.token;
-    if (token) {
-      localStorage.setItem('token', token);
-      alert("Login successful!");
-      // Optionally redirect or update UI here
-    } else {
-      alert("Login failed: No token received.");
+        const token = response.data?.token;
+        if (token) {
+            localStorage.setItem("token", token);
+            alert("Login successful!");
+        } else {
+            alert("Login failed: No token received.");
+        }
+    } catch (error) {
+        alert("Login failed: " + (error.response?.data || error.message));
     }
-  } catch (error) {
-    alert("Login failed: " + (error.response?.data || error.message));
-  }
 };
+
 
 
 const handleRegisterSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    // Validate inputs before sending
-    if (!validUsername || !validEmail || !validPwd || !validMatch) {
-      alert("Please fill all fields correctly.");
-      return;
+    e.preventDefault();
+    try {
+        if (!validUsername || !validEmail || !validPwd || !validMatch) {
+            alert("Please fill all fields correctly.");
+            return;
+        }
+
+        const response = await api.post("api/Auth/register", {
+            email: email,
+            username: username,
+            password: pwd
+        });
+
+        alert("Registration successful: " + (response.data?.message || response.data));
+        toggleForms();
+    } catch (error) {
+        alert("Registration failed: " + (error.response?.data || error.message));
     }
-
-    // Send username, email, and password directly as required by the API
-    const response = await api.post("api/Auth/register", {
-      email,
-      username,
-      password: pwd,
-    });
-
-    alert("Registration successful: " + response.data?.message || response.data);
-    toggleForms();
-  } catch (error) {
-    alert("Registration failed: " + (error.response?.data || error.message));
-  }
 };
+
 
 
 
