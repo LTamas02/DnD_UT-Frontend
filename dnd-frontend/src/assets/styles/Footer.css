@@ -1,0 +1,12 @@
+.footer {
+    background-color: rgb(155, 88, 34);
+    color: #ffffff;
+    border-top: 4px solid #d4af37; /* Gold border for a medieval touch */
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    font-size: 1rem;
+}

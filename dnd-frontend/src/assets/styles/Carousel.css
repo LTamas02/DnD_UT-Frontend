@@ -1,0 +1,27 @@
+.carousel {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.carousel-image {
+  height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.carousel-inner {
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-item {
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+.carousel-item img {
+  width: 100%;
+  display: block;
+}

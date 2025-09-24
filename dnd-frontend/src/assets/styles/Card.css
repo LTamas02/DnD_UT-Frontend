@@ -1,0 +1,44 @@
+/* Fantasy/D&D Themed Card Styling */
+.card {
+    background: linear-gradient(135deg, #3e2723 0%, #212121 100%);
+    border: 3px solid #bfa76f;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(50, 30, 10, 0.5), 0 1.5px 0 #bfa76f inset;
+    color: #f5e6c8;
+    font-family: 'UnifrakturCook', 'Cinzel Decorative', serif;
+    margin: 1rem;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: scale(1.03) rotate(-1deg);
+    box-shadow: 0 12px 36px rgba(50, 30, 10, 0.7);
+    text-decoration: none;
+}
+.card-body {
+    padding: 1.5rem;
+}
+.card-title {
+    font-size: 1.6rem;
+    font-family: 'Cinzel Decorative', serif;
+    letter-spacing: 1px;
+    color: #ffd700;
+    text-shadow: 1px 1px 4px #5d432c;
+}
+.card-subtitle {
+    font-size: 1.1rem;
+    color: #bfa76f !important;
+    font-family: 'Cinzel', serif;
+}
+.card-text {
+    font-size: 1rem;
+    color: #f5e6c8;
+    font-family: 'EB Garamond', serif;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a:hover{
+    text-decoration: none;
+}

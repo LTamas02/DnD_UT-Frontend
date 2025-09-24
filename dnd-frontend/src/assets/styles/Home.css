@@ -1,0 +1,10 @@
+ #home-comp{
+            background-image: url('https://png.pngtree.com/thumb_back/fw800/background/20230519/pngtree-room-in-an-old-tavern-image_2571451.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            background-color: black;
+            color: white;
+            height: 100vh;
+        }
