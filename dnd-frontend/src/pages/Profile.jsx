@@ -1,117 +1,139 @@
-
-import "../assets/styles/Profile.css";
-import 'bootstrap/dist/css/bootstrap.css';
-import '../assets/styles/Login.css';
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
-import Footer from '../components/Footer';
+import "../assets/styles/Profile.css";
+import 'bootstrap/dist/css/bootstrap.css';
+import "../assets/styles/Login.css";
 import "../assets/styles/Footer.css";
-import { Navbar } from '../components/Navbar';
-import { Link } from "react-router-dom";
+
+import Footer from "../components/Footer";
+import { Navbar } from "../components/Navbar";
+import { getUser, getFriends, deleteFriend } from "../Api";
 
 const Profile = () => {
     const navigate = useNavigate();
+    const token = localStorage.getItem("token");
+
     const [user, setUser] = useState(null);
     const [friends, setFriends] = useState([]);
-    const [profilePic, setProfilePic] = useState("./defaults/profile_picture.jpg");
+    const [profilePic, setProfilePic] = useState("/defaults/profile_picture.jpg");
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
-        // API call for user data
-        fetch("https://your-api-url.com/api/user", { credentials: "include" })
-            .then((res) => res.json())
-            .then((data) => {
-                setUser(data);
-                setProfilePic(data.profilePicture || "./defaults/profile_picture.jpg");
-            })
-            .catch((err) => console.error("Error loading user:", err));
+        if (!token) {
+            navigate("/logreg");
+            return;
+        }
 
-        // API call for friends list
-        fetch("https://your-api-url.com/api/friends", { credentials: "include" })
-            .then((res) => res.json())
-            .then((data) => setFriends(data))
-            .catch((err) => console.error("Error loading friends:", err));
-    }, []);
+        // Fetch user data
+        getUser(token)
+            .then(res => {
+                setUser(res.data);
+                setProfilePic(res.data.profilePicture || "/defaults/profile_picture.jpg");
+            })
+            .catch(err => console.error("Error loading user:", err));
+
+        // Fetch friends
+        getFriends(token)
+            .then(res => setFriends(res.data || []))
+            .catch(err => console.error("Error loading friends:", err));
+    }, [token, navigate]);
 
     const logout = () => {
-        fetch("https://your-api-url.com/api/logout", { method: "POST", credentials: "include" })
+        localStorage.removeItem("token");
+        navigate("/logreg");
+    };
+
+    const removeFriend = (friendId) => {
+        if (!window.confirm("Are you sure you want to remove this friend?")) return;
+
+        deleteFriend(token, friendId)
             .then(() => {
-                navigate("/login");
+                setFriends(friends.filter(f => f.id !== friendId));
             })
-            .catch((err) => console.error("Logout error:", err));
+            .catch(err => console.error("Error removing friend:", err));
+    };
+
+    const openModal = () => setModalVisible(true);
+    const closeModal = () => setModalVisible(false);
+
+    const selectImage = (imageName) => {
+        if (!window.confirm("Are you sure you want to select this picture?")) return;
+        setProfilePic(`/defaults/${imageName}`);
+        closeModal();
     };
 
     return (
         <div id="profile-comp">
-        <Navbar/>
-        <div className="container">
-            <div className="profile-box">
-                <img src={profilePic} alt="Profile" className="profile-pic" />
-                <h2 className="username">{user?.username || "Loading..."}</h2>
-                <button className="change-pic-btn" onClick={() => openModal()}>Change Picture</button>
-                <button className="logout-btn" onClick={logout}>Logout</button>
-            </div>
+            <Navbar />
 
-{/* Friends List Sidebar */}
-                <div
-                    className="friendlist-sidebar"
-                >
+            <div className="container">
+                <div className="profile-box">
+                    <img src={profilePic} alt="Profile" className="profile-pic" />
+                    <h2 className="username">{user?.username || "Loading..."}</h2>
+                    <button className="btn btn-outline-primary mt-2" onClick={openModal}>
+                        Change Picture
+                    </button>
+                    <button className="btn btn-outline-danger mt-2 ms-2" onClick={logout}>
+                        Logout
+                    </button>
+                </div>
+
+                {/* Friends List */}
+                <div className="friendlist-sidebar">
                     <h3>Your Allies</h3>
-                    <ul className="friends-list">
-                        {friends.map((friend) => (
+                    <ul className="friends-list list-unstyled">
+                        {friends.map(friend => (
                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
-                                <img src={friend.profile_picture} alt="Friend" className="friend-pic" />
+                                <img
+                                    src={friend.profile_picture || "/defaults/profile_picture.jpg"}
+                                    alt="Friend"
+                                    className="friend-pic rounded-circle"
+                                />
                                 <span className="ms-2 flex-grow-1">{friend.username}</span>
-                                <button className="btn btn-danger btn-sm me-2">Remove</button>
-                                <button className="btn btn-primary btn-sm"
-                                    onClick={() => alert(`Open chat with ${friend.username}`)}>
+                                <button
+                                    className="btn btn-danger btn-sm me-2"
+                                    onClick={() => removeFriend(friend.id)}
+                                >
+                                    Remove
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm"
+                                    onClick={() => alert(`Open chat with ${friend.username}`)}
+                                >
                                     Chat
                                 </button>
                             </li>
                         ))}
                     </ul>
-                </div>        </div>
-        <Footer/>
+                </div>
+            </div>
+
+            <Footer />
+
+            {/* Modal for changing profile picture */}
+            {modalVisible && (
+                <div className="modal d-block">
+                    <div className="modal-content">
+                        <span className="close-btn" onClick={closeModal}>
+                            ×
+                        </span>
+                        <h2>Select a Profile Picture</h2>
+                        <div className="image-options d-flex flex-wrap gap-2">
+                            {["profile1.jpg", "profile2.jpg", "profile3.jpg"].map(img => (
+                                <img
+                                    key={img}
+                                    src={`/defaults/${img}`}
+                                    alt="Default Profile"
+                                    className="selectable-pic"
+                                    onClick={() => selectImage(img)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
 export default Profile;
-const selectImage = (imageName) => {
-    if (window.confirm("Are you sure you want to select this picture?")) {
-        fetch("https://your-api-url.com/api/user/update-profile-picture", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ profile_picture: imageName }),
-            credentials: "include"
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.success) {
-                setProfilePic(`../defaults/${imageName}`);
-                closeModal();
-            } else {
-                alert("Error: " + data.message);
-            }
-        })
-        .catch((err) => console.error("Error updating profile picture:", err));
-    }
-};
-const openModal = () => document.getElementById("pictureModal").style.display = "block";
-const closeModal = () => document.getElementById("pictureModal").style.display = "none";
-<div id="pictureModal" className="modal">
-    <div className="modal-content">
-        <span className="close-btn" onClick={closeModal}>X</span>
-        <h2>Select a Profile Picture</h2>
-        <div className="image-options">
-            {["profile1.jpg", "profile2.jpg", "profile3.jpg"].map((img) => (
-                <img key={img} src={`../defaults/${img}`} alt="Default Profile" onClick={() => selectImage(img)} />
-            ))}
-        </div>
-    </div>
-</div>
-
-const setProfilePic = (newPic) => {
-    // Set the new profile picture
-    setProfilePic(`../defaults/${newPic}`);
-};

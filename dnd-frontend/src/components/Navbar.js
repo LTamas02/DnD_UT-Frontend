@@ -4,7 +4,7 @@ import "../assets/styles/Navbar.css"; // Import your CSS file for styling
 import {href, Link} from "react-router-dom";
 import ppic from "../assets/img/profile_picture.jpg"; // Default profile picture
 
-const Navbar = () => {
+const Navbar = ({username, profilePicture}) => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark">
             <div className="container-fluid">
@@ -58,7 +58,6 @@ const Navbar = () => {
                                 className="profKep"
                                 id="profkep"
                                 src={localStorage.getItem("profilePicture") ?? ppic}
-                                alt="Profile Image"
                                 style={{ width: "30px", height: "30px", borderRadius: "50%" }}
                             />
                             {localStorage.getItem("username") || "Profile"}

@@ -28,7 +28,6 @@ const Home = () => {
     //     }
   return (
     <div id="home-comp" >
-      <Navbar />
       <Carousel />
       <h1>Home Page</h1>
       <h1>Welcome to the Home Page!</h1>

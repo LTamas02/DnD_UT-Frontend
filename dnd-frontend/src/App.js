@@ -1,6 +1,6 @@
 import { Route, Routes, Navigate, BrowserRouter } from "react-router-dom";
 import { useEffect, useState } from "react";
-import api from "./Api"; // ✅ import api
+import { getUser } from "./Api";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import LogReg from "./pages/LogReg";
@@ -14,34 +14,41 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
+  const [loading, setLoading] = useState(true); // <-- Add loading state
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
-      setIsAuthenticated(true);
-      // Optional: load user info from API
-      api
-        .get("/auth/me", { headers: { Authorization: `Bearer ${token}` } })
+      getUser(token)
         .then(res => {
+          setIsAuthenticated(true);
           setUsername(res.data.username || "Guest");
           setProfilePicture(res.data.profilePicture || "/defaults/profile_picture.jpg");
-          localStorage.setItem("username", res.data.username || "Guest");
           localStorage.setItem("profilePicture", res.data.profilePicture || "/defaults/profile_picture.jpg");
+          localStorage.setItem("username", res.data.username || "Guest"); 
+          alert("Welcome back, " + (res.data.username || "Guest") + "!");       
         })
         .catch(() => {
           setIsAuthenticated(false);
           localStorage.removeItem("token");
-        });
+        })
+        .finally(() => setLoading(false)); // <-- Set loading to false after check
+    } else {
+      setLoading(false); // <-- No token, done loading
     }
-  }, []); // runs only once on mount
+  }, []);
+
+  if (loading) return null; // or a loading spinner
 
   return (
     <BrowserRouter>
-      {isAuthenticated && (
-        <Navbar isLoggedIn={isAuthenticated} username={username} profilePicture={profilePicture} />
+      {window.location.pathname !== "/logreg" && (
+        window.location.pathname === "/profile"
+          ? <Navbar username={username} profilePicture={profilePicture} profile />
+          : <Navbar username={username} profilePicture={profilePicture} />
       )}
       <Routes>
-        <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} setProfilePicture={setProfilePicture} />} />
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/logreg" />} />
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
