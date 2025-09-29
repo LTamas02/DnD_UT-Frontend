@@ -10,12 +10,15 @@
     "axios": "^1.8.4",
     "bootstrap": "^5.3.6",
     "js-sha256": "^0.11.1",
-    "jwt-decode": "^4.0.0",
+    "lottie-web": "^5.13.0",
     "md5": "^2.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8",
+    "react-lottie": "^1.2.10",
     "react-router-dom": "^7.4.1",
     "react-scripts": "5.0.1",
+    "tailwindcss": "^4.1.13",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

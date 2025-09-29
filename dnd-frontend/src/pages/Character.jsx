@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import PdfUpload from '../components/PdfUpload';
 
 export default function Character() {
 
@@ -24,6 +25,7 @@ export default function Character() {
 
 
   return (
-    <div>{character.name}</div>
+    
+    <PdfUpload onUpload={(file) => console.log(file)} />
   )
 }
