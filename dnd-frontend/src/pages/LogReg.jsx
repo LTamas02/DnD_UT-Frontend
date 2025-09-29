@@ -5,18 +5,22 @@ import { sha256 } from 'js-sha256';
 import md5 from "md5";
 import axios from 'axios';
 import api from '../Api';
+import { register, login } from '../Api';
 import Footer from '../components/Footer';
 import { NavbarLogin } from '../components/Navbar';
+import { useNavigate } from 'react-router-dom';
+
 
 const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-const Login = () => {
+
+const Login = ( setUsername, setProfilePicture ) => {
 
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [username, setUsername] = useState('');
+  const [username, setUsernameState] = useState('');
   const [validUsername, setValidUsername] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
 
@@ -82,47 +86,49 @@ function hashPassword(password, salt) {
 }
 
 
-const handleLoginSubmit = async (e) => {
+const navigate = useNavigate()
+const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await api.post("api/Auth/login", {
-            email: email,
-            password: password
-        });
-
+        const response = await login(email, password);
         const token = response.data?.token;
+        const user = response.data?.user;
+
         if (token) {
-            localStorage.setItem("token", token);
-            alert("Login successful!");
-        } else {
-            alert("Login failed: No token received.");
-        }
-    } catch (error) {
-        alert("Login failed: " + (error.response?.data || error.message));
+    localStorage.setItem("token", token);
+    if (user) {
+        localStorage.setItem("username", user.username || "");
+        localStorage.setItem("profilePicture", user.profilePicture || "/defaults/profile_picture.jpg");
     }
-};
+    setIsAuthenticated(true); // ✅ Set authentication state
+    navigate("/");
+} else {
+    alert("Login failed: No token received.");
+}
+
+    } catch (error) {
+        setErrorMessage("Login failed: " + (error.response?.data || error.message));
+    }
+  };
+
 
 
 
 const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        if (!validUsername || !validEmail || !validPwd || !validMatch) {
-            alert("Please fill all fields correctly.");
-            return;
-        }
-
-        const response = await api.post("api/Auth/register", {
-            email: email,
-            username: username,
-            password: pwd
-        });
-
-        alert("Registration successful: " + (response.data?.message || response.data));
-        toggleForms();
-    } catch (error) {
-        alert("Registration failed: " + (error.response?.data || error.message));
+  e.preventDefault();
+  try {
+    if (!validUsername || !validEmail || !validPwd || !validMatch) {
+      alert("Please fill all fields correctly.");
+      return;
     }
+    const response = await register(email, username, pwd);
+    
+    toggleForms();
+  } catch (error) {
+    alert("Registration failed: " + (error.response?.data || error.message));
+  }
 };
 
 
