@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate, BrowserRouter } from "react-router-dom";
+import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getUser } from "./Api";
 import Home from "./pages/Home";
@@ -7,7 +7,7 @@ import LogReg from "./pages/LogReg";
 import Characters from "./pages/Characters";
 import Dmtools from "./pages/Dmtools";
 import Wiki from "./pages/Wiki";
-import { Navbar } from "./components/Navbar";
+import { Navbar, NavbarLogin, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
 
 function App() {
@@ -42,11 +42,36 @@ function App() {
 
   return (
     <BrowserRouter>
-      {window.location.pathname !== "/logreg" && (
-        window.location.pathname === "/profile"
-          ? <Navbar username={username} profilePicture={profilePicture} profile />
-          : <Navbar username={username} profilePicture={profilePicture} />
-      )}
+      <AppWithRouter
+        isAuthenticated={isAuthenticated}
+        username={username}
+        profilePicture={profilePicture}
+        setIsAuthenticated={setIsAuthenticated}
+        setUsername={setUsername}
+        setProfilePicture={setProfilePicture}
+      />
+    </BrowserRouter>
+  );
+}
+
+function AppWithRouter({
+  isAuthenticated,
+  username,
+  profilePicture,
+  setIsAuthenticated,
+  setUsername,
+  setProfilePicture
+}) {
+  const location = useLocation();
+
+  return (
+    <>
+{location.pathname === "/profile" ? (
+  <NavbarProfile username={username} profilePicture={profilePicture} />
+) : location.pathname !== "/logreg" ? ( // only render navbars if NOT logreg
+  <Navbar username={username} profilePicture={profilePicture} />
+) : null}
+
       <Routes>
         <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} setProfilePicture={setProfilePicture} />} />
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
@@ -56,7 +81,7 @@ function App() {
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
         <Route path="/character/:id" element={<Character />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 

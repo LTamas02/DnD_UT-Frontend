@@ -100,4 +100,14 @@ export const inviteMultipleFriends = (token, userIds) =>
         params: { userIds: userIds.join(",") }
     });
 
+
+    
+// Chat endpoints
+export const getMessages = (roomId) =>
+    api.get("/chat/messages", { params: { channelId: roomId } });
+
+export const sendMessage = (roomId, content) =>
+    api.post("/chat/send", content, { params: { roomId } });
+
+
 export default api;

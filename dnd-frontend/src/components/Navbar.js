@@ -69,7 +69,59 @@ const Navbar = ({username, profilePicture}) => {
     );
 };
 
+const NavbarProfile = ({username, profilePicture}) => {
+    return (
+        <nav className="navbar navbar-expand-lg navbar-dark">
+            <div className="container-fluid">
+                <Link
+                    to="/"
+                    className="navbar-brand"
+                    style={{
+                        color: "rgb(255, 0, 0)",
+                        backgroundColor: "black",
+                        padding: "10px 20px",
+                        borderRadius: "25px",
+                        fontFamily: "'Cinzel', serif",
+                        fontWeight: "bold"
+                    }}
+                >
+                    D&D Ultimate Tool
+                </Link>
 
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li className="nav-item">
+                            <Link to="/characters" className="nav-link active">
+                                Characters
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/wiki" className="nav-link active">
+                                Wiki
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/dmtools" className="nav-link active">
+                                DM Tools
+                            </Link>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    );
+};
 
 const NavbarLogin= () => {
     return (
@@ -92,5 +144,5 @@ const NavbarLogin= () => {
     );
 };
 
-export {Navbar, NavbarLogin};
+export {Navbar, NavbarLogin, NavbarProfile};
 

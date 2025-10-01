@@ -10,21 +10,23 @@ import Footer from '../components/Footer';
 import { NavbarLogin } from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
 
-
 const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-
-const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
-
+const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [username, setUsernameState] = useState('');
+  // Login form states
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Register form states
+  const [registerUsername, setRegisterUsername] = useState(''); // 🔹 renamed
   const [validUsername, setValidUsername] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
 
-  const [email, setEmail] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
   const [validEmail, setValidEmail] = useState(false);
 
   const [pwd, setPwd] = useState('');
@@ -34,10 +36,11 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
   const [matchPwd, setMatchPwd] = useState('');
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
-  const [password, setPassword] = useState('');
 
   const userRef = useRef();
   const errRef = useRef();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (userRef.current) {
@@ -46,47 +49,32 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
   }, []);
 
   useEffect(() => {
-    const result = usernameRegex.test(username);
-    setValidUsername(result);
-  }, [username]);
+    setValidUsername(usernameRegex.test(registerUsername));
+  }, [registerUsername]);
 
   useEffect(() => {
-    const result = emailRegex.test(email);
-    setValidEmail(result);
-  }, [email]);
+    setValidEmail(emailRegex.test(registerEmail));
+  }, [registerEmail]);
 
   useEffect(() => {
-    const result = passwordRegex.test(pwd);
-    setValidPwd(result);
-    const match = pwd === matchPwd;
-    setValidMatch(match);
+    setValidPwd(passwordRegex.test(pwd));
+    setValidMatch(pwd === matchPwd);
   }, [pwd, matchPwd]);
 
   useEffect(() => {
     setErrorMessage('');
-  }, [username, email, pwd, matchPwd, password]);
+  }, [registerUsername, registerEmail, pwd, matchPwd, password]);
 
-  useEffect(() => {
-    setErrorMessage('');
-  }, [username, email, password]);
-
-
-  // generate salt
   function generateSalt() {
     const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
     return Array.from(array, byte => ('0' + byte.toString(32)).slice(-2)).join('');
   }
 
-
-  // sha-256 hash function for password
   function hashPassword(password, salt) {
     const hash = sha256(password);
     return md5(hash + salt);
   }
-
-
-  const navigate = useNavigate()
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -94,21 +82,20 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
       const response = await login(email, password);
 
       const token = response.data?.token;
-      const user = response.data?.user ? response.data.user : null;
+      const user = response.data?.user ?? null;
 
       if (token) {
         localStorage.setItem("token", token);
-        
+
         if (user) {
           localStorage.setItem("username", user.username || "");
           localStorage.setItem("profilePicture", user.profilePicture || "/defaults/profile_picture.jpg");
         }
-        setIsAuthenticated(true); // ✅ Set authentication state
+        setIsAuthenticated(true);
         navigate("/");
       } else {
         alert("Login failed: No token received.");
       }
-
     } catch (error) {
       let errorMsg = error.response?.data;
       if (typeof errorMsg === "object") {
@@ -118,9 +105,6 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
     }
   };
 
-
-
-
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -128,16 +112,14 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
         alert("Please fill all fields correctly.");
         return;
       }
-      const response = await register(email, username, pwd);
+      const response = await register(registerEmail, registerUsername, pwd);
 
+      setUsername(registerUsername); // pass username to parent
       toggleForms();
     } catch (error) {
       alert("Registration failed: " + (error.response?.data || error.message));
     }
   };
-
-
-
 
   const toggleForms = () => {
     const signInForm = document.getElementById('signIn');
@@ -151,9 +133,6 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
     }
   };
 
-
-
-  //body -> login and register forms
   return (
     <div id="login-comp">
       <NavbarLogin />
@@ -161,6 +140,7 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
       <p ref={errRef} className={errorMessage ? 'errmsg' : "offscreen"} aria-live="assertive">{errorMessage}</p>
 
       <div className="container my-5" id="authForm">
+        {/* Sign In Form */}
         <div id="signIn" style={{ display: 'block' }}>
           <h1 className="form-title mb-4" id="formTitle">Sign In</h1>
           <form method="post" onSubmit={handleLoginSubmit} id="signInForm">
@@ -195,9 +175,7 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
               <a href="#">Recover Password</a>
             </p>
             <input type="submit" className="btn btn-success w-100" value="Sign In" name="signIn" />
-            <p className="or">
-              ---------or---------
-            </p>
+            <p className="or">---------or---------</p>
             <div className="links text-center">
               <p>Don't have an account yet?</p>
               <button type="button" className="btn valtas" onClick={toggleForms}>Register</button>
@@ -205,6 +183,8 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
             <p className="mt-5 mb-3 text-center">© 2024–2026</p>
           </form>
         </div>
+
+        {/* Sign Up Form */}
         <div id="signUp" style={{ display: 'none' }}>
           <h1 className="form-title mb-4" id="formTitle">Sign Up</h1>
           <form method="post" id="signUpForm" onSubmit={handleRegisterSubmit}>
@@ -218,8 +198,8 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
                 placeholder="Username"
                 required
                 autoComplete="off"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
+                value={registerUsername} // 🔹 fixed
+                onChange={e => setRegisterUsername(e.target.value)} // 🔹 fixed
                 onFocus={() => setUserFocus(true)}
                 onBlur={() => setUserFocus(false)}
               />
@@ -233,8 +213,8 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
                 id="registerEmail"
                 placeholder="Email"
                 required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={registerEmail}
+                onChange={e => setRegisterEmail(e.target.value)}
                 aria-invalid={validEmail ? "false" : "true"}
               />
             </div>
@@ -285,20 +265,19 @@ const Login = ({setUsername, setProfilePicture, setIsAuthenticated}) => {
               name="signUp"
               disabled={!validUsername || !validPwd || !validMatch}
             />
-            <p className="or">
-              ----------or--------
-            </p>
+            <p className="or">----------or--------</p>
             <div className="links text-center">
               <p>Already have an account?</p>
-              <button type="button" className="btn valtas" onClick={toggleForms}>Log In</button>
+              <button type="button" className="btn valtas" onClick={toggleForms}>Login</button>
             </div>
             <p className="mt-5 mb-3 text-center">© 2024–2026</p>
           </form>
         </div>
       </div>
+
       <Footer />
     </div>
   );
-}
+};
 
 export default Login;
