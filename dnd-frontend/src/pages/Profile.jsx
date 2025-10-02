@@ -5,6 +5,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "../assets/styles/Login.css";
 import "../assets/styles/Footer.css";
 import ChatPopup from "../components/ChatPopUp";
+import { href, Link } from "react-router-dom";
+
 
 import Footer from "../components/Footer";
 import { Navbar } from "../components/Navbar";
@@ -139,7 +141,7 @@ const Profile = () => {
                                     Logout
                                 </button>
 
-                                
+
                             </div>
                         </div>
                     </div>
@@ -148,31 +150,34 @@ const Profile = () => {
                 <div className="row mt-5">
                     <div className="col-12">
                         <div className="allies-section">
-                            
-                            <h3 className="mb-3">Your Allies</h3>
-                            
 
-                            
+                            <h3 className="mb-3">Your Allies</h3>
+
+
+
                             {friends.length === 0 ? (
                                 <>
                                     <p>You have no allies yet.</p>
                                     <button className="btn btn-primary" onClick={openFriendSearch}>
                                         Add Friend
                                     </button>
-                                    
+
                                 </>
-                                
+
                             ) : (
                                 <>
                                     <button className="btn btn-primary mb-3" onClick={openFriendSearch}>
                                         Add Friend
                                     </button>
                                     <button className=" mb-3 btn btn-outline-secondary position-relative" onClick={toggleFriendRequestsModal}>
-                                    🔔
-                                    {friendRequests.length > 0 && (
-                                        <span className="friend-request-badge">{friendRequests.length}</span>
-                                    )}
-                                </button>
+                                        🔔
+                                        {friendRequests.length > 0 && (
+                                            <span className="friend-request-badge">{friendRequests.length}</span>
+                                        )}
+                                    </button>
+                                    <Link to="/friends" className=" btn btn-primary mb-3">
+                                        Friends Page
+                                    </Link>
                                     <ul className="friends-list list-unstyled">
                                         {friends.map(friend => (
                                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
@@ -184,7 +189,7 @@ const Profile = () => {
                                                 <span className="ms-2 flex-grow-1">{friend.username}</span>
                                                 <button
                                                     className="btn btn-danger btn-sm me-2"
-                                                    onClick={() => removeFriend(friend.id)}
+                                                    onClick={() => deleteFriend(friend.id)}
                                                 >
                                                     Remove
                                                 </button>

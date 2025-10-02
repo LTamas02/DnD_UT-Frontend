@@ -51,6 +51,11 @@ const Navbar = ({username, profilePicture}) => {
                                 DM Tools
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link to="/community" className="nav-link active">
+                                Community
+                            </Link>
+                        </li>
                     </ul>
                     <form className="d-flex">
                         <Link to="/profile" className="btn btn-outline-warning me-2">

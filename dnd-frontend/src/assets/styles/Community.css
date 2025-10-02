@@ -1,0 +1,136 @@
+body {
+    font-family: "Cinzel", serif;
+    background-color: #f5deb3; /* parchment tone */
+    margin: 0;
+}
+
+.community-page {
+    padding: 20px;
+}
+
+.guild-header {
+    background: linear-gradient(90deg, #5c4033, #d4af37);
+    color: #fff8dc;
+    text-align: center;
+    padding: 20px;
+    border-bottom: 5px solid #d4af37;
+    font-size: 2.5rem;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.community-form {
+    background-color: #5c4033;
+    color: #fff8dc;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.community-form h2 {
+    margin-bottom: 15px;
+}
+
+.community-form input,
+.community-form textarea {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 2px solid #d4af37;
+    border-radius: 5px;
+    background: #f5deb3;
+    color: #5c4033;
+    font-family: "Cinzel", serif;
+}
+
+.community-form label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.btn-gold {
+    background-color: #d4af37;
+    color: #5c4033;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.btn-gold:hover {
+    background-color: #ffd700;
+}
+
+.btn-red {
+    background-color: #8b0000;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-red:hover {
+    background-color: #ff0000;
+}
+
+.community-list {
+    margin-top: 30px;
+}
+
+.community-list h2 {
+    color: #5c4033;
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.community-list table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff8dc;
+    border: 2px solid #d4af37;
+}
+
+.community-list th,
+.community-list td {
+    border: 1px solid #d4af37;
+    padding: 10px;
+    text-align: center;
+}
+
+.community-list th {
+    background-color: #d4af37;
+    color: #5c4033;
+    font-weight: bold;
+}
+
+.community-list tr:hover {
+    background-color: #f5deb3;
+}
+
+
+.guild-header {
+    padding: 40px 20px;
+    text-align: center;
+    border-bottom: 5px solid #d4af37;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.guild-header h1 {
+    font-family: "Cinzel Decorative", serif;
+    font-size: 3rem;
+    color: #ffd700;
+    text-shadow: 2px 2px 6px #000;
+}
+
+.guild-header p {
+    font-family: "MedievalSharp", cursive;
+    font-size: 1.3rem;
+    color: #fbeec1;
+    text-shadow: 1px 1px 3px #000;
+}

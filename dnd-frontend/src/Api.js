@@ -7,6 +7,11 @@ const api = axios.create({
     }
 });
 
+
+
+
+
+
 // Auth endpoints
 export const register = (email, username, password) =>
     api.post("/auth/register", null, {
@@ -26,6 +31,13 @@ export const getUser = async (token) =>
             "Accept": "/"
         }
     });
+
+
+
+
+
+
+
 
 // Friends endpoints
 
@@ -102,6 +114,11 @@ export const inviteMultipleFriends = (token, userIds) =>
 
 
     
+
+
+
+
+
 // Chat endpoints
 export const getMessages = (roomId) =>
     api.get("/chat/messages", { params: { channelId: roomId } });
@@ -111,3 +128,82 @@ export const sendMessage = (roomId, content) =>
 
 
 export default api;
+
+
+
+
+
+
+
+
+// PDF endpoints
+
+// Upload PDF file
+export const uploadPdf = (file, token) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return api.post("/pdf/upload", formData, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+        }
+    });
+};
+
+// Get PDF by ID
+export const getPdf = (id, token) => {
+    return api.get(`/pdf/${id}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        responseType: "blob" // important for file downloads
+    });
+};
+
+// Get list of PDFs (characters)
+export const getPdfList = (token) => {
+    return api.get("/pdf/list", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    });
+};
+
+
+
+
+
+
+// Community endpoints
+
+export const getCommunities = (token) =>
+    api.get("/community", {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const getCommunity = (id, token) =>
+    api.get(`/community/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const createCommunity = (data, token) =>
+    api.post("/community", data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+export const updateCommunity = (id, data, token) =>
+    api.put(`/community/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+export const deleteCommunity = (id, token) =>
+    api.delete(`/community/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });

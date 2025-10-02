@@ -7,8 +7,10 @@ import LogReg from "./pages/LogReg";
 import Characters from "./pages/Characters";
 import Dmtools from "./pages/Dmtools";
 import Wiki from "./pages/Wiki";
+import Friends from "./pages/Friends";
 import { Navbar, NavbarLogin, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
+import Community from "./pages/Community";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -25,8 +27,7 @@ function App() {
           setUsername(res.data.username || "Guest");
           setProfilePicture(res.data.profilePicture || "/defaults/profile_picture.jpg");
           localStorage.setItem("profilePicture", res.data.profilePicture || "/defaults/profile_picture.jpg");
-          localStorage.setItem("username", res.data.username || "Guest"); 
-          alert("Welcome back, " + (res.data.username || "Guest") + "!");       
+          localStorage.setItem("username", res.data.username || "Guest");       
         })
         .catch(() => {
           setIsAuthenticated(false);
@@ -76,10 +77,12 @@ function AppWithRouter({
         <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} setProfilePicture={setProfilePicture} />} />
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/logreg" />} />
+        <Route path="/friends" element={isAuthenticated ? <Friends /> : <Navigate to="/logreg" />} />
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
         <Route path="/character/:id" element={<Character />} />
+        <Route path="/community" element={isAuthenticated ? <Community /> : <Navigate to="/logreg" />} />
       </Routes>
     </>
   );
