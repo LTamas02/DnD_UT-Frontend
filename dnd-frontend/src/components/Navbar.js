@@ -120,6 +120,11 @@ const NavbarProfile = ({username, profilePicture}) => {
                             <Link to="/dmtools" className="nav-link active">
                                 DM Tools
                             </Link>
+                        </li>                        
+                        <li className="nav-item">
+                            <Link to="/community" className="nav-link active">
+                                Community
+                            </Link>
                         </li>
                     </ul>
                 </div>

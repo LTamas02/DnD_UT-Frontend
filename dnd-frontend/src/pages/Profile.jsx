@@ -161,6 +161,12 @@ const Profile = () => {
                                     <button className="btn btn-primary" onClick={openFriendSearch}>
                                         Add Friend
                                     </button>
+                                    <button className="  btn btn-outline-secondary position-relative" onClick={toggleFriendRequestsModal}>
+                                        🔔
+                                        {friendRequests.length > 0 && (
+                                            <span className="friend-request-badge">{friendRequests.length}</span>
+                                        )}
+                                    </button>
 
                                 </>
 
