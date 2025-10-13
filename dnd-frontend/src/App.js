@@ -11,6 +11,10 @@ import Friends from "./pages/Friends";
 import { Navbar, NavbarLogin, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
 import Community from "./pages/Community";
+import Spells from "./pages/wikiPages/Spells";
+import Spell from "./pages/wikiPages/Spell";
+import Classes from "./pages/wikiPages/Classes";
+import Class from "./pages/wikiPages/Class";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -83,6 +87,14 @@ function AppWithRouter({
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
         <Route path="/character/:id" element={<Character />} />
         <Route path="/community" element={isAuthenticated ? <Community /> : <Navigate to="/logreg" />} />
+
+        <Route  path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />
+        <Route path="/spell/:index" element={ isAuthenticated ? <Spell /> : <Navigate to="/logreg" />} />
+
+        <Route  path="/wiki/classes" element={isAuthenticated ? <Classes /> : <Navigate to="/logreg" />} />
+        <Route path="/class/:index" element={ isAuthenticated ? <Class /> : <Navigate to="/logreg" />} />
+
+
       </Routes>
     </>
   );

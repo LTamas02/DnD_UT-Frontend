@@ -207,3 +207,81 @@ export const deleteCommunity = (id, token) =>
     api.delete(`/community/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
     });
+
+
+
+
+
+
+// =========================
+// === Spells endpoints
+// =========================
+
+// Get all spells
+export const getAllSpells = () =>
+    api.get("/spells");
+
+// Get spell by index
+export const getSpellByIndex = (index) =>
+    api.get(`/spells/${index}`);
+
+// Get spells by level
+export const getSpellsByLevel = (level) =>
+    api.get(`/spells/level/${level}`);
+
+// Get spells by school
+export const getSpellsBySchool = (schoolIndex) =>
+    api.get(`/spells/school/${schoolIndex}`);
+
+// Get spells by class
+export const getSpellsByClass = (classIndex) =>
+    api.get(`/spells/classes/${classIndex}`);
+
+// Get spells by subclass
+export const getSpellsBySubclass = (subclassIndex) =>
+    api.get(`/spells/subclasses/${subclassIndex}`);
+
+// Get ritual spells
+export const getRitualSpells = () =>
+    api.get("/spells/ritual");
+
+// Get concentration spells
+export const getConcentrationSpells = () =>
+    api.get("/spells/concentration");
+
+// Search spells by name
+export const searchSpellsByName = (name) =>
+    api.get("/spells/search", { params: { name } });
+
+
+
+
+
+
+
+
+// =========================
+// === Classes endpoints
+// =========================
+
+
+// ===== Classes Endpoints =====
+export const getAllClasses = async () => {
+    try {
+        const res = await api.get("/classes");
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch classes:", err);
+        return [];
+    }
+};
+
+export const getClassByIndex = async (index) => {
+    try {
+        const res = await api.get(`/classes/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch class ${index}:`, err);
+        return null;
+    }
+};

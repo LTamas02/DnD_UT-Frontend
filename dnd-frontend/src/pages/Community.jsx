@@ -13,8 +13,6 @@ const CommunityPage = ({ token }) => {
     const [communities, setCommunities] = useState([]);
     const [user, setUser] = useState(null);
 
-    const fixedCommunityCode = "GUILD2025";
-
     // Load logged-in user
     useEffect(() => {
         const fetchUser = async () => {
@@ -79,11 +77,6 @@ const CommunityPage = ({ token }) => {
 
             <section className="community-form">
                 <h2>Create a Guild</h2>
-                <label>
-                    Guild Code:
-                    <input type="text" value={fixedCommunityCode} disabled />
-                </label>
-
                 <label>
                     Guild Name:
                     <input
