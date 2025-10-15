@@ -260,6 +260,7 @@ export const searchSpellsByName = (name) =>
 
 
 
+
 // =========================
 // === Classes endpoints
 // =========================
@@ -283,5 +284,184 @@ export const getClassByIndex = async (index) => {
     } catch (err) {
         console.error(`Failed to fetch class ${index}:`, err);
         return null;
+    }
+};
+
+
+
+
+
+
+
+
+
+// =========================
+// === Races Endpoints
+// =========================
+
+// Get all races
+export const getAllRaces = async () => {
+    try {
+        const res = await api.get("/races");
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch races:", err);
+        return [];
+    }
+};
+
+// Get race by index
+export const getRaceByIndex = async (index) => {
+    try {
+        const res = await api.get(`/races/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch race ${index}:`, err);
+        return null;
+    }
+};
+
+// Get race traits
+export const getRaceTraits = async (index) => {
+    try {
+        const res = await api.get(`/races/${index}/traits`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch traits for race ${index}:`, err);
+        return [];
+    }
+};
+
+// Get race subraces
+export const getRaceSubraces = async (index) => {
+    try {
+        const res = await api.get(`/races/${index}/subraces`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch subraces for race ${index}:`, err);
+        return [];
+    }
+};
+
+// Get race languages
+export const getRaceLanguages = async (index) => {
+    try {
+        const res = await api.get(`/races/${index}/languages`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch languages for race ${index}:`, err);
+        return [];
+    }
+};
+
+// Get race ability bonuses
+export const getRaceAbilityBonuses = async (index) => {
+    try {
+        const res = await api.get(`/races/${index}/ability-bonuses`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch ability bonuses for race ${index}:`, err);
+        return [];
+    }
+};
+
+// Search races by name
+export const searchRacesByName = async (name) => {
+    try {
+        const res = await api.get("/races/search", { params: { name } });
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to search races with name "${name}":`, err);
+        return [];
+    }
+};
+
+// Get all race sizes
+export const getRaceSizes = async () => {
+    try {
+        const res = await api.get("/races/sizes");
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch race sizes:", err);
+        return [];
+    }
+};
+
+// Get races by minimum speed
+export const getRacesByMinSpeed = async (minSpeed) => {
+    try {
+        const res = await api.get(`/races/speed/${minSpeed}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch races with speed >= ${minSpeed}:`, err);
+        return [];
+    }
+};
+
+
+
+
+
+
+
+
+
+// =========================
+// === Monsters Endpoints
+// =========================
+
+// Get all monsters
+export const getAllMonsters = async () => {
+    try {
+        const res = await api.get("/monsters");
+        console.log("getAllMonsters response:", res.data); // Debug
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch monsters:", err);
+        return [];
+    }
+};
+
+// Get monster by index
+export const getMonsterByIndex = async (index) => {
+    try {
+        const res = await api.get(`/monsters/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch monster ${index}:`, err);
+        return null;
+    }
+};
+
+// Get monsters by size
+export const getMonstersBySize = async (size) => {
+    try {
+        const res = await api.get(`/monsters/size/${size}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch monsters of size ${size}:`, err);
+        return [];
+    }
+};
+
+// Get monsters by type
+export const getMonstersByType = async (type) => {
+    try {
+        const res = await api.get(`/monsters/type/${type}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch monsters of type ${type}:`, err);
+        return [];
+    }
+};
+
+// Optional: Search monsters by name
+export const searchMonstersByName = async (name) => {
+    try {
+        const res = await api.get("/monsters/search", { params: { name } });
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to search monsters with name "${name}":`, err);
+        return [];
     }
 };

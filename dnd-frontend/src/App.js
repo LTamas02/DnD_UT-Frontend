@@ -15,6 +15,10 @@ import Spells from "./pages/wikiPages/Spells";
 import Spell from "./pages/wikiPages/Spell";
 import Classes from "./pages/wikiPages/Classes";
 import Class from "./pages/wikiPages/Class";
+import Races from './pages/wikiPages/Races'
+import Race from "./pages/wikiPages/Race";
+import Monsters from './pages/wikiPages/Monsters'
+import Monster from "./pages/wikiPages/Monster";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -94,6 +98,11 @@ function AppWithRouter({
         <Route  path="/wiki/classes" element={isAuthenticated ? <Classes /> : <Navigate to="/logreg" />} />
         <Route path="/class/:index" element={ isAuthenticated ? <Class /> : <Navigate to="/logreg" />} />
 
+        <Route  path="/wiki/races" element={isAuthenticated ? <Races /> : <Navigate to="/logreg" />} />
+        <Route path="/race/:index" element={ isAuthenticated ? <Race /> : <Navigate to="/logreg" />} />
+
+        <Route  path="/wiki/monsters" element={isAuthenticated ? <Monsters /> : <Navigate to="/logreg" />} />
+        <Route path="/monster/:index" element={ isAuthenticated ? <Monster /> : <Navigate to="/logreg" />} />
 
       </Routes>
     </>

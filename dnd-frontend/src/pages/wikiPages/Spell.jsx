@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from "react-router-dom";
 import { getSpellByIndex } from '../../Api';
 import '../../assets/styles/Spells.css';
 
 const Spell = () => {
   const { index } = useParams(); // Get spell ID from URL
+  const navigate = useNavigate();
   const [spell, setSpell] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -33,8 +34,12 @@ const Spell = () => {
   if (!spell) return null;
 
   return (
-    <div id="spell-detail" className="page-content">
+    <div id="spell-detail" className="page-content">      
+        
       <div className="spell-details">
+        <button className="back-button" onClick={() => navigate("/wiki/spells")}>
+          ← Back to spells
+        </button>
       <h1>{spell.name}</h1>
       <p><strong>School:</strong> {spell.school?.name}</p>
       <p><strong>Level:</strong> {spell.level}</p>

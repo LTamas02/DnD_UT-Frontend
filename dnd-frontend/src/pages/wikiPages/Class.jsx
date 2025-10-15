@@ -1,71 +1,90 @@
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { getClassByIndex } from "../../Api";
-import "../../assets/styles/Classes.css";
+import "../../assets/styles/Class.css";
 
-export default function Class() {
+const Class = () => {
   const { index } = useParams();
   const navigate = useNavigate();
-  const [cls, setCls] = useState(null);
+
+  const [classData, setClassData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchClass = async () => {
-      try {
-        const data = await getClassByIndex(index);
-        setCls(data);
-      } catch {
-        setError("Hiba történt a kaszt betöltése során.");
-      } finally {
-        setLoading(false);
-      }
+    const fetchData = async () => {
+      setLoading(true);
+      const data = await getClassByIndex(index);
+      setClassData(data);
+      setLoading(false);
     };
-    fetchClass();
+    fetchData();
   }, [index]);
 
-  if (loading) return <div className="page-content"><div className="loading">Loading...</div></div>;
-  if (error) return <div className="page-content"><div className="error">{error}</div></div>;
+  if (loading) return <div className="loading">Loading class details...</div>;
+  if (!classData) return <div className="error">Class not found.</div>;
+
+  const getPrimaryAbility = (data) =>
+    data.saving_throws?.length
+      ? data.saving_throws.map((st) => st.name).join(", ")
+      : "Strength and Constitution";
+
+  const getProficiencyChoices = (data) =>
+    data.proficiency_choices?.length
+      ? data.proficiency_choices[0].desc
+      : "No choices available";
 
   return (
-    <div id="class-details" className="page-content">
-        <div className="class-detail">
-      <header>
-        <h1>{cls.name}</h1>
-        <p className="subtitle">{cls.description}</p>
-      </header>
+    <div id="class-page">
+      <button className="back-button" onClick={() => navigate("/wiki/classes")}>
+        ← Back to Classes
+      </button>
 
-      <div className="class-detail active">
-        <div className="class-header">
-          <h2 className="class-title">{cls.name}</h2>
-        </div>
+      <main>
+        <div className="class-detail-card">
+          <div className="class-header">
+            <h2>{classData.name}</h2>
+            <p>The {classData.name} is a powerful class with a hit die of d{classData.hit_die}.</p>
+          </div>
 
-        <div className="class-content">
           <div className="class-info">
-            <h3>Általános Információ</h3>
-            <p><strong>Életkocka:</strong> {cls.hitDie}</p>
-            <p><strong>Elsődleges Tulajdonság:</strong> {cls.primaryAbility}</p>
-            <p><strong>Mentődobások:</strong> {cls.savingThrows?.join(", ")}</p>
-            <p><strong>Fegyver Ismeret:</strong> {cls.weaponProficiencies}</p>
-            <p><strong>Páncél Ismeret:</strong> {cls.armorProficiencies}</p>
-          </div>
+            <h3>General Information</h3>
+            <div className="info-grid">
+              <div className="info-item">
+                <span className="info-label">Hit Die</span>
+                <p>d{classData.hit_die}</p>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Primary Ability</span>
+                <p>{getPrimaryAbility(classData)}</p>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Saving Throws</span>
+                <p>{(classData.saving_throws || []).map(st => st.name).join(", ") || "-"}</p>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Proficiencies</span>
+                <p>{getProficiencyChoices(classData)}</p>
+              </div>
+            </div>
 
-          <div className="class-abilities">
-            <h3>Képességek</h3>
-            {cls.features?.length > 0 ? (
-              <ul className="ability-list">
-                {cls.features.map(f => (
-                  <li key={f.name}>
-                    <strong>{f.name}</strong> {f.level ? `(${f.level}. szint)` : ""} <br />
-                    {f.description ? <small>{f.description.substring(0, 100)}...</small> : null}
-                  </li>
-                ))}
+            <div className="info-item">
+              <span className="info-label">Weapon Proficiencies</span>
+              <ul>
+                {(classData.proficiencies || []).filter(p => p.name.includes("Weapon")).map((p,i) => <li key={i}>{p.name}</li>)}
               </ul>
-            ) : <p>Nincsenek elérhető képességek.</p>}
+            </div>
+
+            <div className="info-item">
+              <span className="info-label">Armor Proficiencies</span>
+              <ul>
+                {(classData.proficiencies || []).filter(p => p.name.includes("Armor") || p.name.includes("Shield")).map((p,i) => <li key={i}>{p.name}</li>)}
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-      </div>
+      </main>
     </div>
   );
-}
+};
+
+export default Class;

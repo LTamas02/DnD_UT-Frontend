@@ -1,0 +1,185 @@
+#races-comp {
+    background-image: url('../img/BG/WikiBG.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    padding: 30px 0;
+    margin-bottom: 30px;
+}
+
+header .subtitle {
+    color: #b8a57c; /* muted parchment */
+    font-size: 1.2rem;
+}
+
+.search-section {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-section input,
+.search-section button {
+    padding: 10px 15px;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+}
+
+.search-section input {
+    flex-grow: 1;
+    max-width: 400px;
+    background-color: #3e2e1a; /* secondary-dark */
+    color: #f4e4bc; /* parchment text */
+}
+
+.search-section button {
+    background-color: #5a432a; /* accent */
+    color: #f4e4bc; /* parchment text */
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-section button:hover {
+    background-color: #d4af37; /* gold highlight */
+    color: #1a1a2e; /* primary-dark text */
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.filters select,
+.filters button {
+    padding: 10px 15px;
+    border-radius: 4px;
+    border: none;
+    background-color: #3e2e1a; /* secondary-dark */
+    color: #f4e4bc; /* text-light */
+    cursor: pointer;
+}
+
+.filters button:hover {
+    background-color: #d4af37; /* gold highlight */
+    color: #1a1a2e;
+}
+
+.races-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.race-card {
+    background-color: #3e3225; /* dark parchment */
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #cd7f32; /* bronze */
+    transition: all 0.3s ease;
+}
+
+.race-card:hover {
+    background-color: #4b3b2d; /* slightly lighter */
+    transform: translateY(-5px);
+    border-color: #d4af37; /* gold highlight */
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); /* soft gold glow */
+}
+
+.race-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    text-align: center;
+}
+
+.race-name {
+    font-size: 1.5rem;
+    color: #d4af37; /* gold highlight */
+}
+
+.race-size {
+    color: #b8a57c; /* muted parchment */
+    font-size: 0.9rem;
+}
+
+.race-details {
+    padding: 15px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.detail-label {
+    color: #b8a57c; /* muted parchment */
+    font-weight: bold;
+}
+
+.detail-value {
+    font-weight: bold;
+    color: #f4e4bc; /* text-light */
+}
+
+.abilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.ability-bonus {
+    background: linear-gradient(to bottom, #5a432a, #3e2e1a); /* accent to secondary-dark */
+    padding: 4px 8px;
+    border-radius: 3px;
+    color: #f4e4bc; /* text-light */
+    font-size: 0.85rem;
+    border: 1px solid #d4af37; /* gold highlight */
+}
+
+.view-details {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 8px;
+    margin-top: 10px;
+    background: linear-gradient(to bottom, #cd7f32, #d4af37); /* bronze to gold */
+    color: #1a1a2e; /* primary-dark text */
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #d4af37; /* gold highlight */
+}
+
+.view-details:hover {
+    background: linear-gradient(to bottom, #d4af37, #cd7f32); /* gold to bronze */
+    color: #1a1a2e;
+}
+
+.loading,
+.error {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.2rem;
+    color: #b8a57c; /* muted parchment */
+}

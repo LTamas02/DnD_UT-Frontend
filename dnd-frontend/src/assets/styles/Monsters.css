@@ -1,0 +1,98 @@
+#monsters-page, #monster-page {
+  padding: 20px;
+}
+
+.back-button {
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-section {
+  margin: 10px 0;
+}
+
+.search-section input {
+  padding: 5px;
+  width: 200px;
+}
+
+.search-section button {
+  padding: 5px 10px;
+  margin-left: 5px;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.monsters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  width: 100%;
+}
+
+.monster-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.monster-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.monster-name {
+  font-size: 1.2em;
+}
+
+.monster-details {
+  margin-top: 5px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.monster-detail-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 800px;
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.info-item {
+  margin: 10px 0;
+}
+
+.info-label {
+  font-weight: bold;
+}
+
+.monster-image {
+  max-width: 200px;
+  display: block;
+  margin: 10px 0;
+}

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAllClasses } from "../../Api";
 import "../../assets/styles/Classes.css";
@@ -7,6 +7,7 @@ export default function Classes() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -14,7 +15,7 @@ export default function Classes() {
         const data = await getAllClasses();
         setClasses(data);
       } catch {
-        setError("Hiba történt a kasztok betöltése során.");
+        setError("An error occurred while loading classes.");
       } finally {
         setLoading(false);
       }
@@ -23,29 +24,34 @@ export default function Classes() {
     fetchClasses();
   }, []);
 
-  if (loading) return <div className="page-content"><div className="loading">Betöltés...</div></div>;
+  if (loading) return <div className="page-content"><div className="loading">Loading...</div></div>;
   if (error) return <div className="page-content"><div className="error">{error}</div></div>;
 
   return (
-    <div id="classes-comp" className="page-content">
+    <div id="classes-comp">
+    <div className="page-content">
       <header>
+        <button className="back-button" onClick={() => navigate("/wiki")}>
+          ← Back to Main Page
+        </button>
         <h1>D&D Class Wiki</h1>
-        <p className="subtitle">Fedezd fel a Dungeons & Dragons kasztjainak titkait</p>
+        <p className="subtitle">Discover the secrets of Dungeons & Dragons classes</p>
       </header>
 
       <div className="classes-grid">
         {classes.length === 0 ? (
-          <div className="error">Nincsenek elérhető kasztok.</div>
+          <div className="error">No classes available.</div>
         ) : (
           classes.map((cls) => (
             <Link to={`/class/${cls.index}`} key={cls.index} className={`class-card ${cls.index}`}>
               <span className="class-icon">{getClassIcon(cls.index)}</span>
               <h3 className="class-name">{cls.name}</h3>
-              <p className="class-description">Kattints a részletekért...</p>
+              <p className="class-description">Click for details...</p>
             </Link>
           ))
         )}
       </div>
+    </div>
     </div>
   );
 }

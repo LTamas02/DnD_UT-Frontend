@@ -12,7 +12,8 @@ const wikiSections = [
   { name: 'Items', path: '/wiki/items' },
   { name: 'Feats', path: '/wiki/feats' },
   { name: 'Racial Feats', path: '/wiki/racial-feats' },
-  { name: 'Miscellaneous', path: '/wiki/miscellaneous' },
+  { name: 'Miscellaneous', path: '/wiki/miscellaneous' },  
+  { name: 'Monsters', path: '/wiki/monsters' },
   { name: 'Homebrew', path: '/wiki/homebrew' },
   { name: 'UA', path: '/wiki/ua' }
 ];

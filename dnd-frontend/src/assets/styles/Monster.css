@@ -1,0 +1,65 @@
+#monster-comp {
+    padding: 20px;
+}
+
+.back-button {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 8px 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.back-button:hover {
+    opacity: 0.9;
+}
+
+.monster-detail-card {
+    background: rgba(0,0,0,0.4);
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.monster-header h2 {
+    color: #ffd700;
+    margin-bottom: 5px;
+}
+
+.monster-header p {
+    color: #4ecdc4;
+    margin-bottom: 15px;
+}
+
+.monster-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.info-item {
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 4px solid #4ecdc4;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #b0b0b0;
+}
+
+.abilities {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ability-score {
+    background: rgba(255,255,255,0.1);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #ffd700;
+}

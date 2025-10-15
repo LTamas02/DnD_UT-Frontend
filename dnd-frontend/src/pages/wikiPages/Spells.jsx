@@ -49,6 +49,10 @@ const Spells = () => {
 
   return (
     <div id="spells-comp">
+      
+        <button className="back-button" onClick={() => navigate("/wiki")}>
+          ← Back to Wiki page
+        </button>
       <h1>Spells</h1>
       <p>Browse all the spells available in the game.</p>
 
@@ -109,6 +113,7 @@ const Spells = () => {
             </tbody>
           </table>
         )}
+        
       </div>
     </div>
   );
