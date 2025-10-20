@@ -19,6 +19,7 @@ import Races from './pages/wikiPages/Races'
 import Race from "./pages/wikiPages/Race";
 import Monsters from './pages/wikiPages/Monsters'
 import Monster from "./pages/wikiPages/Monster";
+import Equipments from './pages/wikiPages/Equipments'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -103,6 +104,9 @@ function AppWithRouter({
 
         <Route  path="/wiki/monsters" element={isAuthenticated ? <Monsters /> : <Navigate to="/logreg" />} />
         <Route path="/monster/:index" element={ isAuthenticated ? <Monster /> : <Navigate to="/logreg" />} />
+
+
+        <Route  path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
 
       </Routes>
     </>

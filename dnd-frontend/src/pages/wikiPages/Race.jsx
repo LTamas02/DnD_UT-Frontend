@@ -7,7 +7,7 @@ import {
   getRaceLanguages,
   getRaceAbilityBonuses,
 } from "../../Api";
-import "../../assets/styles/Race.css";
+import "../../assets/styles/WikiTheme.css";
 
 const Race = () => {
   const { index } = useParams();

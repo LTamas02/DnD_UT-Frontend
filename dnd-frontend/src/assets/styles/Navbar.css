@@ -1,7 +1,11 @@
 .navbar {
     background: linear-gradient(to right, #3e2723, #5d4037);
     border-bottom: 3px solid #8d6e63;
-    
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .navbar-brand {

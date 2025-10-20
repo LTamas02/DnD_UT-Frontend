@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { getSpellByIndex } from '../../Api';
-import '../../assets/styles/Spells.css';
+import '../../assets/styles/WikiTheme.css';
 
 const Spell = () => {
   const { index } = useParams(); // Get spell ID from URL

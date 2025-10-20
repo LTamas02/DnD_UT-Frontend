@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../assets/styles/Spells.css';
+import '../../assets/styles/WikiTheme.css';
 import { getSpellsByLevel } from '../../Api';
 
 const levels = [

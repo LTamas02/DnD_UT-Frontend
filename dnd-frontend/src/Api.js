@@ -465,3 +465,163 @@ export const searchMonstersByName = async (name) => {
         return [];
     }
 };
+
+
+
+
+
+
+
+
+
+// =========================
+// === Items (Equipment) Endpoints
+// =========================
+
+// Base route for DND 2014 items
+const equipmentBase = "/2014/equipment";
+
+// Get all items
+export const getAllItems = async () => {
+    try {
+        const res = await api.get(equipmentBase);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch items:", err);
+        return [];
+    }
+};
+
+// Get item by index
+export const getItemByIndex = async (index) => {
+    try {
+        const res = await api.get(`${equipmentBase}/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch item ${index}:`, err);
+        return null;
+    }
+};
+
+// Get all item categories
+export const getItemCategories = async () => {
+    try {
+        const res = await api.get(`${equipmentBase}/categories`);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch item categories:", err);
+        return [];
+    }
+};
+
+// Get items by category
+export const getItemsByCategory = async (category) => {
+    try {
+        const res = await api.get(`${equipmentBase}/category/${category}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch items in category ${category}:`, err);
+        return [];
+    }
+};
+
+// Get all weapons (optionally filter by weaponCategory)
+export const getWeapons = async (weaponCategory = null) => {
+    try {
+        const res = await api.get(`${equipmentBase}/weapons`, {
+            params: weaponCategory ? { weaponCategory } : {}
+        });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch weapons:", err);
+        return [];
+    }
+};
+
+// Get all armor (optionally filter by armorCategory)
+export const getArmor = async (armorCategory = null) => {
+    try {
+        const res = await api.get(`${equipmentBase}/armor`, {
+            params: armorCategory ? { armorCategory } : {}
+        });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch armor:", err);
+        return [];
+    }
+};
+
+// Get all gear (optionally filter by gearCategory)
+export const getGear = async (gearCategory = null) => {
+    try {
+        const res = await api.get(`${equipmentBase}/gear`, {
+            params: gearCategory ? { gearCategory } : {}
+        });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch gear:", err);
+        return [];
+    }
+};
+
+// Get all tools (optionally filter by toolCategory)
+export const getTools = async (toolCategory = null) => {
+    try {
+        const res = await api.get(`${equipmentBase}/tools`, {
+            params: toolCategory ? { toolCategory } : {}
+        });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch tools:", err);
+        return [];
+    }
+};
+
+// Get all mounts & vehicles (optionally filter by vehicleCategory)
+export const getMountsAndVehicles = async (vehicleCategory = null) => {
+    try {
+        const res = await api.get(`${equipmentBase}/mounts-vehicles`, {
+            params: vehicleCategory ? { vehicleCategory } : {}
+        });
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch mounts and vehicles:", err);
+        return [];
+    }
+};
+
+// Search items by query string
+export const searchItems = async (query) => {
+    try {
+        const res = await api.get(`${equipmentBase}/search`, { params: { q: query } });
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to search items with query "${query}":`, err);
+        return [];
+    }
+};
+
+
+// =========================
+// === Weapon Properties Endpoints
+// =========================
+export const getWeaponProperties = async () => {
+    try {
+        const res = await api.get("/2014/WeaponProperties");
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch weapon properties:", err);
+        return [];
+    }
+};
+
+export const getWeaponPropertyByIndex = async (index) => {
+    try {
+        const res = await api.get(`/2014/WeaponProperties/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch weapon property ${index}:`, err);
+        return null;
+    }
+};
+
