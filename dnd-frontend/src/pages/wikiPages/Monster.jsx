@@ -14,8 +14,10 @@ export default function Monster() {
       setLoading(true);
       try {
         const data = await getMonsterByIndex(index);
+        console.log("Fetched monster:", data);
         setMonster(data);
-      } catch {
+      } catch (err) {
+        console.error("Error loading monster:", err);
         setMonster(null);
       } finally {
         setLoading(false);
@@ -27,84 +29,110 @@ export default function Monster() {
   if (loading) return <div className="loading">Monster details loading...</div>;
   if (!monster) return <div className="error">Monster not found.</div>;
 
+  // Handle optional data safely
+  const speed = monster.speed || {};
+  const abilities = [
+    { label: "STR", value: monster.strength },
+    { label: "DEX", value: monster.dexterity },
+    { label: "CON", value: monster.constitution },
+    { label: "INT", value: monster.intelligence },
+    { label: "WIS", value: monster.wisdom },
+    { label: "CHA", value: monster.charisma },
+  ];
+
   return (
-    <div id="monster-comp">
-      <div id="monster-page">
+    <div id="monster-comp" className="monster-page-container">
+      <div className="monster-overlay">
         <button className="back-button" onClick={() => navigate("/wiki/monsters")}>
           ← Back to Monsters
         </button>
 
-        <main>
-          <div className="monster-detail-card">
-            <div className="monster-header">
-              <h2>{monster.Name}</h2>
-              {monster.Image ? <img src={monster.Image} alt={monster.Name} className="monster-image" /> : null}
-              <p>
-                The {monster.Name} is a {monster.Size} {monster.Type || ""} with {monster.Alignment || "unknown"} alignment and CR {monster.ChallengeRating ?? "unknown"}.
-              </p>
-            </div>
+        <div className="monster-detail-card">
+          <div className="monster-header">
+            <h2>{monster.name}</h2>
+            {monster.image ? (
+              <img src={monster.image} alt={monster.name} className="monster-image" />
+            ) : (
+              <div className="no-image">No Image Available</div>
+            )}
+            <p className="monster-summary">
+              The <b>{monster.name}</b> is a {monster.size || "Unknown"}{" "}
+              {monster.type || ""} creature with{" "}
+              {monster.alignment || "unknown"} alignment and challenge rating{" "}
+              {monster.challenge_rating ?? "?"}.
+            </p>
+          </div>
 
-            <div className="monster-info">
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="info-label">Size</span>
-                  <p>{monster.Size}</p>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Type</span>
-                  <p>{monster.Type || "Unknown"}</p>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Alignment</span>
-                  <p>{monster.Alignment || "Unknown"}</p>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">CR</span>
-                  <p>{monster.ChallengeRating ?? "Unknown"}</p>
-                </div>
+          <div className="monster-info">
+            <div className="info-grid">
+              <div className="info-item">
+                <span className="info-label">Armor Class</span>
+                <p>
+                  {monster.armor_class?.[0]?.value
+                    ? `${monster.armor_class[0].value} (${monster.armor_class[0].type})`
+                    : "Unknown"}
+                </p>
               </div>
-
               <div className="info-item">
                 <span className="info-label">Hit Points</span>
-                <p>{monster.HitPoints ?? "Unknown"} ({monster.HitDice || "Unknown"})</p>
+                <p>
+                  {monster.hit_points} ({monster.hit_dice})
+                </p>
               </div>
-
               <div className="info-item">
                 <span className="info-label">Speed</span>
                 <p>
-                  {monster.Speed?.Walk ? `Walk ${monster.Speed.Walk}` : ""}
-                  {monster.Speed?.Fly ? `, Fly ${monster.Speed.Fly}` : ""}
-                  {monster.Speed?.Swim ? `, Swim ${monster.Speed.Swim}` : ""}
+                  {speed.walk ? `Walk ${speed.walk}` : ""}
+                  {speed.fly ? `, Fly ${speed.fly}` : ""}
+                  {speed.swim ? `, Swim ${speed.swim}` : ""}
+                  {!speed.walk && !speed.fly && !speed.swim ? "Unknown" : ""}
                 </p>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Abilities</span>
-                <p>
-                  STR {monster.Strength ?? "-"}, DEX {monster.Dexterity ?? "-"}, CON {monster.Constitution ?? "-"}, INT {monster.Intelligence ?? "-"}, WIS {monster.Wisdom ?? "-"}, CHA {monster.Charisma ?? "-"}
-                </p>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Special Abilities</span>
-                <ul>
-                  {monster.SpecialAbilities?.length
-                    ? monster.SpecialAbilities.map((sa, i) => <li key={i}>{sa.Name}: {sa.Desc}</li>)
-                    : "None"}
-                </ul>
-              </div>
-
-              <div className="info-item">
-                <span className="info-label">Actions</span>
-                <ul>
-                  {monster.Actions?.length
-                    ? monster.Actions.map((a, i) => <li key={i}>{a.Name}: {a.Desc}</li>)
-                    : "None"}
-                </ul>
               </div>
             </div>
+
+            <div className="info-item">
+              <span className="info-label">Abilities</span>
+              <p>
+                {abilities.map((a) => `${a.label} ${a.value ?? "-"}`).join(", ")}
+              </p>
+            </div>
+
+            <div className="info-item">
+              <span className="info-label">Languages</span>
+              <p>{monster.languages || "None"}</p>
+            </div>
+
+            <div className="info-item">
+              <span className="info-label">Special Abilities</span>
+              {monster.special_abilities?.length ? (
+                <ul>
+                  {monster.special_abilities.map((sa, i) => (
+                    <li key={i}>
+                      <b>{sa.name}</b>: {sa.desc}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>None</p>
+              )}
+            </div>
+
+            <div className="info-item">
+              <span className="info-label">Actions</span>
+              {monster.actions?.length ? (
+                <ul>
+                  {monster.actions.map((a, i) => (
+                    <li key={i}>
+                      <b>{a.name}</b>: {a.desc}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>None</p>
+              )}
+            </div>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
