@@ -998,3 +998,24 @@ header h1, header h2 {
     width: 100%;
   }
 }
+
+.spell-class-badge {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid #ffd700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  color: #ffd700;
+}
+.spell-class-badge:hover {
+  background: rgba(255, 215, 0, 0.3);
+}
+/* Make subclass badges slightly different (but still matching) */
+.spell-class-badge.subclass {
+  border-color: #87CEFA;
+  color: #87CEFA;
+}
+
+.spell-class-badge.subclass:hover {
+  background: rgba(135, 206, 250, 0.25);
+}
