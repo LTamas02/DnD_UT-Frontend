@@ -79,7 +79,10 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await login(email, password);
+      const saltResponse = await api.getSalt(email);
+      const salt = saltResponse.data?.salt || '';
+      const hashedPassword = hashPassword(password, salt);
+      const response = await login(email, hashedPassword);
 
       const token = response.data?.token;
       const user = response.data?.user ?? null;
@@ -108,11 +111,18 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     try {
+      
       if (!validUsername || !validEmail || !validPwd || !validMatch) {
         alert("Please fill all fields correctly.");
         return;
       }
-      const response = await register(registerEmail, registerUsername, pwd);
+      
+      const salt = generateSalt();
+      const hashedPassword = hashPassword(pwd, salt);
+
+      const response = await register(registerEmail, registerUsername, hashedPassword);
+      await api.saltSend(registerEmail, salt);
+
 
       setUsername(registerUsername); // pass username to parent
       toggleForms();

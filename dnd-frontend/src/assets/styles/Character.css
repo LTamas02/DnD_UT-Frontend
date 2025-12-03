@@ -1,0 +1,191 @@
+/* Global & Body */
+body, html {
+  margin:0;
+  padding:0;
+  font-family:"Inter",sans-serif;
+  height:100%;
+  background: linear-gradient(160deg, #0b0010, #1c0f2f, #2a1b4d);
+  background-size: 400% 400%;
+  animation: bgAnim 20s ease infinite;
+  color:#eee;
+}
+
+/* Background animation */
+@keyframes bgAnim {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+/* App Layout */
+.character-app {
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width:220px;
+  background: rgba(28,15,47,0.85);
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  box-shadow: 0 0 20px rgba(127,90,240,0.5);
+  border-radius:10px;
+}
+.sidebar-header {
+  margin-bottom:20px;
+  text-align:center;
+}
+.sidebar-name {
+  font-size:18px;
+  font-weight:bold;
+  color:#ffdd99;
+  text-shadow: 0 0 5px #7f5af0;
+}
+.sidebar-class {
+  font-size:14px;
+  color:#ccc;
+  margin-top:4px;
+}
+
+/* Sidebar Nav */
+.sidebar-nav {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.nav-btn {
+  background:#2a1b4d;
+  color:#eee;
+  border:none;
+  padding:8px;
+  border-radius:6px;
+  cursor:pointer;
+  text-align:left;
+  box-shadow: 0 0 10px rgba(127,90,240,0.3);
+  transition: all 0.2s;
+}
+.nav-btn:hover {
+  background:#422a7a;
+  box-shadow:0 0 15px rgba(127,90,240,0.6);
+}
+.nav-btn.active {
+  background:#7f5af0;
+  font-weight:bold;
+  color:#fff;
+  box-shadow:0 0 20px rgba(127,90,240,0.8);
+}
+
+/* Page container */
+.page-container {
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  background: rgba(15,5,25,0.7);
+}
+
+/* Cards */
+.tab-page {
+  background: rgba(20,10,40,0.7);
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:20px;
+  box-shadow:0 0 20px rgba(127,90,240,0.4);
+}
+.tab-page h2 {
+  color:#ffdd99;
+  text-shadow:0 0 5px #7f5af0;
+}
+.tab-page h3 {
+  color:#ffd;
+  margin:10px 0 5px 0;
+}
+
+/* Inputs / Textareas */
+input, textarea {
+  background: rgba(30,20,50,0.8);
+  color:#eee;
+  border:1px solid #555;
+  border-radius:5px;
+  padding:4px 6px;
+  width:100%;
+}
+textarea {
+  resize:none;
+  height:60px;
+}
+
+/* Grids */
+.grid-2, .grid-3, .grid-5 {
+  display:grid;
+  gap:10px;
+  margin-bottom:10px;
+}
+.grid-2 { grid-template-columns:1fr 1fr; }
+.grid-3 { grid-template-columns:repeat(3,1fr); }
+.grid-5 { grid-template-columns:repeat(5,1fr); }
+
+/* Ability / Mod */
+.ability-grid {
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:10px;
+  margin-bottom:10px;
+}
+.ability span {
+  display:block;
+  text-align:center;
+  font-weight:bold;
+  color:#ffdd99;
+  text-shadow:0 0 5px #7f5af0;
+}
+.mod-pill {
+  background:#555;
+  padding:2px 6px;
+  border-radius:4px;
+  margin-top:2px;
+  display:block;
+  text-align:center;
+  box-shadow:0 0 5px rgba(127,90,240,0.5);
+}
+
+/* Saves & Skills */
+.saves-grid, .skill-list {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:10px;
+}
+
+/* Attacks */
+.attack-row {
+  display:flex;
+  gap:5px;
+  margin-bottom:5px;
+}
+.attack-row input {
+  flex:1;
+}
+button {
+  cursor:pointer;
+  border:none;
+  border-radius:4px;
+  background:#7f5af0;
+  color:#fff;
+  padding:4px 6px;
+  box-shadow:0 0 5px rgba(127,90,240,0.7);
+}
+button:hover {
+  box-shadow:0 0 10px rgba(127,90,240,1);
+}
+
+/* Scrollbar */
+.page-container::-webkit-scrollbar {
+  width:10px;
+}
+.page-container::-webkit-scrollbar-thumb {
+  background:#7f5af0;
+  border-radius:5px;
+}

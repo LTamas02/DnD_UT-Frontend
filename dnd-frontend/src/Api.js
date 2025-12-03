@@ -17,10 +17,21 @@ export const register = (email, username, password) =>
     api.post("/auth/register", null, {
         params: { email, username, password }
     });
+export const saltSend = (email, salt) =>
+    api.post("/auth/salt-send", null, {
+        params: { email, salt },
+        headers: { "Content-Type": "application/json" }
+    });
 
 export const login = (email, password) =>
     api.post("/auth/login", null, {
         params: { email, password },
+        headers: { "Content-Type": "application/json" }
+    });
+
+export const getSalt = (email) =>
+    api.get("/auth/salt", {
+        params: { email },
         headers: { "Content-Type": "application/json" }
     });
 
@@ -625,3 +636,43 @@ export const getWeaponPropertyByIndex = async (index) => {
     }
 };
 
+
+
+
+
+
+
+
+
+
+// =========================
+// === Character Endpoints
+// =========================
+
+
+export const CharacterApi = {
+  async getAll() {
+    const res = await api.get("/character");
+    return res.data;
+  },
+
+  async get(id) {
+    const res = await api.get(`/character/${id}`);
+    return res.data;
+  },
+
+  async create(data) {
+    const res = await api.post("/character", data);
+    return res.data;
+  },
+
+  async update(id, data) {
+    const res = await api.put(`/character/${id}`, data);
+    return res.data;
+  },
+
+  async remove(id) {
+    const res = await api.delete(`/character/${id}`);
+    return res.data;
+  },
+};
