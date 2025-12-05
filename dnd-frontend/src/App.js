@@ -36,7 +36,7 @@ function App() {
           setUsername(res.data.username || "Guest");
           setProfilePicture(res.data.profilePicture || "/defaults/profile_picture.jpg");
           localStorage.setItem("profilePicture", res.data.profilePicture || "/defaults/profile_picture.jpg");
-          localStorage.setItem("username", res.data.username || "Guest");       
+          localStorage.setItem("username", res.data.username || "Guest");
         })
         .catch(() => {
           setIsAuthenticated(false);
@@ -76,11 +76,11 @@ function AppWithRouter({
 
   return (
     <>
-{location.pathname === "/profile" ? (
-  <NavbarProfile username={username} profilePicture={profilePicture} />
-) : location.pathname !== "/logreg" ? ( // only render navbars if NOT logreg
-  <Navbar username={username} profilePicture={profilePicture} />
-) : null}
+      {location.pathname === "/profile" ? (
+        <NavbarProfile username={username} profilePicture={profilePicture} />
+      ) : location.pathname !== "/logreg" ? ( // only render navbars if NOT logreg
+        <Navbar username={username} profilePicture={profilePicture} />
+      ) : null}
 
       <Routes>
         <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} setProfilePicture={setProfilePicture} />} />
@@ -89,26 +89,26 @@ function AppWithRouter({
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/logreg" />} />
         <Route path="/friends" element={isAuthenticated ? <Friends /> : <Navigate to="/logreg" />} />
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
-        <Route path="/character" element={<Character />} />
+        <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
-        
+
         <Route path="/community" element={isAuthenticated ? <Community /> : <Navigate to="/logreg" />} />
 
-        <Route  path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />
-        <Route path="/spell/:index" element={ isAuthenticated ? <Spell /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />
+        <Route path="/spell/:index" element={isAuthenticated ? <Spell /> : <Navigate to="/logreg" />} />
 
-        <Route  path="/wiki/classes" element={isAuthenticated ? <Classes /> : <Navigate to="/logreg" />} />
-        <Route path="/class/:index" element={ isAuthenticated ? <Class /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/classes" element={isAuthenticated ? <Classes /> : <Navigate to="/logreg" />} />
+        <Route path="/class/:index" element={isAuthenticated ? <Class /> : <Navigate to="/logreg" />} />
 
-        <Route  path="/wiki/races" element={isAuthenticated ? <Races /> : <Navigate to="/logreg" />} />
-        <Route path="/race/:index" element={ isAuthenticated ? <Race /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/races" element={isAuthenticated ? <Races /> : <Navigate to="/logreg" />} />
+        <Route path="/race/:index" element={isAuthenticated ? <Race /> : <Navigate to="/logreg" />} />
 
-        <Route  path="/wiki/monsters" element={isAuthenticated ? <Monsters /> : <Navigate to="/logreg" />} />
-        <Route path="/monster/:index" element={ isAuthenticated ? <Monster /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/monsters" element={isAuthenticated ? <Monsters /> : <Navigate to="/logreg" />} />
+        <Route path="/monster/:index" element={isAuthenticated ? <Monster /> : <Navigate to="/logreg" />} />
 
 
-        <Route  path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
 
       </Routes>
     </>

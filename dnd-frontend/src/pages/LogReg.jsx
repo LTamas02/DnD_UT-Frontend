@@ -121,13 +121,18 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
       const hashedPassword = hashPassword(pwd, salt);
 
       const response = await register(registerEmail, registerUsername, hashedPassword);
-      await api.saltSend(registerEmail, salt);
-
-
-      setUsername(registerUsername); // pass username to parent
-      toggleForms();
+      if (response && response.data) {
+        await api.saltSend(registerEmail, salt);
+        setUsername(registerUsername); // pass username to parent
+        alert("Registration successful!");
+        toggleForms();
+      }
     } catch (error) {
-      alert("Registration failed: " + (error.response?.data || error.message));
+      let errorMsg = error.response?.data;
+      if (typeof errorMsg === "object") {
+        errorMsg = JSON.stringify(errorMsg);
+      }
+      setErrorMessage("Registration failed: " + (errorMsg || error.message));
     }
   };
 
