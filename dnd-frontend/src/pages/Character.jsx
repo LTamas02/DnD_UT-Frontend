@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
-// 1. Import useParams from react-router-dom
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom"; 
 import "../assets/styles/Character.css";
 import {
   getAllSpells,
@@ -11,18 +10,54 @@ import {
   getRaceByIndex
 } from "../Api";
 
-// Placeholder for the custom API function (implement this in your Api.js)
-// This function must fetch a character object by ID from your .NET API.
+// ==========================================================
+// === API Placeholders ===
+// ==========================================================
+
 async function getCharacterById(id) {
   const token = localStorage.getItem("token");
-  // Replace with your actual endpoint and authentication logic
   const response = await fetch(`/api/characters/${id}`, {
     headers: { "Authorization": `Bearer ${token}` }
   });
-  if (!response.ok) throw new Error("Character not found or access denied.");
+  if (response.status === 404) return null;
+  if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Character not found or access denied: ${errorText}`);
+  }
   const data = await response.json();
-  return data; // Assuming this returns a character object matching DEFAULT_PROFILE structure
+  return data;
 }
+
+async function saveCharacter(characterData) {
+  const token = localStorage.getItem("token");
+  const method = characterData.id && characterData.id !== 'new' ? 'PUT' : 'POST'; 
+  const url = characterData.id && characterData.id !== 'new' ? `/api/characters/${characterData.id}` : `/api/characters`;
+  
+  const response = await fetch(url, {
+    method: method,
+    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(characterData)
+  });
+  if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to save character: ${errorText}`);
+  }
+  const data = await response.json(); 
+  return data;
+}
+
+async function deleteCharacter(id) {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`/api/characters/${id}`, {
+    method: 'DELETE',
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (response.status >= 400) throw new Error("Failed to delete character."); 
+}
+
+// ==========================================================
+// === DEFAULT PROFILE & Helper Data ===
+// ==========================================================
 
 const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const SKILL_MAP = {
@@ -34,28 +69,40 @@ const SKILL_MAP = {
 };
 
 const DEFAULT_PROFILE = {
+  id: null, 
   characterName: "", race: "", raceIndex: "", classIndex: "", classLevel: 1, background: "",
   playerName: "", alignment: "", xp: 0, inspiration: false,
-  profBonus: 2,
+  profBonus: 2, 
+  
   age: "", height: "", weight: "", eyes: "", skin: "", hair: "",
   symbol: "", appearance: "",
+
   str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
-  saveProf: {}, skillProf: {}, passivePerception: 10,
+  saveProf: {}, 
+  skillProf: {}, 
+  passivePerception: 10,
+
   armor: 10, initiative: 0, speed: 30,
   hpMax: 0, hpCurrent: 0, hpTemp: 0,
   deathSuccesses: 0, deathFailures: 0,
-  attacks: [],
-  // Added generalEquipment and customItems to match your Equipment tab logic
-  generalEquipment: [], customItems: [],
-  equipment: "", cp: 0, sp: 0, ep: 0, gp: 0, pp: 0,
+  
+  attacks: [], 
+  
+  generalEquipment: [], 
+  equipment: "", 
+  cp: 0, sp: 0, ep: 0, gp: 0, pp: 0,
+  
   personalityTraits: "", ideals: "", bonds: "", flaws: "",
   allies: "", additionalFeatures: "", treasure: "", backstory: "",
-  spells: [],
-  spellSlots: [],
-  newItemName: "", newItemType: "", newItemDesc: ""
+  
+  slots1Total: 0, slots1Used: 0, slots2Total: 0, slots2Used: 0, slots3Total: 0, slots3Used: 0,
+  slots4Total: 0, slots4Used: 0, slots5Total: 0, slots5Used: 0, slots6Total: 0, slots6Used: 0,
+  slots7Total: 0, slots7Used: 0, slots8Total: 0, slots8Used: 0, slots9Total: 0, slots9Used: 0,
+  
+  selectedSpells: [], 
+  portraitDataUrl: ""
 };
 
-// helper to normalize api return
 function normalizeArrayResponse(res) {
   if (!res) return [];
   if (Array.isArray(res)) return res;
@@ -75,556 +122,950 @@ function getProfBonusFromLevel(level) {
 }
 
 export default function Character() {
-  // 2. Get the 'id' from the URL parameters
   const { id } = useParams();
+  const navigate = useNavigate(); 
   const [profile, setProfile] = useState(DEFAULT_PROFILE);
   const [activeTab, setActiveTab] = useState("identity");
+  
   const [allClasses, setAllClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null);
   const [allSpells, setAllSpells] = useState([]);
   const [allWeapons, setAllWeapons] = useState([]);
   const [allRaces, setAllRaces] = useState([]);
-  const [selectedRace, setSelectedRace] = useState(null);
-  // 3. Add loading state for the main character data
   const [isLoading, setIsLoading] = useState(!!id);
+  
+  const [spellSearchTerm, setSpellSearchTerm] = useState(""); 
+  const [selectedSpellDetail, setSelectedSpellDetail] = useState(null); 
 
-  // --- FETCH D&D DATA (CLASSES, SPELLS, etc.) ---
+  // --- CALCULATION HELPERS ---
+  const getMod = useCallback((val) => {
+    const score = Number(val) || 10;
+    return Math.floor((score - 10) / 2);
+  }, []);
+
+  const calcSaving = useCallback((key) => {
+    const base = getMod(profile[key] || 10);
+    const hasProf = !!(profile.saveProf && profile.saveProf[key]);
+    const total = base + (hasProf ? profile.profBonus : 0);
+    return (total >= 0 ? "+" : "") + total;
+  }, [profile, getMod]);
+
+  const calcSkill = useCallback((key) => {
+    const ab = SKILL_MAP[key];
+    if (!ab) return "N/A";
+
+    const base = getMod(profile[ab] || 10);
+    const hasProf = !!(profile.skillProf && profile.skillProf[key]);
+    const total = base + (hasProf ? profile.profBonus : 0);
+    return (total >= 0 ? "+" : "") + total;
+  }, [profile, getMod]);
+
+  const capitalizeWords = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+
+  // --- STATE MODIFIER ---
+  const setField = (key, value) => {
+    setProfile(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleProficiencyChange = (type, key, checked) => {
+    setProfile(prev => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        [key]: checked
+      }
+    }));
+  };
+
+  // --- FUNCTION BUTTON HANDLERS ---
+  
+  const handleSave = async () => {
+    const charToSave = { 
+        ...profile, 
+        id: id === 'new' ? null : profile.id || id
+    };
+
+    try {
+        const savedData = await saveCharacter(charToSave); 
+        alert("Character successfully saved!");
+        
+        if (id === 'new' && savedData.id) {
+            navigate(`/character/${savedData.id}`);
+        }
+        setProfile(prev => ({ ...prev, id: savedData.id }));
+    } catch (error) {
+        console.error("Save failed:", error);
+        alert(`Error during save: ${error.message}`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!profile.id || id === 'new') {
+        alert("Character not saved yet, cannot delete.");
+        return;
+    }
+    if (!window.confirm(`Are you sure you want to delete ${profile.characterName}?`)) return;
+    
+    try {
+        await deleteCharacter(profile.id);
+        alert("Character successfully deleted!");
+        navigate('/characters'); 
+    } catch (error) {
+        console.error("Delete failed:", error);
+        alert(`Error during delete: ${error.message}`);
+    }
+  };
+
+  const handleNew = () => {
+    navigate('/character/new'); 
+  };
+  
+  // --- AUTOMATIC PROFICIENCY HANDLING ---
+
+  // Class Proficiencies
+  useEffect(() => {
+    if (!profile.classIndex) return;
+    
+    getClassByIndex(profile.classIndex)
+      .then(classData => {
+        const newSaveProfs = classData.saving_throws ? 
+            classData.saving_throws.reduce((acc, st) => ({ ...acc, [st.index]: true }), {}) : {};
+        
+        setProfile(prev => ({
+          ...prev,
+          saveProf: {
+            ...prev.saveProf,
+            ...newSaveProfs 
+          }
+        }));
+      })
+      .catch(err => console.error("Failed to fetch class details for proficiencies:", err));
+    
+  }, [profile.classIndex]);
+
+  // Race Proficiencies
+  useEffect(() => {
+    if (!profile.raceIndex) return;
+    
+    getRaceByIndex(profile.raceIndex)
+      .then(raceData => {
+        const newSkillProfs = raceData.starting_proficiencies ?
+            raceData.starting_proficiencies
+                .filter(p => p.type === 'skill' && p.index) 
+                .reduce((acc, p) => ({ ...acc, [p.index]: true }), {}) : {};
+        
+        setProfile(prev => ({
+          ...prev,
+          skillProf: {
+            ...prev.skillProf,
+            ...newSkillProfs
+          },
+          speed: raceData.speed || prev.speed
+        }));
+      })
+      .catch(err => console.error("Failed to fetch race details for proficiencies/speed:", err));
+
+  }, [profile.raceIndex]);
+
+
+  // --- FETCH D&D & CHARACTER DATA ---
   useEffect(() => {
     let mounted = true;
     const fetchAll = async () => {
       try {
-        const classes = await getAllClasses();
-        if (mounted) setAllClasses(Array.isArray(classes) ? classes : normalizeArrayResponse(classes));
-
-        const sres = await getAllSpells();
-        if (mounted) setAllSpells(normalizeArrayResponse(sres));
-
-        const wres = await getWeapons();
-        if (mounted) setAllWeapons(normalizeArrayResponse(wres));
-
-        const races = await getAllRaces();
-        if (mounted) setAllRaces(normalizeArrayResponse(races));
-      } catch (err) {
-        console.error("Failed to fetch dnd data", err);
-      }
-    };
-    fetchAll();
-    return () => { mounted = false; };
-  }, []);
-
-  // --- FETCH CHARACTER DATA ---
-  useEffect(() => {
-    let mounted = true;
-    const fetchCharacter = async () => {
-      if (!id) {
-        setProfile(DEFAULT_PROFILE); // Reset or use default for new character
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        const charData = await getCharacterById(id);
+        const [classes, sres, wres, races] = await Promise.all([
+          getAllClasses(),
+          getAllSpells(),
+          getWeapons(),
+          getAllRaces(),
+        ]);
+        
         if (mounted) {
-          // Merge fetched data with default to ensure all fields exist
-          setProfile(prev => ({
-            ...DEFAULT_PROFILE,
-            ...charData,
-            // Ensure nested objects are initialized if null/undefined in API response
-            saveProf: charData.saveProf || {},
-            skillProf: charData.skillProf || {},
-            attacks: charData.attacks || [],
-            spells: charData.spells || [],
-            generalEquipment: charData.generalEquipment || [],
-            customItems: charData.customItems || [],
-          }));
+          setAllClasses(normalizeArrayResponse(classes));
+          setAllSpells(normalizeArrayResponse(sres));
+          setAllWeapons(normalizeArrayResponse(wres));
+          setAllRaces(normalizeArrayResponse(races));
+        }
+
+        let charData = null;
+        if (id && id !== 'new') { 
+            charData = await getCharacterById(id);
+        }
+
+        if (mounted) {
+          if (charData) {
+            setProfile(prev => ({
+              ...DEFAULT_PROFILE,
+              ...charData,
+              id: id, 
+              saveProf: charData.saveProf || {},
+              skillProf: charData.skillProf || {},
+              attacks: charData.attacks || [],
+              selectedSpells: charData.selectedSpells || [],
+              generalEquipment: charData.generalEquipment || [], 
+            }));
+          } else if (id === 'new') {
+            setProfile(DEFAULT_PROFILE);
+          }
         }
       } catch (err) {
-        console.error(`Failed to load character ${id}`, err);
-        // Optionally navigate to an error page or character list
+        console.error("Failed to fetch data", err);
+        if(id && id !== 'new') {
+             alert("Character loading failed!");
+             navigate('/characters');
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
     };
-
-    fetchCharacter();
+    fetchAll();
     return () => { mounted = false; };
-  }, [id]); // Rerun when ID changes
+  }, [id, navigate]);
 
-  // generic setter
-  const setField = (field, value) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
-  };
-
-  const toggleSaveProf = key => {
-    setProfile(prev => ({
-      ...prev,
-      saveProf: { ...prev.saveProf, [key]: !prev.saveProf[key] }
-    }));
-  };
-
-  const toggleSkillProf = key => {
-    setProfile(prev => ({
-      ...prev,
-      skillProf: { ...prev.skillProf, [key]: !prev.skillProf[key] }
-    }));
-  };
-
-  const getMod = val => Math.floor((val - 10) / 2);
-  const calcSaving = key => getMod(profile[key] || 10) + ((profile.saveProf && profile.saveProf[key]) ? profile.profBonus : 0);
-  const calcSkill = key => {
-    const ab = SKILL_MAP[key];
-    return getMod(profile[ab] || 10) + ((profile.skillProf && profile.skillProf[key]) ? profile.profBonus : 0);
-  };
-  const capitalizeWords = s => s.charAt(0).toUpperCase() + s.slice(1);
-
-  // --- CLASS & PROFICIENCY MANAGEMENT (Keep existing logic) ---
+  // --- DERIVED STATS UPDATE ---
   useEffect(() => {
-    let mounted = true;
-    const updateClass = async () => {
-      if (!profile.classIndex) {
-        setSelectedClass(null);
+    const rawPerceptionSkillValue = getMod(profile.wis) + (profile.skillProf?.perception ? profile.profBonus : 0);
+    const newPassivePerception = 10 + rawPerceptionSkillValue;
+    const newInitiative = getMod(profile.dex);
+    const calculatedProfBonus = getProfBonusFromLevel(profile.classLevel);
+
+    setProfile(prev => {
+      let updated = false;
+      let newProfile = { ...prev };
+
+      if (newPassivePerception !== prev.passivePerception) {
+        newProfile.passivePerception = newPassivePerception;
+        updated = true;
+      }
+      if (newInitiative !== prev.initiative) {
+        newProfile.initiative = newInitiative;
+        updated = true;
+      }
+      if (prev.profBonus !== calculatedProfBonus) {
+        newProfile.profBonus = calculatedProfBonus;
+        updated = true;
+      }
+
+      return updated ? newProfile : prev;
+    });
+  }, [profile.dex, profile.wis, profile.skillProf.perception, profile.classLevel, profile.profBonus, getMod]);
+
+
+  // --- ATTACK MANAGEMENT (FIXED: Damage Dice Access) ---
+  const addNewAttack = (weaponData = null) => {
+    const modKey = profile.dex > profile.str ? 'dex' : 'str'; 
+    const attackMod = getMod(profile[modKey]) + profile.profBonus;
+
+    // FIX: Safely access damage dice string, defaulting to "N/A" if missing
+    const damageDice = weaponData?.damage?.damage_dice || "N/A";
+
+    const newAttack = weaponData ? {
+      name: weaponData.name,
+      bonus: `+${attackMod}`,
+      damage: `${damageDice}+${getMod(profile[modKey])}`, 
+      type: weaponData.damage?.damage_type?.name || "Unspecified", 
+      notes: weaponData.desc || ""
+    } : { name: "", bonus: "", damage: "", type: "", notes: "" };
+
+    setProfile(prev => ({
+      ...prev,
+      attacks: [
+        ...(prev.attacks || []),
+        newAttack
+      ]
+    }));
+  };
+
+  const handleWeaponSelection = (event) => {
+    const selectedIndex = event.target.value;
+    if (selectedIndex) {
+      const weaponData = allWeapons.find(w => w.index === selectedIndex);
+      if (weaponData) {
+        addNewAttack(weaponData);
+        event.target.value = ""; 
+      }
+    }
+  };
+
+  const updateAttackField = (index, key, value) => {
+    setProfile(prev => {
+      const newAttacks = [...(prev.attacks || [])];
+      newAttacks[index] = { ...newAttacks[index], [key]: value };
+      return { ...prev, attacks: newAttacks };
+    });
+  };
+
+  const removeAttack = (index) => {
+    setProfile(prev => ({
+      ...prev,
+      attacks: prev.attacks.filter((_, i) => i !== index)
+    }));
+  };
+  
+  // --- SPELL MANAGEMENT ---
+  const filteredSpells = (allSpells || [])
+    .filter(spell => 
+        spell.name.toLowerCase().includes(spellSearchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
+
+  const handleSpellSearchSelect = (event) => {
+    const selectedIndex = event.target.value;
+    if (selectedIndex) {
+        const spellData = allSpells.find(s => s.index === selectedIndex);
+        setSelectedSpellDetail(spellData);
+        event.target.value = "";
+        setSpellSearchTerm(""); 
+    }
+  };
+
+  const addSpellToCharacter = (spell) => {
+    const isSelected = profile.selectedSpells.some(s => s.index === spell.index);
+    if (isSelected) {
+        alert(`${spell.name} is already added!`);
         return;
-      }
-      try {
-        const cls = await getClassByIndex(profile.classIndex);
-        const clsData = cls?.data ? cls.data : cls;
-        if (!mounted) return;
-        setSelectedClass(clsData || null);
+    }
 
-        const pb = getProfBonusFromLevel(profile.classLevel);
-        setProfile(prev => {
-          const newSaveProf = { ...prev.saveProf };
-          if (clsData?.saving_throws) {
-            clsData.saving_throws.forEach(st => {
-              const name = (st.name || st.index || "").toString().toLowerCase();
-              const key = ABILITIES.find(a => name.startsWith(a));
-              if (key) newSaveProf[key] = true;
-            });
-          }
-
-          let slots = prev.spellSlots || [];
-          if (clsData?.spellcasting?.spell_slots) {
-            slots = clsData.spellcasting.spell_slots.map(s => s);
-          }
-
-          return { ...prev, profBonus: pb, saveProf: newSaveProf, spellSlots: slots };
-        });
-      } catch (err) {
-        console.error("Failed to load class details", err);
-      }
+    const newSpell = {
+        index: spell.index, 
+        name: spell.name, 
+        level: spell.level,
+        casting_time: spell.casting_time,
+        range: spell.range,
+        duration: spell.duration,
+        concentration: spell.concentration || false,
     };
-    updateClass();
-    return () => { mounted = false; };
-  }, [profile.classIndex, profile.classLevel]);
-
-  // --- RACE MANAGEMENT (Keep existing logic) ---
-  const updateRace = async (raceIndex) => {
-    setField("raceIndex", raceIndex);
-    const raceDataRaw = await getRaceByIndex(raceIndex);
-    const raceData = raceDataRaw?.data || raceDataRaw;
-    setSelectedRace(raceData || null);
-    if (!raceData) return;
-
-    const speed = raceData.speed || 30;
-    const newStats = { ...profile };
-    if (raceData.ability_bonuses) {
-      raceData.ability_bonuses.forEach(ab => {
-        const key = ab.ability_score?.index || ab.ability_score?.name?.toLowerCase().slice(0, 3);
-        if (key && ABILITIES.includes(key)) {
-          newStats[key] += ab.bonus || 0;
-        }
-      });
-    }
-    setProfile(prev => ({ ...prev, ...newStats, speed }));
+    
+    setProfile(prev => ({
+        ...prev,
+        selectedSpells: [...(prev.selectedSpells || []), newSpell]
+    }));
+    setSelectedSpellDetail(null);
+  };
+  
+  const removeSpell = (index) => {
+    setProfile(prev => ({
+        ...prev,
+        selectedSpells: prev.selectedSpells.filter(s => s.index !== index)
+    }));
   };
 
-  // --- ATTACK MANAGEMENT (Keep existing logic) ---
-  const addAttack = () => setProfile(prev => ({ ...prev, attacks: [...prev.attacks, { name: "", bonus: "", damage: "", weaponIndex: "" }] }));
-  const updateAttack = (index, field, value) => {
-    const newAttacks = [...(profile.attacks || [])];
-    if (field === "weaponIndex") {
-      if (!value) {
-        newAttacks[index] = { name: "", bonus: "", damage: "", weaponIndex: "" };
-      } else {
-        const weapon = allWeapons.find(w => w.index === value);
-        if (!weapon) {
-          newAttacks[index] = { ...newAttacks[index], weaponIndex: value };
-        } else {
-          const isFinesse = (Array.isArray(weapon.properties) && weapon.properties.some(p => p.name?.toLowerCase().includes("finesse")))
-            || (weapon.property_category && weapon.property_category.toLowerCase().includes("finesse"));
-          const isRanged = weapon.weapon_range && weapon.weapon_range.toLowerCase && weapon.weapon_range.toLowerCase() !== "melee";
-          const abilityMod = (isFinesse || isRanged) ? getMod(profile.dex) : getMod(profile.str);
+  const addCustomSpell = () => {
+      const customSpell = {
+          index: `custom-${Date.now()}`,
+          name: "New Custom Spell",
+          level: 1,
+          casting_time: "1 Action",
+          range: "30 ft",
+          duration: "Instantaneous",
+          concentration: false,
+          custom: true
+      };
+      setProfile(prev => ({
+          ...prev,
+          selectedSpells: [...(prev.selectedSpells || []), customSpell]
+      }));
+  };
 
-          let hasProf = false;
-          if (selectedClass?.proficiencies) {
-            const profStrings = selectedClass.proficiencies.map(p => (p.name || p).toString().toLowerCase());
-            const wc = (weapon.weapon_category || "").toLowerCase();
-            if (profStrings.some(ps => ps.includes(wc) && ps.includes("weapon"))) hasProf = true;
-            if (!hasProf && profStrings.some(ps => weapon.name.toLowerCase().includes(ps))) hasProf = true;
-            if (!hasProf && wc && profStrings.includes(`${wc} weapons`)) hasProf = true;
+  const updateCustomSpellField = (index, key, value) => {
+      setProfile(prev => {
+          const newSpells = [...(prev.selectedSpells || [])];
+          const spellIndex = newSpells.findIndex(s => s.index === index);
+          if (spellIndex > -1) {
+              const val = (key === 'level') ? Number(value) : value; 
+              newSpells[spellIndex] = { ...newSpells[spellIndex], [key]: val };
           }
-
-          const bonus = abilityMod + (hasProf ? (profile.profBonus || getProfBonusFromLevel(profile.classLevel)) : 0);
-          const damageDice = weapon.damage?.damage_dice || weapon.damage?.dice || weapon.damage?.damage || "";
-          newAttacks[index] = { name: weapon.name, bonus, damage: damageDice, weaponIndex: value };
-        }
-      }
-    } else {
-      newAttacks[index] = { ...(newAttacks[index] || {}), [field]: value };
-    }
-    setProfile(prev => ({ ...prev, attacks: newAttacks }));
-  };
-  const removeAttack = index => setProfile(prev => ({ ...prev, attacks: (prev.attacks || []).filter((_, i) => i !== index) }));
-
-  // --- SPELL MANAGEMENT (Keep existing logic) ---
-  const getSpellByIndex = idx => (allSpells || []).find(s => s.index === idx);
-  const removeSpell = index => {
-    const newSpells = [...(profile.spells || [])];
-    newSpells.splice(index, 1);
-    setProfile(prev => ({ ...prev, spells: newSpells }));
+          return { ...prev, selectedSpells: newSpells };
+      });
   };
 
-  // --- PASSIVE PERCEPTION (Keep existing logic) ---
-  useEffect(() => {
-    const p = 10 + getMod(profile.wis || 10) + ((profile.skillProf?.perception) ? (profile.profBonus || getProfBonusFromLevel(profile.classLevel)) : 0);
-    setProfile(prev => ({ ...prev, passivePerception: p }));
-  }, [profile.wis, profile.skillProf, profile.profBonus]);
 
-  // --- HP CALCULATION (Keep existing logic) ---
-  useEffect(() => {
-    if (!selectedClass) return;
-    const hitDie = selectedClass.hit_die || 8;
-    const conMod = getMod(profile.con);
-    let hp = hitDie + conMod; // level 1
-    for (let lvl = 2; lvl <= profile.classLevel; lvl++) {
-      hp += Math.floor(hitDie / 2 + 1) + conMod; // average
-    }
-    setProfile(prev => ({ ...prev, hpMax: hp, hpCurrent: prev.hpCurrent > 0 ? prev.hpCurrent : hp })); // Retain current HP if loaded, otherwise set to max
-  }, [selectedClass, profile.classLevel, profile.con]);
-
-  // --- RENDER ---
-
-  // Display a loading indicator while character data is being fetched
+  // --- JSX START ---
   if (isLoading) {
-    return (
-      <div className="character-app loading">
-        <h1>Loading Character...</h1>
-      </div>
-    );
+    return <div className="loading-state">Loading Character...</div>;
   }
+
+  const navTabs = ["identity", "stats", "combat", "equipment", "story"];
 
   return (
     <div className="character-app">
-      <aside className="sidebar gothic-border">
+      {/* Sidebar */}
+      <aside className="sidebar">
         <div className="sidebar-header">
-          <div className="sidebar-name">{profile.characterName || (id ? "Loading Failed" : "New Character")}</div>
-          <div className="sidebar-class">{profile.classIndex ? `${profile.classIndex} ${profile.classLevel}` : "Class & Level"}</div>
+          <div className="sidebar-name">{profile.characterName || (id === 'new' ? "New Character" : "No Name")}</div>
+          <div className="sidebar-class">
+            {profile.classIndex ? `${capitalizeWords(profile.classIndex)} ${profile.classLevel}` : "Class & Level"}
+          </div>
         </div>
+        
+        {/* Navigation */}
         <nav className="sidebar-nav">
-          {["identity", "stats", "combat", "equipment", "story"].map(tab => (
+          {navTabs.map(tab => (
             <button
               key={tab}
               className={`nav-btn ${activeTab === tab ? "active" : ""}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1).replace("-", " / ")}
+              {capitalizeWords(tab)}
             </button>
           ))}
         </nav>
       </aside>
 
       <main className="page-container">
-        {/* --- IDENTITY --- */}
+        
+        {/* --- ACTION BAR / FUNCTION BUTTONS --- */}
+        <header className="action-bar card">
+          <h1>{profile.characterName || (id === 'new' ? "Create New Character" : "Edit Character")}</h1>
+          <div className="action-buttons">
+            <button className="btn-save btn-aura" onClick={handleSave}>
+              Save
+            </button>
+            <button 
+                className="btn-delete btn-aura" 
+                onClick={handleDelete}
+                disabled={!profile.id || id === 'new'} 
+            >
+              Delete
+            </button>
+            <button className="btn-new btn-aura" onClick={handleNew}>
+              New Character
+            </button>
+          </div>
+        </header>
+
+
+        {/* --- IDENTITY TAB (Redesigned) --- */}
         {activeTab === "identity" && (
           <section className="tab-page">
             <h2>Identity</h2>
-            <div className="grid-4">
-              <div>
-                <label>Name</label>
-                <input value={profile.characterName} onChange={e => setField("characterName", e.target.value)} />
-              </div>
-              <div>
-                <label>Race</label>
-                <select value={profile.raceIndex || ""} onChange={e => updateRace(e.target.value)}>
-                  <option value="">Select Race</option>
-                  {allRaces.map(r => (
-                    <option key={r.index} value={r.index}>{r.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label>Class</label>
-                <select value={profile.classIndex || ""} onChange={async e => {
-                  const clsIndex = e.target.value;
-                  setField("classIndex", clsIndex);
-                }}>
-                  <option value="">Select Class</option>
-                  {allClasses.map(cls => (<option key={cls.index} value={cls.index}>{cls.name}</option>))}
-                </select>
-              </div>
-              <div>
-                <label>Level</label>
-                <input type="number" min="1" value={profile.classLevel} onChange={e => {
-                  const lvl = Number(e.target.value) || 1;
-                  setField("classLevel", lvl);
-                  setProfile(prev => ({ ...prev, profBonus: getProfBonusFromLevel(lvl) }));
-                }} />
-              </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
+                
+                {/* Left Column: Core Info & Appearance */}
+                <div>
+                    <section className="card">
+                        <h2 className="section-title">Core Details (Race/Class selection sets base proficiencies)</h2>
+                        <div className="grid-3">
+                            <div><label>Name</label><input value={profile.characterName} onChange={e => setField("characterName", e.target.value)} className="input-dark" /></div>
+                            <div><label>Race</label>
+                            <select value={profile.raceIndex || ""} onChange={e => setField("raceIndex", e.target.value)} className="input-dark">
+                                <option value="">Select Race</option>
+                                {(allRaces || []).map(r => (<option key={r.index} value={r.index}>{r.name}</option>))}
+                            </select>
+                            </div>
+                            <div><label>Class & Level</label>
+                            <div style={{display: 'flex', gap: '5px'}}>
+                                <select value={profile.classIndex || ""} onChange={e => setField("classIndex", e.target.value)} className="input-dark" style={{flexGrow: 1}}>
+                                <option value="">Select Class</option>
+                                {(allClasses || []).map(c => (<option key={c.index} value={c.index}>{c.name}</option>))}
+                                </select>
+                                <input type="number" min="1" max="20" value={profile.classLevel} onChange={e => setField("classLevel", Number(e.target.value))} className="input-dark" style={{width: '60px'}} />
+                            </div>
+                            </div>
+                        </div>
+                        <div className="grid-3 mt-2">
+                            <div><label>Background</label><input value={profile.background} onChange={e => setField("background", e.target.value)} className="input-dark" /></div>
+                            <div><label>Alignment</label><input value={profile.alignment} onChange={e => setField("alignment", e.target.value)} className="input-dark" /></div>
+                            <div><label>XP</label><input type="number" value={profile.xp} onChange={e => setField("xp", Number(e.target.value))} className="input-dark" /></div>
+                        </div>
+                        <div className="prof-bonus-line mt-2" style={{borderTop: '1px solid #444', paddingTop: '10px'}}>
+                            <span>Proficiency Bonus</span>
+                            <input type="number" value={profile.profBonus} onChange={e => setField("profBonus", Number(e.target.value))} className="input-dark" style={{width: '60px', textAlign: 'center'}} />
+                        </div>
+                    </section>
+                
+                    <section className="card mt-4">
+                        <h2 className="section-title">Appearance</h2>
+                        <div className="grid-3">
+                            <div><label>Age</label><input value={profile.age} onChange={e => setField("age", e.target.value)} className="input-dark" /></div>
+                            <div><label>Height</label><input value={profile.height} onChange={e => setField("height", e.target.value)} className="input-dark" /></div>
+                            <div><label>Weight</label><input value={profile.weight} onChange={e => setField("weight", e.target.value)} className="input-dark" /></div>
+                            <div><label>Eyes</label><input value={profile.eyes} onChange={e => setField("eyes", e.target.value)} className="input-dark" /></div>
+                            <div><label>Skin</label><input value={profile.skin} onChange={e => setField("skin", e.target.value)} className="input-dark" /></div>
+                            <div><label>Hair</label><input value={profile.hair} onChange={e => setField("hair", e.target.value)} className="input-dark" /></div>
+                        </div>
+                        <div className="mt-2"><label>Symbol / Deity</label><input value={profile.symbol} onChange={e => setField("symbol", e.target.value)} className="input-dark" /></div>
+                        <div className="mt-2"><label>Full Appearance</label><textarea value={profile.appearance} onChange={e => setField("appearance", e.target.value)} className="textarea-dark" /></div>
+                    </section>
+                </div>
+
+                {/* Right Column: Player & Portrait */}
+                <div>
+                    <section className="card">
+                        <h2 className="section-title">Player Info</h2>
+                        <div className="grid-1">
+                            <div><label>Player Name</label><input value={profile.playerName} onChange={e => setField("playerName", e.target.value)} className="input-dark" /></div>
+                            <div className="mt-2"><label>Inspiration</label><input type="checkbox" checked={profile.inspiration} onChange={e => setField("inspiration", e.target.checked)} /></div>
+                        </div>
+                    </section>
+                    
+                    <section className="card mt-4">
+                        <h2 className="section-title">Portrait</h2>
+                        <input type="file" id="portraitUpload" accept="image/*" onChange={(e) => {
+                            const file = e.target.files && e.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (e) => { setField("portraitDataUrl", e.target.result); };
+                            reader.readAsDataURL(file);
+                        }} />
+                        {profile.portraitDataUrl && (
+                            <img src={profile.portraitDataUrl} alt="Character Portrait Preview" style={{ maxWidth: '100%', marginTop: '10px', border: '2px solid #6b4226' }} />
+                        )}
+                    </section>
+                </div>
             </div>
-
-            {selectedClass && (
-              <div className="class-info card">
-                <h4>{selectedClass.name}</h4>
-                <div><strong>Proficiency bonus:</strong> {getProfBonusFromLevel(profile.classLevel)}</div>
-                <div><strong>Saving throw profs:</strong> {selectedClass.saving_throws?.map(s => s.name || s).join(", ") || "—"}</div>
-                <div><strong>Proficiencies:</strong> {selectedClass.proficiencies?.map(p => p.name || p).join(", ") || "—"}</div>
-                {selectedClass.spellcasting && <div><strong>Spellcasting:</strong> available (see Combat tab)</div>}
-              </div>
-            )}
-
-            {selectedRace && (
-              <div className="race-info card">
-                <h4>{selectedRace.name}</h4>
-                <div><strong>Speed:</strong> {selectedRace.speed}</div>
-                <div><strong>Ability Bonuses:</strong> {selectedRace.ability_bonuses?.map(ab => `${ab.ability_score?.name} +${ab.bonus}`).join(", ") || "—"}</div>
-              </div>
-            )}
           </section>
         )}
 
-        {/* --- STATS --- (Remains the same) */}
+        {/* --- STATS TAB --- */}
         {activeTab === "stats" && (
           <section className="tab-page">
-            <h2>Abilities, Saving Throws & Skills</h2>
-            <div className="ability-grid">
-              {ABILITIES.map(a => (
-                <div key={a} className="ability">
-                  <span>{a.toUpperCase()}</span>
-                  <input type="number" value={profile[a]} onChange={e => setField(a, Number(e.target.value))} />
-                  <span className="mod-pill">{getMod(profile[a]) >= 0 ? "+" : ""}{getMod(profile[a])}</span>
-                </div>
-              ))}
-            </div>
+            <h2>Abilities & Proficiencies</h2>
+            
+            <div className="grid-3" style={{gridTemplateColumns: '1fr 1fr 2fr', gap: '20px'}}>
+                
+                {/* Column 1: Ability Scores */}
+                <section className="card">
+                    <h2 className="section-title">Ability Scores</h2>
+                    <div className="abilities-grid" style={{ display: 'grid', gap: '10px' }}>
+                        {ABILITIES.map(ab => (
+                        <div key={ab} className="ability">
+                            <span className="ability-label">{ab.toUpperCase()}</span>
+                            <input 
+                            type="number" 
+                            min="1"
+                            value={profile[ab]} 
+                            onChange={e => setField(ab, Number(e.target.value))} 
+                            className="input-dark"
+                            style={{ width: '60px', textAlign: 'center' }}
+                            />
+                            <span className="mod-pill">
+                            {getMod(profile[ab] || 10) >= 0 ? "+" : ""}{getMod(profile[ab] || 10)}
+                            </span>
+                        </div>
+                        ))}
+                    </div>
+                    <div className="passive-line mt-3" style={{borderTop: '1px solid #6b4226', paddingTop: '10px'}}>
+                        <span>Passive Perception</span>
+                        <input value={profile.passivePerception} readOnly className="input-dark" style={{ width: '60px', textAlign: 'center' }} />
+                    </div>
+                </section>
+                
+                {/* Column 2: Saving Throws */}
+                <section className="card">
+                    <h2 className="section-title">Saving Throws</h2>
+                    <div className="saves-grid" style={{ display: 'grid', gap: '5px' }}>
+                        {ABILITIES.map(ab => (
+                        <div key={ab} className="save-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <label style={{ margin: 0 }}>
+                            <input 
+                                type="checkbox" 
+                                checked={!!profile.saveProf?.[ab]}
+                                onChange={e => handleProficiencyChange("saveProf", ab, e.target.checked)}
+                            /> 
+                            {capitalizeWords(ab)}
+                            </label>
+                            <input value={calcSaving(ab)} readOnly className="computed input-dark" style={{ width: '40px', textAlign: 'center' }} />
+                        </div>
+                        ))}
+                    </div>
+                </section>
 
-            <h3>Saving Throws</h3>
-            <div className="saves-grid">
-              {ABILITIES.map(a => (
-                <div key={a}>
-                  <label>
-                    <input type="checkbox" checked={!!profile.saveProf[a]} onChange={() => toggleSaveProf(a)} /> {capitalizeWords(a)}
-                  </label>
-                  <input value={(calcSaving(a) >= 0 ? "+" : "") + calcSaving(a)} readOnly />
-                </div>
-              ))}
-            </div>
+                {/* Column 3: Skills */}
+                <section className="card">
+                    <h2 className="section-title">Skills</h2>
+                    <div className="skills-grid" style={{ columnCount: 2, columnGap: '10px' }}>
+                        {Object.entries(SKILL_MAP).map(([skill, ability]) => (
+                        <div key={skill} className="skill" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                            <label style={{ margin: 0, fontSize: '0.9em' }}>
+                            <input 
+                                type="checkbox" 
+                                checked={!!profile.skillProf?.[skill]}
+                                onChange={e => handleProficiencyChange("skillProf", skill, e.target.checked)}
+                            /> 
+                            {capitalizeWords(skill)} ({ability.toUpperCase()})
+                            </label>
+                            <input value={calcSkill(skill)} readOnly className="computed input-dark" style={{ width: '40px', textAlign: 'center' }} />
+                        </div>
+                        ))}
+                    </div>
+                </section>
 
-            <h3>Skills</h3>
-            <div className="skill-list">
-              {Object.keys(SKILL_MAP).map(sk => (
-                <div key={sk}>
-                  <label><input type="checkbox" checked={profile.skillProf[sk] || false} onChange={() => toggleSkillProf(sk)} /> {capitalizeWords(sk)} ({SKILL_MAP[sk].toUpperCase()})</label>
-                  <input value={(calcSkill(sk) >= 0 ? "+" : "") + calcSkill(sk)} readOnly />
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <label>Passive Perception</label>
-              <input value={profile.passivePerception} readOnly />
             </div>
           </section>
         )}
 
-        {/* --- COMBAT --- (Remains the same) */}
+        {/* --- COMBAT + SPELLS TAB --- */}
         {activeTab === "combat" && (
           <section className="tab-page">
-            <h2>Combat</h2>
-            <div className="grid-3">
-              <div><label>Armor Class</label><input type="number" value={profile.armor} onChange={e => setField("armor", Number(e.target.value))} /></div>
-              <div><label>Initiative</label><input type="number" value={profile.initiative} onChange={e => setField("initiative", Number(e.target.value))} /></div>
-              <div><label>Speed</label><input type="number" value={profile.speed} onChange={e => setField("speed", Number(e.target.value))} /></div>
+            <h2>Combat & Spells</h2>
+            
+            {/* TOP ROW: Core Combat Stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr', gap: '20px' }}>
+                
+                <section className="card">
+                    <h2 className="section-title">AC, Init & Speed</h2>
+                    <div className="grid-3">
+                        <div><label>Armor Class</label><input type="number" value={profile.armor} onChange={e => setField("armor", Number(e.target.value))} className="input-dark" /></div>
+                        <div><label>Initiative</label><input value={profile.initiative >= 0 ? `+${profile.initiative}` : profile.initiative} readOnly className="input-dark" /></div>
+                        <div><label>Speed (ft)</label><input type="number" value={profile.speed} onChange={e => setField("speed", Number(e.target.value))} className="input-dark" /></div>
+                    </div>
+                </section>
+
+                <section className="card">
+                    <h2 className="section-title">Hit Points</h2>
+                    <div className="grid-3">
+                        <div><label>HP Max</label><input type="number" value={profile.hpMax} onChange={e => setField("hpMax", Number(e.target.value))} className="input-dark" /></div>
+                        <div><label>Current HP</label><input type="number" value={profile.hpCurrent} onChange={e => setField("hpCurrent", Number(e.target.value))} className="input-dark" /></div>
+                        <div><label>Temp HP</label><input type="number" value={profile.hpTemp} onChange={e => setField("hpTemp", Number(e.target.value))} className="input-dark" /></div>
+                    </div>
+                </section>
+
+                <section className="card">
+                    <h2 className="section-title">Death Saves</h2>
+                    <div className="death-saves" style={{display: 'flex', justifyContent: 'space-around'}}>
+                    <div>
+                        <label>Successes</label>
+                        {[1, 2, 3].map(i => (
+                            <input 
+                            key={`ds-${i}`} 
+                            type="checkbox" 
+                            checked={profile.deathSuccesses >= i}
+                            onChange={() => setField("deathSuccesses", profile.deathSuccesses === i ? i - 1 : i)}
+                            />
+                        ))}
+                    </div>
+                    <div>
+                        <label>Failures</label>
+                        {[1, 2, 3].map(i => (
+                            <input 
+                            key={`df-${i}`} 
+                            type="checkbox" 
+                            checked={profile.deathFailures >= i}
+                            onChange={() => setField("deathFailures", profile.deathFailures === i ? i - 1 : i)}
+                            />
+                        ))}
+                    </div>
+                    </div>
+                </section>
+            </div>
+              
+            {/* MIDDLE ROW: Attacks & Spell Slots */}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+                
+                {/* Attacks and Spellcasting */}
+                <section className="card mt-4">
+                    <h2 className="section-title">Attacks</h2>
+                    
+                    <div className="add-weapon-line">
+                        <label>Add Weapon from API:</label>
+                        <select onChange={handleWeaponSelection} defaultValue="" className="input-dark">
+                            <option value="" disabled>Select a Weapon</option>
+                            {allWeapons.map(w => (
+                                <option key={w.index} value={w.index}>{w.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    
+                    <div id="attacksContainer" className="mt-2">
+                        <div className="attack-header" style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 3fr 30px', fontWeight: 'bold', borderBottom: '1px solid #6b4226', paddingBottom: '5px' }}>
+                            <span>Name</span>
+                            <span>Bonus</span>
+                            <span>Damage / Type</span>
+                            <span></span>
+                        </div>
+                        {(profile.attacks || []).map((atk, index) => (
+                            <div key={index} className="attack-row page-fade-item" style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 3fr 30px', gap: '5px', padding: '5px 0' }}>
+                            <input 
+                                className="input-dark"
+                                placeholder="Name"
+                                value={atk.name || ""}
+                                onChange={e => updateAttackField(index, "name", e.target.value)}
+                            />
+                            <input 
+                                className="input-dark"
+                                placeholder="Bonus"
+                                value={atk.bonus || ""}
+                                onChange={e => updateAttackField(index, "bonus", e.target.value)}
+                                style={{textAlign: 'center'}}
+                            />
+                            <input 
+                                className="input-dark"
+                                placeholder="Damage / Type"
+                                value={atk.damage || ""}
+                                onChange={e => updateAttackField(index, "damage", e.target.value)}
+                            />
+                            <button className="btn-aura small" onClick={() => removeAttack(index)}>X</button>
+                            </div>
+                        ))}
+                    </div>
+                    <button id="addAttack" className="btn-aura mt-2" onClick={() => addNewAttack(null)}>
+                        + Add Custom Attack
+                    </button>
+                </section>
+
+                {/* Spell Slots (Compact) - FIXED to 1 column grid */}
+                <section className="card mt-4">
+                    <h2 className="section-title">Spell Slots (Compact)</h2>
+                    <div className="spell-slots-compact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(level => (
+                        <div key={level} 
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'space-between', 
+                                background: 'rgba(30, 15, 50, 0.7)', 
+                                padding: '5px', 
+                                borderRadius: '4px' 
+                            }}
+                        >
+                            <span style={{ color: '#ffdd99', fontWeight: 'bold', minWidth: '40px' }}>Lvl {level}:</span>
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                <input 
+                                type="number" 
+                                placeholder="Total" 
+                                value={profile[`slots${level}Total`]} 
+                                onChange={e => setField(`slots${level}Total`, Number(e.target.value))}
+                                className="input-dark"
+                                style={{ width: '60px', padding: '3px', textAlign: 'center' }}
+                                />
+                                <input 
+                                type="number" 
+                                placeholder="Used" 
+                                value={profile[`slots${level}Used`]} 
+                                onChange={e => setField(`slots${level}Used`, Number(e.target.value))}
+                                className="input-dark"
+                                style={{ width: '60px', padding: '3px', textAlign: 'center' }}
+                                />
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                </section>
             </div>
 
-            <div className="grid-3">
-              <div><label>HP Max</label><input type="number" value={profile.hpMax} onChange={e => setField("hpMax", Number(e.target.value))} /></div>
-              <div><label>Current HP</label><input type="number" value={profile.hpCurrent} onChange={e => setField("hpCurrent", Number(e.target.value))} /></div>
-              <div><label>Temp HP</label><input type="number" value={profile.hpTemp} onChange={e => setField("hpTemp", Number(e.target.value))} /></div>
-            </div>
 
-            <div className="grid-2">
-              <div><label>Death Saves Successes</label><input type="number" min="0" max="3" value={profile.deathSuccesses} onChange={e => setField("deathSuccesses", Number(e.target.value))} /></div>
-              <div><label>Death Saves Failures</label><input type="number" min="0" max="3" value={profile.deathFailures} onChange={e => setField("deathFailures", Number(e.target.value))} /></div>
-            </div>
-
-            <h3>Attacks</h3>
-            {(profile.attacks || []).map((atk, i) => (
-              <div key={i} className="attack-row">
-                <select value={atk.weaponIndex || ""} onChange={e => updateAttack(i, "weaponIndex", e.target.value)}>
-                  <option value="">Select Weapon</option>
-                  {(allWeapons || []).map(w => (<option key={w.index} value={w.index}>{w.name}</option>))}
-                </select>
-                <input placeholder="Bonus" value={atk.bonus !== undefined ? atk.bonus : ""} readOnly />
-                <input placeholder="Damage" value={atk.damage !== undefined ? atk.damage : ""} readOnly />
-                <button onClick={() => removeAttack(i)}>X</button>
-              </div>
-            ))}
-            <button onClick={addAttack}>Add Attack</button>
-
-            {selectedClass?.spellcasting && (
-              <>
-                <h3>Spell Slots</h3>
-                {(selectedClass.spellcasting.spell_slots || []).map((slots, lvl) => (
-                  <div key={lvl} className="slot-row">
-                    <label>Level {lvl + 1}</label>
-                    <input type="number" value={profile.spellSlots?.[lvl] ?? slots} onChange={e => {
-                      const newSlots = [...(profile.spellSlots || [])]; newSlots[lvl] = Number(e.target.value);
-                      setProfile(prev => ({ ...prev, spellSlots: newSlots }));
-                    }} />
-                    <span>/ {slots}</span>
-                  </div>
-                ))}
-              </>
-            )}
-
-            <h3>Spells</h3>
-            {(profile.spells || []).map((sp, i) => (
-              <div key={i} className="spell-row">
-                <select value={sp.index || ""} onChange={e => {
-                  const idx = e.target.value; const spell = getSpellByIndex(idx);
-                  const newSpells = [...(profile.spells || [])];
-                  if (spell) newSpells[i] = { index: spell.index, name: spell.name, level: spell.level, range: spell.range, duration: spell.duration, casting_time: spell.casting_time, components: spell.components };
-                  else newSpells[i] = {};
-                  setProfile(prev => ({ ...prev, spells: newSpells }));
-                }}>
-                  <option value="">Select Spell</option>
-                  {(allSpells || []).map(s => (<option key={s.index} value={s.index}>{s.name}</option>))}
-                </select>
-                {sp?.name && (
-                  <div className="spell-details">
-                    <strong>{sp.name}</strong> — Level: {sp.level} | Range: {sp.range} | Duration: {sp.duration} | Cast: {sp.casting_time}
-                    {sp.components ? <> | Components: {Array.isArray(sp.components) ? sp.components.join(", ") : sp.components}</> : null}
-                  </div>
+            {/* BOTTOM ROW: Spell Search and List (Full Width) */}
+            <section className="card mt-4">
+                <h2 className="section-title">Spell Search & Addition</h2>
+                
+                <div className="spell-search-container">
+                    <label htmlFor="spellSearch">Search Spells (API)</label>
+                    <input 
+                        type="text" 
+                        placeholder="Search D&D spells..." 
+                        value={spellSearchTerm}
+                        onChange={e => setSpellSearchTerm(e.target.value)}
+                        className="input-dark search-input"
+                        style={{width: '100%'}}
+                    />
+                    
+                    {spellSearchTerm.length > 2 && filteredSpells.length > 0 && (
+                        <select 
+                            onChange={handleSpellSearchSelect} 
+                            value=""
+                            size={Math.min(filteredSpells.length, 10)} 
+                            style={{ width: '100%', marginTop: '5px', maxHeight: '200px', overflowY: 'auto' }}
+                        >
+                            <option value="" disabled>Select a Spell</option>
+                            {filteredSpells.map(spell => (
+                                <option key={spell.index} value={spell.index}>
+                                    {spell.name} (Lvl {spell.level === 0 ? "Cantrip" : spell.level})
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                    
+                    {spellSearchTerm.length > 2 && filteredSpells.length === 0 && (
+                        <p style={{marginTop: '10px', color: '#3a1d0f'}}>No results found.</p>
+                    )}
+                </div>
+                
+                {selectedSpellDetail && (
+                    <div className="spell-detail-preview card mt-3 p-3">
+                        <h3 style={{color: '#8b5a2b', borderBottom: '1px solid #6b4226', paddingBottom: '5px'}}>{selectedSpellDetail.name} (Lvl {selectedSpellDetail.level === 0 ? "Cantrip" : selectedSpellDetail.level})</h3>
+                        <p style={{color: '#3a1d0f'}}><strong>Casting Time:</strong> {selectedSpellDetail.casting_time}</p>
+                        <p style={{color: '#3a1d0f'}}><strong>Range:</strong> {selectedSpellDetail.range}</p>
+                        <p style={{color: '#3a1d0f'}}><strong>Duration:</strong> {selectedSpellDetail.duration}</p>
+                        {selectedSpellDetail.desc && <p style={{color: '#3a1d0f'}}><strong>Description (Excerpt):</strong> {selectedSpellDetail.desc[0].substring(0, 150)}...</p>}
+                        
+                        <button 
+                            className="btn-aura mt-2" 
+                            onClick={() => addSpellToCharacter(selectedSpellDetail)}
+                        >
+                            + Add to Character
+                        </button>
+                    </div>
                 )}
-                <button onClick={() => removeSpell(i)}>Delete</button>
-              </div>
-            ))}
-            <button onClick={() => setProfile(prev => ({ ...prev, spells: [...(prev.spells || []), {}] }))}>Add Spell</button>
+                
+                <button className="btn-aura mt-3" onClick={addCustomSpell}>
+                    + Add Custom Spell
+                </button>
+            </section>
+
+            <section className="card mt-4">
+                <h2 className="section-title">Character Spells</h2>
+                <table className="spell-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Level</th>
+                            <th>Time</th>
+                            <th>Range</th>
+                            <th>Duration (Conc.)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {profile.selectedSpells
+                            .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
+                            .map((spell) => (
+                                <tr key={spell.index}>
+                                    <td>
+                                        {spell.custom ? (
+                                            <input 
+                                                type="text" 
+                                                value={spell.name}
+                                                onChange={e => updateCustomSpellField(spell.index, 'name', e.target.value)}
+                                                className="input-dark small-input"
+                                                placeholder="Name"
+                                            />
+                                        ) : spell.name}
+                                    </td>
+                                    <td>
+                                        {spell.custom ? (
+                                            <input 
+                                                type="number" 
+                                                min="0"
+                                                value={spell.level}
+                                                onChange={e => updateCustomSpellField(spell.index, 'level', e.target.value)}
+                                                className="input-dark small-input"
+                                                style={{width: '60px'}}
+                                            />
+                                        ) : (spell.level === 0 ? "Cantrip" : spell.level)}
+                                    </td>
+                                    <td>
+                                        {spell.custom ? (
+                                            <input type="text" value={spell.casting_time} onChange={e => updateCustomSpellField(spell.index, 'casting_time', e.target.value)} className="input-dark small-input" placeholder="Time"/>
+                                        ) : spell.casting_time}
+                                    </td>
+                                    <td>
+                                        {spell.custom ? (
+                                            <input type="text" value={spell.range} onChange={e => updateCustomSpellField(spell.index, 'range', e.target.value)} className="input-dark small-input" placeholder="Range"/>
+                                        ) : spell.range}
+                                    </td>
+                                    <td>
+                                        {spell.custom ? (
+                                            <input type="text" value={spell.duration} onChange={e => updateCustomSpellField(spell.index, 'duration', e.target.value)} className="input-dark small-input" placeholder="Duration"/>
+                                        ) : `${spell.duration} ${spell.concentration ? "(Conc.)" : ""}`}
+                                    </td>
+                                    <td>
+                                        <button className="btn-aura small" onClick={() => removeSpell(spell.index)}>
+                                            X
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        {profile.selectedSpells.length === 0 && (
+                            <tr><td colSpan="6" style={{textAlign: 'center'}}>No spells added.</td></tr>
+                        )}
+                    </tbody>
+                </table>
+            </section>
           </section>
         )}
-
-        {/* --- EQUIPMENT --- (General Equipment list was added based on your tab-content logic) */}
+        
+        {/* --- EQUIPMENT TAB --- */}
         {activeTab === "equipment" && (
           <section className="tab-page">
-            <h2>Equipment & Coins</h2>
-
-            {/* General Equipment list (Custom Item style) */}
-            {(profile.generalEquipment || []).map((item, i) => (
-              <div key={i} className="item-card">
-                <div className="item-row">
-                  <input
-                    type="text"
-                    placeholder="Item Name"
-                    value={item.name || ""}
-                    onChange={e => {
-                      const newItems = [...(profile.generalEquipment || [])];
-                      newItems[i] = { ...newItems[i], name: e.target.value };
-                      setField("generalEquipment", newItems);
-                    }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Description / Notes"
-                    value={item.notes || ""}
-                    onChange={e => {
-                      const newItems = [...(profile.generalEquipment || [])];
-                      newItems[i] = { ...newItems[i], notes: e.target.value };
-                      setField("generalEquipment", newItems);
-                    }}
-                  />
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.quantity || 1}
-                    onChange={e => {
-                      const newItems = [...(profile.generalEquipment || [])];
-                      newItems[i] = { ...newItems[i], quantity: Number(e.target.value) || 1 };
-                      setField("generalEquipment", newItems);
-                    }}
-                    style={{ width: "70px" }}
-                  />
-                  <button onClick={() => {
-                    const newItems = (profile.generalEquipment || []).filter((_, idx) => idx !== i);
-                    setField("generalEquipment", newItems);
-                  }}>X</button>
-                </div>
+            <h2>Equipment</h2>
+            <section className="card">
+              <h2 className="section-title">Money</h2>
+              <div className="grid-5 money-grid">
+                <div><label>CP (Copper)</label><input type="number" value={profile.cp} onChange={e => setField("cp", Number(e.target.value))} className="input-dark" /></div>
+                <div><label>SP (Silver)</label><input type="number" value={profile.sp} onChange={e => setField("sp", Number(e.target.value))} className="input-dark" /></div>
+                <div><label>EP (Electrum)</label><input type="number" value={profile.ep} onChange={e => setField("ep", Number(e.target.value))} className="input-dark" /></div>
+                <div><label>GP (Gold)</label><input type="number" value={profile.gp} onChange={e => setField("gp", Number(e.target.value))} className="input-dark" /></div>
+                <div><label>PP (Platinum)</label><input type="number" value={profile.pp} onChange={e => setField("pp", Number(e.target.value))} className="input-dark" /></div>
               </div>
-            ))}
+            </section>
 
-            <button onClick={() => {
-              setField("generalEquipment", [...(profile.generalEquipment || []), { name: "", notes: "", quantity: 1 }]);
-            }}>Add Item</button>
-
-
-            {/* Coins */}
-            <h3>Coins</h3>
-            <div className="coins-grid">
-              {["cp", "sp", "ep", "gp", "pp"].map(c => (
-                <div key={c} className="coin-card">
-                  <label>{c.toUpperCase()}</label>
-                  <input
-                    type="number"
-                    value={profile[c] || 0}
-                    onChange={e => setField(c, Number(e.target.value))}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <h3>Custom Items</h3>
-            <div className="custom-item-row">
-              <input placeholder="Name" value={profile.newItemName} onChange={e => setField("newItemName", e.target.value)} />
-              <input placeholder="Type" value={profile.newItemType} onChange={e => setField("newItemType", e.target.value)} />
-              <input placeholder="Description" value={profile.newItemDesc} onChange={e => setField("newItemDesc", e.target.value)} />
-              <button onClick={() => {
-                if (!profile.newItemName) return;
-                const newList = [...(profile.customItems || []), { name: profile.newItemName, type: profile.newItemType, desc: profile.newItemDesc }];
-                setProfile(prev => ({ ...prev, customItems: newList, newItemName: "", newItemType: "", newItemDesc: "" }));
-              }}>Add</button>
-            </div>
-
-            <div className="equipment-list">
-              {(profile.customItems || []).map((item, i) => (
-                <div key={i} className="equipment-card">
-                  <div>
-                    <strong>{item.name}</strong>
-                    <span>{item.type} — {item.desc}</span>
-                  </div>
-                  <button onClick={() => {
-                    const newList = (profile.customItems || []).filter((_, idx) => idx !== i);
-                    setProfile(prev => ({ ...prev, customItems: newList }));
-                  }}>Delete</button>
-                </div>
-              ))}
-            </div>
-
+            <section className="card">
+              <h2 className="section-title">General Equipment & Notes</h2>
+              <textarea value={profile.equipment} onChange={e => setField("equipment", e.target.value)} className="textarea-dark" placeholder="Place general notes, carry capacity, or unlisted equipment here..." />
+            </section>
+            
+            <section className="card">
+                <h2 className="section-title">Item List (with Quantity)</h2>
+                {(profile.generalEquipment || []).map((item, i) => (
+                    <div key={i} className="item-card" style={{ display: 'flex', gap: '10px', marginBottom: '8px', alignItems: 'center' }}>
+                        
+                        {/* Quantity Input */}
+                        <label style={{ margin: 0, minWidth: '40px' }}>Qty:</label>
+                        <input 
+                            type="number" 
+                            min="1"
+                            value={item.quantity || 1} 
+                            onChange={e => { 
+                                const newItems = [...(profile.generalEquipment || [])]; 
+                                newItems[i] = { ...newItems[i], quantity: Number(e.target.value) }; 
+                                setField("generalEquipment", newItems); 
+                            }} 
+                            className="input-dark"
+                            style={{ width: '60px', textAlign: 'center' }}
+                        />
+                        
+                        <input 
+                            type="text" 
+                            placeholder="Item Name" 
+                            value={item.name || ""} 
+                            onChange={e => { 
+                                const newItems = [...(profile.generalEquipment || [])]; 
+                                newItems[i] = { ...newItems[i], name: e.target.value }; 
+                                setField("generalEquipment", newItems); 
+                            }} 
+                            className="input-dark"
+                            style={{ flexGrow: 1 }}
+                        />
+                        <input 
+                            type="text" 
+                            placeholder="Description / Notes" 
+                            value={item.notes || ""} 
+                            onChange={e => {
+                                const newItems = [...(profile.generalEquipment || [])];
+                                newItems[i] = { ...newItems[i], notes: e.target.value };
+                                setField("generalEquipment", newItems);
+                            }} 
+                            className="input-dark"
+                            style={{ flexGrow: 2 }}
+                        />
+                        <button className="btn-aura small" onClick={() => setField("generalEquipment", profile.generalEquipment.filter((_, idx) => idx !== i))}>X</button>
+                    </div>
+                ))}
+                <button className="btn-aura mt-2" onClick={() => setField("generalEquipment", [...(profile.generalEquipment || []), { name: "", notes: "", quantity: 1 }])}>
+                  + Add Item
+                </button>
+            </section>
           </section>
         )}
 
-
-        {/* --- STORY --- (Remains the same) */}
+        {/* --- STORY TAB --- */}
         {activeTab === "story" && (
           <section className="tab-page">
             <h2>Story</h2>
-            <div><label>Personality Traits</label><textarea value={profile.personalityTraits} onChange={e => setField("personalityTraits", e.target.value)} /></div>
-            <div><label>Ideals</label><textarea value={profile.ideals} onChange={e => setField("ideals", e.target.value)} /></div>
-            <div><label>Bonds</label><textarea value={profile.bonds} onChange={e => setField("bonds", e.target.value)} /></div>
-            <div><label>Flaws</label><textarea value={profile.flaws} onChange={e => setField("flaws", e.target.value)} /></div>
-            <div className="multi-textareas">
-              <textarea value={profile.allies} onChange={e => setField("allies", e.target.value)} placeholder="Allies" />
-              <textarea value={profile.additionalFeatures} onChange={e => setField("additionalFeatures", e.target.value)} placeholder="Additional Features" />
-              <textarea value={profile.treasure} onChange={e => setField("treasure", e.target.value)} placeholder="Treasure" />
-              <textarea value={profile.backstory} onChange={e => setField("backstory", e.target.value)} placeholder="Backstory" />
+            <div><label>Personality Traits</label><textarea value={profile.personalityTraits} onChange={e => setField("personalityTraits", e.target.value)} className="textarea-dark" /></div>
+            <div><label>Ideals</label><textarea value={profile.ideals} onChange={e => setField("ideals", e.target.value)} className="textarea-dark" /></div>
+            <div><label>Bonds</label><textarea value={profile.bonds} onChange={e => setField("bonds", e.target.value)} className="textarea-dark" /></div>
+            <div><label>Flaws</label><textarea value={profile.flaws} onChange={e => setField("flaws", e.target.value)} className="textarea-dark" /></div>
+            <div className="multi-textareas" style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
+              <textarea value={profile.allies} onChange={e => setField("allies", e.target.value)} placeholder="Allies & Organizations" className="textarea-dark" />
+              <textarea value={profile.additionalFeatures} onChange={e => setField("additionalFeatures", e.target.value)} placeholder="Additional Features & Traits" className="textarea-dark" />
+              <textarea value={profile.treasure} onChange={e => setField("treasure", e.target.value)} placeholder="Treasure" className="textarea-dark" />
+              <textarea value={profile.backstory} onChange={e => setField("backstory", e.target.value)} placeholder="Backstory" className="textarea-dark" />
             </div>
           </section>
         )}

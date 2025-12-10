@@ -4,7 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { sha256 } from 'js-sha256';
 import md5 from "md5";
 import axios from 'axios';
-import api, { register, login, saltSend, getSalt } from '../Api'; // Added missing imports from api
+// === FIX 2 APPLIED: Explicitly importing all API functions ===
+import api, { register, login, getSalt, saltSend } from '../Api';
+// ==========================================================
 import Footer from '../components/Footer';
 import { NavbarLogin } from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
@@ -62,31 +64,31 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
 
     useEffect(() => {
         setErrorMessage('');
-    }, [registerUsername, registerEmail, pwd, matchPwd, email, password]); // Added email and password for clarity
+    }, [registerUsername, registerEmail, pwd, matchPwd, email, password]);
 
     function generateSalt() {
         const array = new Uint8Array(32);
         window.crypto.getRandomValues(array);
-        // Generates a 64-character hex string (32 bytes * 2 hex chars)
         return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
     }
 
     function hashPassword(password, salt) {
-        // Hashing logic based on original code: sha256(password) then md5(hash + salt)
         const hash = sha256(password);
         return md5(hash + salt);
     }
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
-        try {
-            // Check if email is filled before getting salt
-            if (!email) {
-                setErrorMessage("Email field cannot be empty.");
-                return;
-            }
+        
+        // === FIX 1 APPLIED: Client-Side Empty Field Check ===
+        if (!email || !password) {
+            setErrorMessage("Please enter both email and password.");
+            return;
+        }
+        // ===================================================
 
-            const saltResponse = await getSalt(email); // Use imported getSalt
+        try {
+            const saltResponse = await getSalt(email);
             const salt = saltResponse.data?.salt || '';
             const hashedPassword = hashPassword(password, salt);
             const response = await login(email, hashedPassword);
@@ -102,10 +104,9 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
                     localStorage.setItem("profilePicture", user.profilePicture || "/defaults/profile_picture.jpg");
                 }
                 
-                // === SECURITY/UX FIX: Clear login fields on success ===
+                // Clear login fields on success
                 setEmail('');
                 setPassword('');
-                // ========================================================
 
                 setIsAuthenticated(true);
                 navigate("/");
@@ -114,11 +115,20 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
             }
         } catch (error) {
             let errorMsg = error.response?.data?.message || error.response?.data?.error || error.message;
-            if (typeof error.response?.data === "string") {
-                errorMsg = error.response.data;
-            } else if (error.response?.data) {
+
+            // Improved error parsing
+            if (error.response?.status === 400 && error.response?.data?.errors) {
+                const validationErrors = Object.values(error.response.data.errors)
+                    .map(arr => arr.join(', '))
+                    .join('; ');
+                errorMsg = `Validation failed: ${validationErrors}`;
+            } 
+            else if (typeof error.response?.data === "object" && error.response.data !== null) {
                 errorMsg = JSON.stringify(error.response.data);
+            } else if (typeof error.response?.data === "string") {
+                errorMsg = error.response.data;
             }
+
             setErrorMessage("Login failed: " + (errorMsg || "An unknown error occurred."));
         }
     };
@@ -126,12 +136,10 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
 
-        // === VALIDATION FIX: Ensure all fields are valid (including email) ===
         if (!validUsername || !validEmail || !validPwd || !validMatch) {
             setErrorMessage("Please ensure username, a valid email, and matching passwords are provided.");
             return;
         }
-        // ====================================================================
 
         try {
             const salt = generateSalt();
@@ -139,26 +147,35 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
 
             const response = await register(registerEmail, registerUsername, hashedPassword);
             if (response && response.data) {
-                await saltSend(registerEmail, salt); // Use imported saltSend
+                await saltSend(registerEmail, salt);
 
-                // === SECURITY/UX FIX: Clear register fields on success ===
+                // Clear register fields on success
                 setRegisterUsername('');
                 setRegisterEmail('');
                 setPwd('');
                 setMatchPwd('');
-                // =========================================================
                 
-                setErrorMessage(""); // Clear any prior error message
+                setErrorMessage(""); 
                 alert("Registration successful! Please log in.");
                 toggleForms();
             }
         } catch (error) {
+            // === FIX 3 APPLIED: Improved error parsing for 'object object' ===
             let errorMsg = error.response?.data?.message || error.response?.data?.error || error.message;
-            if (typeof error.response?.data === "string") {
-                errorMsg = error.response.data;
-            } else if (error.response?.data) {
+
+            if (error.response?.status === 400 && error.response?.data?.errors) {
+                const validationErrors = Object.values(error.response.data.errors)
+                    .map(arr => arr.join(', '))
+                    .join('; ');
+                errorMsg = `Validation failed: ${validationErrors}`;
+            } 
+            else if (typeof error.response?.data === "object" && error.response.data !== null) {
                 errorMsg = JSON.stringify(error.response.data);
+            } else if (typeof error.response?.data === "string") {
+                errorMsg = error.response.data;
             }
+            // =================================================================
+
             setErrorMessage("Registration failed: " + (errorMsg || "An unknown error occurred."));
         }
     };
@@ -169,11 +186,11 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
         if (signInForm.style.display === 'block') {
             signInForm.style.display = 'none';
             signUpForm.style.display = 'block';
-            setErrorMessage(''); // Clear error when switching forms
+            setErrorMessage(''); 
         } else {
             signInForm.style.display = 'block';
             signUpForm.style.display = 'none';
-            setErrorMessage(''); // Clear error when switching forms
+            setErrorMessage(''); 
         }
     };
 
@@ -307,9 +324,7 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
                             className="btn btn-success w-100"
                             value="Sign Up"
                             name="signUp"
-                            // === VALIDATION FIX: Added !validEmail to the disabled prop ===
                             disabled={!validUsername || !validEmail || !validPwd || !validMatch}
-                            // =============================================================
                         />
                         <p className="or">----------or--------</p>
                         <div className="links text-center">

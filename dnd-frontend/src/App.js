@@ -89,7 +89,7 @@ function AppWithRouter({
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/logreg" />} />
         <Route path="/friends" element={isAuthenticated ? <Friends /> : <Navigate to="/logreg" />} />
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
-        <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />
+        <Route path="/character" element={<Character /> } />
         <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
 
