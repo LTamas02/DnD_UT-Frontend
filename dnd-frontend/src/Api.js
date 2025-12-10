@@ -11,31 +11,30 @@ const api = axios.create({
 
 
 
-
-// Auth endpoints
 export const register = (email, username, password) =>
-    api.post("/auth/register", { email, username, password });
-
-export const saltSend = (email, salt) =>
-    api.post("/auth/salt-send", { email, salt });
+    api.post("Auth/register", null, {
+        params: { email, username, password }
+    });
 
 export const login = (email, password) =>
-    api.post("/auth/login", { email, password });
+    api.post("Auth/login", null, {
+        params: { email, password }
+    });
 
 export const getSalt = (email) =>
-    api.get("/auth/salt", {
+    api.get("Auth/salt", {
         params: { email }
     });
 
-export const getUser = async (token) =>
-    api.get("/auth/me", {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "/"
-        }
+export const saltSend = (email, salt) =>
+    api.post("Auth/salt-send", null, {
+        params: { email, salt }
     });
 
-
+export const getUser = (token) =>
+    api.get("Auth/me", {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
 
 
 

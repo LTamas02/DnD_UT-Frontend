@@ -2,11 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../assets/styles/Login.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { sha256 } from 'js-sha256';
-import md5 from "md5";
-import axios from 'axios';
-// === FIX 2 APPLIED: Explicitly importing all API functions ===
 import api, { register, login, getSalt, saltSend } from '../Api';
-// ==========================================================
 import Footer from '../components/Footer';
 import { NavbarLogin } from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
@@ -15,28 +11,24 @@ const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
+const LogReg = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
     const [errorMessage, setErrorMessage] = useState('');
 
-    // Login form states
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // Register form states
+    // Register states
     const [registerUsername, setRegisterUsername] = useState('');
     const [validUsername, setValidUsername] = useState(false);
-    const [userFocus, setUserFocus] = useState(false);
 
     const [registerEmail, setRegisterEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
 
     const [pwd, setPwd] = useState('');
     const [validPwd, setValidPwd] = useState(false);
-    const [pwdFocus, setPwdFocus] = useState(false);
 
     const [matchPwd, setMatchPwd] = useState('');
     const [validMatch, setValidMatch] = useState(false);
-    const [matchFocus, setMatchFocus] = useState(false);
 
     const userRef = useRef();
     const errRef = useRef();
@@ -44,9 +36,7 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userRef.current) {
-            userRef.current.focus();
-        }
+        userRef.current?.focus();
     }, []);
 
     useEffect(() => {
@@ -64,7 +54,14 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
 
     useEffect(() => {
         setErrorMessage('');
-    }, [registerUsername, registerEmail, pwd, matchPwd, email, password]);
+    }, [email, password, registerUsername, registerEmail, pwd, matchPwd]);
+
+    // ==============================
+    // SALT + SHA256(password + salt)
+    // ==============================
+    function computeClientHash(password, salt) {
+        return sha256(password + salt);
+    }
 
     function generateSalt() {
         const array = new Uint8Array(32);
@@ -72,266 +69,169 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
         return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
     }
 
-    function hashPassword(password, salt) {
-        const hash = sha256(password);
-        return md5(hash + salt);
-    }
-
+    // ==============================
+    // LOGIN
+    // ==============================
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
-        
-        // === FIX 1 APPLIED: Client-Side Empty Field Check ===
+
         if (!email || !password) {
             setErrorMessage("Please enter both email and password.");
             return;
         }
-        // ===================================================
 
         try {
             const saltResponse = await getSalt(email);
-            const salt = saltResponse.data?.salt || '';
-            const hashedPassword = hashPassword(password, salt);
-            const response = await login(email, hashedPassword);
+            const salt = saltResponse.data?.salt;
+
+            if (!salt) {
+                setErrorMessage("Salt not found for this user.");
+                return;
+            }
+
+            const clientHash = computeClientHash(password, salt);
+            const response = await login(email, clientHash);
 
             const token = response.data?.token;
-            const user = response.data?.user ?? null;
-
-            if (token) {
-                localStorage.setItem("token", token);
-
-                if (user) {
-                    localStorage.setItem("username", user.username || "");
-                    localStorage.setItem("profilePicture", user.profilePicture || "/defaults/profile_picture.jpg");
-                }
-                
-                // Clear login fields on success
-                setEmail('');
-                setPassword('');
-
-                setIsAuthenticated(true);
-                navigate("/");
-            } else {
+            if (!token) {
                 setErrorMessage("Login failed: No token received.");
+                return;
             }
+
+            localStorage.setItem("token", token);
+
+            setIsAuthenticated(true);
+            setEmail('');
+            setPassword('');
+
+            navigate("/");
         } catch (error) {
-            let errorMsg = error.response?.data?.message || error.response?.data?.error || error.message;
-
-            // Improved error parsing
-            if (error.response?.status === 400 && error.response?.data?.errors) {
-                const validationErrors = Object.values(error.response.data.errors)
-                    .map(arr => arr.join(', '))
-                    .join('; ');
-                errorMsg = `Validation failed: ${validationErrors}`;
-            } 
-            else if (typeof error.response?.data === "object" && error.response.data !== null) {
-                errorMsg = JSON.stringify(error.response.data);
-            } else if (typeof error.response?.data === "string") {
-                errorMsg = error.response.data;
-            }
-
-            setErrorMessage("Login failed: " + (errorMsg || "An unknown error occurred."));
+            const msg = error.response?.data || error.message;
+            setErrorMessage("Login failed: " + msg);
         }
     };
 
+    // ==============================
+    // REGISTER
+    // ==============================
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
 
         if (!validUsername || !validEmail || !validPwd || !validMatch) {
-            setErrorMessage("Please ensure username, a valid email, and matching passwords are provided.");
+            setErrorMessage("Please complete all fields correctly.");
             return;
         }
 
         try {
             const salt = generateSalt();
-            const hashedPassword = hashPassword(pwd, salt);
+            const clientHash = computeClientHash(pwd, salt);
 
-            const response = await register(registerEmail, registerUsername, hashedPassword);
-            if (response && response.data) {
-                await saltSend(registerEmail, salt);
+            await register(registerEmail, registerUsername, clientHash);
+            await saltSend(registerEmail, salt);
 
-                // Clear register fields on success
-                setRegisterUsername('');
-                setRegisterEmail('');
-                setPwd('');
-                setMatchPwd('');
-                
-                setErrorMessage(""); 
-                alert("Registration successful! Please log in.");
-                toggleForms();
-            }
+            setRegisterUsername('');
+            setRegisterEmail('');
+            setPwd('');
+            setMatchPwd('');
+
+            alert("Registration successful! Please log in.");
+            toggleForms();
         } catch (error) {
-            // === FIX 3 APPLIED: Improved error parsing for 'object object' ===
-            let errorMsg = error.response?.data?.message || error.response?.data?.error || error.message;
-
-            if (error.response?.status === 400 && error.response?.data?.errors) {
-                const validationErrors = Object.values(error.response.data.errors)
-                    .map(arr => arr.join(', '))
-                    .join('; ');
-                errorMsg = `Validation failed: ${validationErrors}`;
-            } 
-            else if (typeof error.response?.data === "object" && error.response.data !== null) {
-                errorMsg = JSON.stringify(error.response.data);
-            } else if (typeof error.response?.data === "string") {
-                errorMsg = error.response.data;
-            }
-            // =================================================================
-
-            setErrorMessage("Registration failed: " + (errorMsg || "An unknown error occurred."));
+            const msg = error.response?.data || error.message;
+            setErrorMessage("Registration failed: " + msg);
         }
     };
 
     const toggleForms = () => {
         const signInForm = document.getElementById('signIn');
         const signUpForm = document.getElementById('signUp');
+
         if (signInForm.style.display === 'block') {
             signInForm.style.display = 'none';
             signUpForm.style.display = 'block';
-            setErrorMessage(''); 
         } else {
-            signInForm.style.display = 'block';
             signUpForm.style.display = 'none';
-            setErrorMessage(''); 
+            signInForm.style.display = 'block';
         }
+
+        setErrorMessage('');
     };
 
     return (
         <div id="login-comp">
             <NavbarLogin />
 
-            <p ref={errRef} className={errorMessage ? 'errmsg' : "offscreen"} aria-live="assertive">{errorMessage}</p>
+            <p ref={errRef} className={errorMessage ? 'errmsg' : "offscreen"} aria-live="assertive">
+                {errorMessage}
+            </p>
 
             <div className="container my-5" id="authForm">
-                {/* Sign In Form */}
+
+                {/* LOGIN FORM */}
                 <div id="signIn" style={{ display: 'block' }}>
-                    <h1 className="form-title mb-4" id="formTitle">Sign In</h1>
-                    <form method="post" onSubmit={handleLoginSubmit} id="signInForm">
+                    <h1 className="form-title mb-4">Sign In</h1>
+
+                    <form onSubmit={handleLoginSubmit}>
                         <div className="input-group mb-3">
                             <span className="input-group-text"><i className="fas fa-envelope"></i></span>
-                            <input
-                                type="email"
-                                className="form-control"
-                                name="email"
-                                id="email"
-                                placeholder="Email"
-                                required
-                                ref={userRef}
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                            />
+                            <input type="email" className="form-control" placeholder="Email"
+                                required ref={userRef} value={email} onChange={e => setEmail(e.target.value)} />
                         </div>
+
                         <div className="input-group mb-3">
                             <span className="input-group-text"><i className="fas fa-lock"></i></span>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="password"
-                                id="password"
-                                placeholder="Password"
-                                required
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                            />
+                            <input type="password" className="form-control" placeholder="Password"
+                                required value={password} onChange={e => setPassword(e.target.value)} />
                         </div>
-                        <p className="recover">
-                            <a href="#">Recover Password</a>
-                        </p>
-                        <input type="submit" className="btn btn-success w-100" value="Sign In" name="signIn" />
+
+                        <input type="submit" className="btn btn-success w-100" value="Sign In" />
                         <p className="or">---------or---------</p>
+
                         <div className="links text-center">
                             <p>Don't have an account yet?</p>
                             <button type="button" className="btn valtas" onClick={toggleForms}>Register</button>
                         </div>
-                        <p className="mt-5 mb-3 text-center">© 2024–2026</p>
                     </form>
                 </div>
 
-                {/* Sign Up Form */}
+                {/* REGISTER FORM */}
                 <div id="signUp" style={{ display: 'none' }}>
-                    <h1 className="form-title mb-4" id="formTitle">Sign Up</h1>
-                    <form method="post" id="signUpForm" onSubmit={handleRegisterSubmit}>
+                    <h1 className="form-title mb-4">Sign Up</h1>
+
+                    <form onSubmit={handleRegisterSubmit}>
                         <div className="input-group mb-3">
                             <span className="input-group-text"><i className="fas fa-user"></i></span>
-                            <input
-                                type="text"
-                                className="form-control"
-                                name="registerUsername"
-                                id="registerUsername"
-                                placeholder="Username"
-                                required
-                                autoComplete="off"
-                                value={registerUsername}
-                                onChange={e => setRegisterUsername(e.target.value)}
-                                onFocus={() => setUserFocus(true)}
-                                onBlur={() => setUserFocus(false)}
-                            />
+                            <input type="text" className="form-control" placeholder="Username"
+                                required value={registerUsername} onChange={e => setRegisterUsername(e.target.value)} />
                         </div>
+
                         <div className="input-group mb-3">
                             <span className="input-group-text"><i className="fas fa-envelope"></i></span>
-                            <input
-                                type="email"
-                                className="form-control"
-                                name="registerEmail"
-                                id="registerEmail"
-                                placeholder="Email"
-                                required
-                                value={registerEmail}
-                                onChange={e => setRegisterEmail(e.target.value)}
-                                aria-invalid={validEmail ? "false" : "true"}
-                            />
+                            <input type="email" className="form-control" placeholder="Email"
+                                required value={registerEmail} onChange={e => setRegisterEmail(e.target.value)} />
                         </div>
+
                         <div className="input-group mb-3">
                             <span className="input-group-text"><i className="fas fa-lock"></i></span>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="registerPassword"
-                                id="registerPassword"
-                                placeholder="Password"
-                                required
-                                value={pwd}
-                                onChange={e => setPwd(e.target.value)}
-                                aria-invalid={validPwd ? "false" : "true"}
-                                aria-describedby="pwdnote"
-                                onFocus={() => setPwdFocus(true)}
-                                onBlur={() => setPwdFocus(false)}
-                            />
-                            <p id="pwdnote" className={pwdFocus && !validPwd ? "instructions" : "offscreen"}>
-                                8+ chars, uppercase, lowercase, number, special character.
-                            </p>
+                            <input type="password" className="form-control" placeholder="Password"
+                                required value={pwd} onChange={e => setPwd(e.target.value)} />
                         </div>
+
                         <div className="input-group mb-3">
                             <span className="input-group-text"><i className="fas fa-lock"></i></span>
-                            <input
-                                type="password"
-                                className="form-control"
-                                name="confirmPassword"
-                                id="confirmPassword"
-                                placeholder="Confirm Password"
-                                required
-                                value={matchPwd}
-                                onChange={e => setMatchPwd(e.target.value)}
-                                aria-invalid={validMatch ? "false" : "true"}
-                                aria-describedby="confirmnote"
-                                onFocus={() => setMatchFocus(true)}
-                                onBlur={() => setMatchFocus(false)}
-                            />
-                            <p id="confirmnote" className={matchFocus && !validMatch ? "instructions" : "offscreen"}>
-                                Must match the first password input field.
-                            </p>
+                            <input type="password" className="form-control" placeholder="Confirm Password"
+                                required value={matchPwd} onChange={e => setMatchPwd(e.target.value)} />
                         </div>
-                        <input
-                            type="submit"
-                            className="btn btn-success w-100"
-                            value="Sign Up"
-                            name="signUp"
-                            disabled={!validUsername || !validEmail || !validPwd || !validMatch}
-                        />
-                        <p className="or">----------or--------</p>
+
+                        <input type="submit" className="btn btn-success w-100" value="Sign Up"
+                            disabled={!validUsername || !validEmail || !validPwd || !validMatch} />
+
+                        <p className="or">---------or---------</p>
+
                         <div className="links text-center">
                             <p>Already have an account?</p>
                             <button type="button" className="btn valtas" onClick={toggleForms}>Login</button>
                         </div>
-                        <p className="mt-5 mb-3 text-center">© 2024–2026</p>
                     </form>
                 </div>
             </div>
@@ -341,4 +241,4 @@ const Login = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
     );
 };
 
-export default Login;
+export default LogReg;
