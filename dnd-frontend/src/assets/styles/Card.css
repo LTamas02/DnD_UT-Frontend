@@ -1,44 +1,82 @@
-/* Fantasy/D&D Themed Card Styling */
+/*
+ * 💳 Kártya Stílus: Prémium Lounge Kártya 💳
+ * Mély barna alap, letisztult arany/bronz kiemelések.
+ */
 .card {
-    background: linear-gradient(135deg, #3e2723 0%, #212121 100%);
-    border: 3px solid #bfa76f;
-    border-radius: 18px;
-    box-shadow: 0 6px 24px rgba(50, 30, 10, 0.5), 0 1.5px 0 #bfa76f inset;
-    color: #f5e6c8;
-    font-family: 'UnifrakturCook', 'Cinzel Decorative', serif;
+    /* Háttér: Elegáns, mélybarna gradient */
+    background: linear-gradient(135deg, #4e342e 0%, #3e2723 100%); 
+    
+    /* Keret: Finom, bronz/réz színű vonal */
+    border: 2px solid #a1887f; 
+    border-radius: 12px; /* Lágyabb, modernebb sarok */
+    
+    /* Árnyék: Diszkrét, mély, texturált árnyék */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
+    
+    /* Szöveg: Krémfehér/világos arany */
+    color: #fff8e1; 
+    
+    /* Betűtípus: Elegáns, olvasható Serif */
+    font-family: 'Georgia', serif; 
+    
     margin: 1rem;
-    transition: transform 0.2s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Finomabb átmenet */
 }
+
 .card:hover {
-    transform: scale(1.03) rotate(-1deg);
-    box-shadow: 0 12px 36px rgba(50, 30, 10, 0.7);
+    /* Enyhe, elegáns emelkedés és ragyogás */
+    transform: scale(1.02); 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 10px #ffcc80; 
     text-decoration: none;
 }
+
 .card-body {
     padding: 1.5rem;
 }
+
+/*
+ * 🖋️ Kártya Cím (Title) 🖋️
+ * Kontrasztos, fényes arany.
+ */
 .card-title {
-    font-size: 1.6rem;
-    font-family: 'Cinzel Decorative', serif;
-    letter-spacing: 1px;
-    color: #ffd700;
-    text-shadow: 1px 1px 4px #5d432c;
+    font-size: 1.5rem;
+    font-family: 'Cinzel', serif; /* Megtartva az elegáns hangulatot */
+    letter-spacing: 0.5px;
+    color: #ffcc80; /* Krém-arany */
+    text-shadow: 1px 1px 3px #000;
+    margin-bottom: 0.5rem;
 }
+
+/*
+ * 🏷️ Kártya Alcím (Subtitle) 🏷️
+ * Visszafogottabb, meleg árnyalat.
+ */
 .card-subtitle {
-    font-size: 1.1rem;
-    color: #bfa76f !important;
-    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: #a1887f !important; /* Bronzos barna */
+    font-family: 'Georgia', serif;
+    margin-bottom: 1rem;
 }
+
+/*
+ * 📝 Kártya Szöveg 📝
+ */
 .card-text {
     font-size: 1rem;
-    color: #f5e6c8;
-    font-family: 'EB Garamond', serif;
+    color: #ffe0b2; /* Világos krém árnyalat */
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
 }
+
+/*
+ * 🔗 Linkek Stílusa 🔗
+ */
 a {
     text-decoration: none;
     color: inherit;
 }
 
-a:hover{
+a:hover {
     text-decoration: none;
+    color: #ffc107; /* Enyhe arany kiemelés link hoverre, ha a szöveg örökölt színe eltér */
 }

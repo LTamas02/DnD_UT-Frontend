@@ -9,10 +9,11 @@ body, html {
   font-family:'IM Fell English SC', serif;
   height:100%;
   /* Use the dark wood/parchment background */
-  background: url('https://www.transparenttextures.com/patterns/aged-paper.png');
-  background-color: #3a1d0f; /* Dark brown for depth */
-  background-size: auto;
-  animation: none; /* Remove background animation */
+  /* !!! FONTOS: !important a felülírás megakadályozására !!! */
+  background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
+  background-color: #2d1a0d !important; /* SÖTÉT BARNA ALAPSZÍN */
+  background-size: auto !important;
+  animation: none !important; /* Remove background animation */
   color:#e4c590; /* Light gold for medieval feel */
   overflow-y: auto; /* Ensure scrolling is possible */
 }
@@ -110,18 +111,18 @@ body, html {
 .card {
   /* Parchment background from LogReg.css */
   background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
-  background-color: #c4a484; /* Parchment color */
+  background-color: #4a321e; /* MÉLYEBB, SÖTÉTEBB BARNA A KONTÉNERNEK */
   background-blend-mode: multiply; 
   padding:15px;
   margin-bottom:20px;
   border: 6px solid #6b4226; /* Dark brown border */
   border-radius:10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  color: #3a1d0f; /* Dark text inside card */
+  color: #ffdd99; /* VILÁGOSABB SZÖVEG a sötét kártyán */
 }
 
 .card h2.section-title, .card h3 {
-    color: #8b5a2b; /* Medium brown title color */
+    color: #e4c590; /* VILÁGOSABB címszín */
     border-bottom: 2px solid #6b4226;
     padding-bottom: 5px;
     margin-top: 0;
@@ -132,14 +133,17 @@ body, html {
 /* Inputs and Textareas */
 .input-dark, .textarea-dark, .computed {
   /* Input style from LogReg.css */
-  background: rgba(255, 240, 200, 0.9);
+  background: rgba(255, 240, 200, 0.9); /* A beviteli mezőket meghagyjuk világosnak a jó láthatóságért */
   border: 2px solid #6b4226;
-  color: #3a1d0f;
+  color: #3a1d0f; /* SÖTÉT SZÖVEG AZ INPUTON BELÜL */
   font-weight: bold;
   font-family: 'IM Fell English SC', serif;
   padding: 8px 12px;
   border-radius: 5px;
   transition: all 0.2s;
+  /* FIX: Ensure inputs fill their container and don't overflow in grids */
+  width: 100%; 
+  box-sizing: border-box; 
 }
 .input-dark:focus, .textarea-dark:focus {
   background: rgba(255, 240, 200, 1);
@@ -153,6 +157,11 @@ body, html {
     resize: vertical;
     margin-top: 5px;
 }
+/* Különleges stílus a kis inputoknak, ahol szükség van rá (pl. Abilities) */
+.ability input.input-dark, .passive-line input.input-dark {
+    width: 60px !important;
+    text-align: center;
+}
 
 /* Grid Layouts (from previous turn) */
 .grid-3 {
@@ -165,6 +174,13 @@ body, html {
     grid-template-columns: 1fr;
     gap: 15px;
 }
+/* FIX: Money Grid - grid-5 a 5 pénznek egymás mellett */
+.grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    gap: 10px;
+}
+
 .abilities-grid {
     display: grid;
     gap: 10px;
@@ -177,7 +193,7 @@ body, html {
 .ability-label {
     flex-grow: 1;
     font-weight: bold;
-    color: #3a1d0f;
+    color: #ffdd99; /* VILÁGOSABB */
 }
 .mod-pill {
     background: #8b5a2b;
@@ -195,7 +211,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #3a1d0f;
+    color: #ffdd99; /* VILÁGOSABB */
     font-weight: bold;
 }
 
@@ -230,7 +246,7 @@ body, html {
 
 /* Attack Table Specifics */
 .attack-header, .attack-row {
-    color: #3a1d0f; /* Dark text for table content */
+    color: #ffdd99; /* VILÁGOSABB text for table content */
 }
 .attack-header {
     border-bottom: 2px solid #6b4226 !important;
@@ -257,6 +273,10 @@ body, html {
 .spell-detail-preview p {
     color: #e4c590 !important;
 }
+.spell-detail-preview h3 {
+    color: #e4c590 !important;
+}
+
 .spell-table {
     width: 100%;
     border-collapse: collapse;
@@ -284,7 +304,7 @@ body, html {
     /* Uses .card style */
 }
 .action-bar h1 {
-    color: #3a1d0f;
+    color: #ffdd99; /* VILÁGOSABB */
     font-size: 1.8em;
     margin: 0;
 }
@@ -297,7 +317,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #3a1d0f;
+    color: #ffdd99; /* VILÁGOSABB */
     font-weight: bold;
 }
 .prof-bonus-line input {
@@ -329,3 +349,9 @@ body, html {
 .mt-4 { margin-top: 20px; }
 .p-3 { padding: 15px; }
 .small-input { padding: 3px 5px !important; }
+
+/* Különleges stílus a kis inputokhoz a Spell táblában (a 100% width felülírása) */
+.small-input {
+    width: auto !important;
+    min-width: 50px;
+}

@@ -329,7 +329,7 @@ export default function Character() {
   useEffect(() => {
     const rawPerceptionSkillValue = getMod(profile.wis) + (profile.skillProf?.perception ? profile.profBonus : 0);
     const newPassivePerception = 10 + rawPerceptionSkillValue;
-    const newInitiative = getMod(profile.dex);
+    const newInitiative = getMod(profile.dex); // Csak a modifikátor
     const calculatedProfBonus = getProfBonusFromLevel(profile.classLevel);
 
     setProfile(prev => {
@@ -495,6 +495,7 @@ export default function Character() {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-header">
+          {/* A név automatikusan frissül, mivel a 'profile' state-hez van kötve */}
           <div className="sidebar-name">{profile.characterName || (id === 'new' ? "New Character" : "No Name")}</div>
           <div className="sidebar-class">
             {profile.classIndex ? `${capitalizeWords(profile.classIndex)} ${profile.classLevel}` : "Class & Level"}
@@ -711,7 +712,8 @@ export default function Character() {
                     <h2 className="section-title">AC, Init & Speed</h2>
                     <div className="grid-3">
                         <div><label>Armor Class</label><input type="number" value={profile.armor} onChange={e => setField("armor", Number(e.target.value))} className="input-dark" /></div>
-                        <div><label>Initiative</label><input value={profile.initiative >= 0 ? `+${profile.initiative}` : profile.initiative} readOnly className="input-dark" /></div>
+                        {/* Javítva a mező elrendezése a CSS-ben */}
+                        <div><label>Initiative</label><input value={(profile.initiative >= 0 ? "+" : "") + profile.initiative} readOnly className="input-dark" /></div>
                         <div><label>Speed (ft)</label><input type="number" value={profile.speed} onChange={e => setField("speed", Number(e.target.value))} className="input-dark" /></div>
                     </div>
                 </section>
@@ -720,6 +722,7 @@ export default function Character() {
                     <h2 className="section-title">Hit Points</h2>
                     <div className="grid-3">
                         <div><label>HP Max</label><input type="number" value={profile.hpMax} onChange={e => setField("hpMax", Number(e.target.value))} className="input-dark" /></div>
+                        {/* Javítva a mező elrendezése a CSS-ben */}
                         <div><label>Current HP</label><input type="number" value={profile.hpCurrent} onChange={e => setField("hpCurrent", Number(e.target.value))} className="input-dark" /></div>
                         <div><label>Temp HP</label><input type="number" value={profile.hpTemp} onChange={e => setField("hpTemp", Number(e.target.value))} className="input-dark" /></div>
                     </div>
@@ -985,6 +988,7 @@ export default function Character() {
             <h2>Equipment</h2>
             <section className="card">
               <h2 className="section-title">Money</h2>
+              {/* HASZNÁLJA A FRISSÍTETT grid-5 STÍLUSOSZTÁLYT */}
               <div className="grid-5 money-grid">
                 <div><label>CP (Copper)</label><input type="number" value={profile.cp} onChange={e => setField("cp", Number(e.target.value))} className="input-dark" /></div>
                 <div><label>SP (Silver)</label><input type="number" value={profile.sp} onChange={e => setField("sp", Number(e.target.value))} className="input-dark" /></div>

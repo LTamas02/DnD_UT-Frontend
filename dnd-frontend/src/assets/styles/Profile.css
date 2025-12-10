@@ -1,195 +1,219 @@
-
-.profile-container {
-    text-align: center;
-    background-color: #1e1e1e;
-    color: gold;
-    padding: 20px;
-}
-
-.profile-box {
-    background-color: #333;
-    padding: 20px;
-    border-radius: 10px;
-    display: inline-block;
-}
-
-.profile-pic {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin: 10px;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.8);
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    margin: 10% auto;
-    width: 50%;
-    text-align: center;
-}
-
-.image-options img {
-    width: 100px;
-    margin: 5px;
-    cursor: pointer;
-}
-
+/*
+ * 🏛️ Teljes oldal konténer: Háttér és alapbetűtípus 🏛️
+ * A profil komponens (ID) határozza meg a teljes oldal textúráját.
+ */
 #profile-comp {
+    /* A háttérkép URL-t meg kell tartani, de az alábbiak finomítják */
     background-image: url('../img/BG/ProfileBG.png');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
-    height: 100vh;
-
-
+    min-height: 100vh; /* Teljes magasság */
+    
+    /* Visszafogott, mély, sötét barna textúra mint fallback/overlay */
+    background-color: #3e2723; 
+    
+    padding: 20px 0; /* Egy kis térköz felül és alul */
 }
 
+/*
+ * 👤 Fő profil tartalom konténer 👤
+ * Központosított tartalom, a háttérkép fölé helyezve.
+ */
+.profile-container {
+    text-align: center;
+    /* Áttetsző, de sötét alap a kontrasztért */
+    background-color: rgba(30, 30, 30, 0.65); 
+    color: #ffcc80; /* Lágy, krémszínű arany */
+    padding: 30px 20px;
+    margin: 50px auto 30px auto; /* Középre igazítás, térköz */
+    max-width: 900px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Mély árnyék */
+}
 
-/* Allies Section */
-
-.allies-section {
-    background: #f8f9fa; /* light background */
-    opacity: 0.90;
-    padding: 20px;
+/*
+ * 🖼️ Profil Információs Box 🖼️
+ * A fő adatok kerete, kiemelkedve a konténerből.
+ */
+.profile-box {
+    /* Mélybarna, texturált háttér */
+    background-color: #4e342e; 
+    padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    display: inline-block;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid #795548; /* Finom barna keret */
+}
+
+/*
+ * 🖼️ Profilkép 🖼️
+ */
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 10px;
+    /* Keret: Fényes arany (bronz/réz) a kiemelésért */
+    border: 5px solid #ffcc80; 
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(255, 204, 128, 0.6); /* Lágy ragyogás */
+}/*
+ * 🤝 Szövetségesek Szekció: A kávézó asztala 🤝
+ * Enyhén áttetsző, világosabb háttér a tartalom kiemeléséhez.
+ */
+.allies-section {
+    /* Szín: Nagyon világos kávé, vagy krémfehér, enyhe áttetszőséggel */
+    background: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(5px); /* Enyhe elmosás a háttérkép miatt */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 40px;
+    color: #ffcc80; /* Szöveg alapértelmezett színe */
 }
 
 .allies-section h3 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
+    margin-bottom: 25px;
+    color: #ffcc80; /* Címsor színe */
+    text-shadow: 1px 1px 2px #000;
 }
 
-.friends-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 0;
-    margin: 0;
-}
-
+/*
+ * 🧑‍🤝‍🧑 Barát Kártya Stílus 🧑‍🤝‍🧑
+ * Egyedi, texturált kártya design.
+ */
 .friend {
-    background: #fff;
-    border-radius: 10px;
+    /* Szín: Meleg barna, mint egy prémium bőr ülés */
+    background: #5d4037; 
+    border-radius: 8px;
     padding: 15px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    flex: 1 1 250px; /* responsive card width */
-    transition: transform 0.2s ease;
+    gap: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    flex: 1 1 280px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 5px solid #ffcc80; /* Kiemelő vonal */
 }
 
 .friend:hover {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 204, 128, 0.5); /* Erősebb kiemelés és ragyogás */
 }
 
 .friend-pic {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid #ddd;
+    border: 3px solid #ffcc80; /* Arany keret */
 }
 
 .friend span {
     flex-grow: 1;
     font-weight: 500;
-    color: #555;
+    color: #ffe0b2; /* Világosabb szöveg a sötét kártyán */
+    font-size: 1.1rem;
 }
 
 .friend button {
-    font-size: 0.8rem;
-    padding: 5px 10px;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    /* Gomb stílus: Elegáns barna alapon arany szöveg */
+    background-color: #795548; 
+    color: #fff8e1;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.friend button:hover {
+    background-color: #6d4c41;
 }
 
 .no-allies {
     font-style: italic;
-    color: #777;
+    color: #a1887f; /* Lágy barna szín */
 }
 
-/*Friend add modal*/
+/*
+ * 📝 Modális Ablak Alapja 📝
+ * Fél-átlátszó sötét overlay (ugyanaz a stílus mindkét modálra)
+ */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.85); /* Sötétebb, elegánsabb overlay */
+    z-index: 2000; /* Magas z-index, hogy biztosan a tetején legyen */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/*
+ * 📄 Modális Tartalom Box 📄
+ * Prémium, világos háttér a sötét overlay-en.
+ */
 .modal-content {
-    background: #fff;
-    padding: 20px;
-    margin: 10% auto;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 10px;
+    /* Világos krém/kávé szín */
+    background: #fdfaf0; 
+    padding: 30px;
+    width: 90%;
+    max-width: 550px;
+    border-radius: 12px;
     position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color: #4e342e; /* Sötét szöveg a világos alapon */
+    animation: fadeIn 0.3s ease-out;
 }
 
 .close-btn {
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
     cursor: pointer;
+    color: #795548; /* Barna X */
 }
 
-/*Friend request*/
-
-
-.friend-requests-list {
-    padding: 0;
-    list-style: none;
-}
-
-.request-item {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-}
-
-.friend-request-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.friend-request-badge {
-    background: red;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-size: 0.8rem;
-    margin-left: 5px;
-}
-
-.selectable-pic {
+/*
+ * 🖼️ Profilkép választó képek 🖼️
+ */
+.image-options img, .selectable-pic {
     width: 80px;
     height: 80px;
     border-radius: 50%;
+    margin: 8px;
     cursor: pointer;
     object-fit: cover;
+    border: 3px solid #795548;
+    transition: transform 0.2s ease-in-out, border-color 0.2s;
 }
 
-.selectable-pic:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s ease-in-out;
+.image-options img:hover, .selectable-pic:hover {
+    transform: scale(1.15);
+    border-color: #ffcc80; /* Arany kiemelés hoverre */
+    box-shadow: 0 0 10px rgba(255, 204, 128, 0.8);
+}
+
+/*
+ * 📩 Barátkérelmek jelvénye 📩
+ */
+.friend-request-badge {
+    background: #b71c1c; /* Mélyebb vörös, mint a meggy */
+    color: white;
+    padding: 3px 8px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    margin-left: 8px;
+    box-shadow: 0 0 5px rgba(183, 28, 28, 0.8); /* Enyhe ragyogás */
 }

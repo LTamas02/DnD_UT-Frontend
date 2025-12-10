@@ -1,25 +1,60 @@
+/*
+ * ☕ Navigációs sáv: Elegáns, sötét kávé hangulat ☕
+ * Mélybarna alap, fényes, arany kiemelésekkel.
+ */
 .navbar {
-    background: linear-gradient(to right, #3e2723, #5d4037);
-    border-bottom: 3px solid #8d6e63;
+    /* Alap: Mély, texturált barna (esetleg diófa vagy étcsokoládé) */
+    background: linear-gradient(to right, #4e342e, #6d4c41); /* Sötét kávé/Bécsi barna gradient */
+    
+    /* Vonal: Égett, karamell/réz árnyalat, finoman kiemeli az alját */
+    border-bottom: 2px solid #a1887f; 
+    
+    /* Pozíció: Felső, fix rögzítés, hogy mindig látható legyen */
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
+    
+    /* Finom, diszkrét árnyék a kiemelésért */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* * 👑 Márka/Logó: A kávézó neve 👑
+ * Fényes, krém-arany szín a logónak, nagybetűkkel.
+ */
 .navbar-brand {
-    color: #ffcc80 !important;
-    font-size: 24px;
+    /* Szín: Fényes, vanília/arany kiemelés */
+    color: #fff8e1 !important; 
+    font-size: 26px; /* Kicsit nagyobb méret */
     text-transform: uppercase;
+    font-family: 'Georgia', serif; /* Elegánsabb betűtípus */
+    letter-spacing: 1px;
 }
 
+/*
+ * 📜 Navigációs linkek: A menüpontok 📜
+ * Meleg, közép-arany szín, határozott megjelenés.
+ */
 .navbar-nav .nav-link {
-    color: #ffb74d !important;
-    font-weight: bold;
+    /* Szín: Meleg, sárgásbarna/réz árnyalat */
+    color: #ffe0b2 !important; 
+    font-weight: 500; /* Közepes vastagság */
+    margin-left: 15px; /* Kicsit több térköz */
+    transition: all 0.3s ease; /* Átmenet a hoverhez */
 }
 
+/*
+ * ✨ Link kiemelés: Amikor fölé viszi az egeret ✨
+ * Fényes, krémes arany szín, mélyebb árnyékkal.
+ */
 .navbar-nav .nav-link:hover {
-    color: #ff9800 !important;
-    text-shadow: 1px 1px 3px #000;
+    /* Szín: Tiszta arany/Karamell, nagyon világos */
+    color: #ffc107 !important; 
+    
+    /* Árnyék: Elegáns mélység, mintha meg lenne nyomva */
+    text-shadow: 0 0 8px rgba(255, 193, 7, 0.6); /* Lágy arany ragyogás */
+    
+    /* Enyhe felemelés effektus */
+    transform: translateY(-1px);
 }

@@ -1,138 +1,173 @@
-
-
+/*
+ * 🏛️ Alap Stílusok: Elegáns, minimalista alap 🏛️
+ */
 body {
-    font-family: "Cinzel", serif;
-    background-color: #f5deb3; /* parchment tone */
+    /* Visszaállás a sötét, elegáns alapra */
+    font-family: 'Georgia', serif; /* Elegáns, olvasható betűtípus */
+    background-color: #3e2723; /* Mély barna (dark coffee) */
+    color: #ffcc80; /* Krém-arany szöveg */
     margin: 0;
 }
 
 .community-page {
     padding: 20px;
+    max-width: 1200px;
+    margin: auto;
 }
 
+/*
+ * 👑 Közösség/Céh Fejléc 👑
+ * Erős, mély, kontrasztos címsor.
+ */
 .guild-header {
-    background: linear-gradient(90deg, #5c4033, #d4af37);
-    color: #fff8dc;
+    /* Mély gradient: Sötétbarna – bronz/arany */
+    background: linear-gradient(90deg, #4e342e, #8d6e63); 
+    color: #fff8e1; /* Krémfehér/arany szín */
     text-align: center;
-    padding: 20px;
-    border-bottom: 5px solid #d4af37;
+    padding: 30px 20px;
+    /* Elegáns alsó vonal */
+    border-bottom: 3px solid #ffcc80; 
     font-size: 2.5rem;
     font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    /* Mély, lágy árnyék */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+    margin-bottom: 30px;
 }
 
+.guild-header h1 {
+    font-family: 'Cinzel', serif; /* Megtartva az elegáns felirat stílust */
+    font-size: 3rem;
+    color: #ffc107; /* Fényes arany */
+    text-shadow: 2px 2px 4px #000;
+}
+
+.guild-header p {
+    font-family: 'Georgia', serif;
+    font-size: 1.2rem;
+    color: #ffe0b2; /* Világosabb krém */
+    text-shadow: 1px 1px 2px #000;
+}
+
+/*
+ * 📝 Űrlap/Létrehozás Szekció 📝
+ * Sötét alap a kontrasztért.
+ */
 .community-form {
-    background-color: #5c4033;
-    color: #fff8dc;
-    padding: 20px;
+    background-color: #4e342e; /* Mélyebb barna */
+    color: #ffcc80;
+    padding: 30px;
     margin-top: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    border: 1px solid #795548; /* Finom keret */
 }
 
 .community-form h2 {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    color: #ffcc80;
 }
 
+/* Űrlap beviteli mezők */
 .community-form input,
 .community-form textarea {
     display: block;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 2px solid #d4af37;
+    padding: 12px;
+    margin-bottom: 15px;
+    /* Arany keret, lágyabb háttér */
+    border: 1px solid #ffcc80; 
     border-radius: 5px;
-    background: #f5deb3;
-    color: #5c4033;
-    font-family: "Cinzel", serif;
+    background: #fdfaf0; /* Világos krém háttér */
+    color: #4e342e;
+    font-family: 'Georgia', serif;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .community-form label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-weight: bold;
 }
 
+/*
+ * 🌟 Arany Gomb Stílus 🌟
+ */
 .btn-gold {
-    background-color: #d4af37;
-    color: #5c4033;
-    padding: 10px 20px;
+    background-color: #ffc107; /* Fényes arany */
+    color: #5d4037; /* Sötétbarna szöveg */
+    padding: 10px 25px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.05rem;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .btn-gold:hover {
     background-color: #ffd700;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+/*
+ * 🛑 Piros Gomb Stílus (pl. törlés) 🛑
+ */
 .btn-red {
-    background-color: #8b0000;
+    background-color: #b71c1c; /* Mély vörös/bordó */
     color: white;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.2s;
 }
 
 .btn-red:hover {
-    background-color: #ff0000;
+    background-color: #e53935;
 }
 
+/*
+ * 📊 Közösségi Lista (Táblázat) 📊
+ */
 .community-list {
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .community-list h2 {
-    color: #5c4033;
-    font-size: 2rem;
-    margin-bottom: 10px;
+    color: #ffcc80;
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 2px #000;
 }
 
 .community-list table {
     width: 100%;
     border-collapse: collapse;
-    background: #fff8dc;
-    border: 2px solid #d4af37;
+    /* Nagyon világos alap a kontrasztért */
+    background: #fff8e1; 
+    border: 2px solid #ffcc80; /* Arany keret */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .community-list th,
 .community-list td {
-    border: 1px solid #d4af37;
-    padding: 10px;
+    border: 1px solid #ffcc80;
+    padding: 12px;
     text-align: center;
+    color: #4e342e; /* Sötét szöveg a világos alapon */
 }
 
 .community-list th {
-    background-color: #d4af37;
-    color: #5c4033;
+    /* Fejléc: Arany alapon sötét szöveg */
+    background-color: #ffcc80; 
+    color: #5d4037; 
     font-weight: bold;
+    text-transform: uppercase;
 }
 
 .community-list tr:hover {
-    background-color: #f5deb3;
-}
-
-
-.guild-header {
-    padding: 40px 20px;
-    text-align: center;
-    border-bottom: 5px solid #d4af37;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.6);
-}
-
-.guild-header h1 {
-    font-family: "Cinzel Decorative", serif;
-    font-size: 3rem;
-    color: #ffd700;
-    text-shadow: 2px 2px 6px #000;
-}
-
-.guild-header p {
-    font-family: "MedievalSharp", cursive;
-    font-size: 1.3rem;
-    color: #fbeec1;
-    text-shadow: 1px 1px 3px #000;
+    /* Enyhe, krémes kiemelés hoverre */
+    background-color: #fdfaf0; 
 }
