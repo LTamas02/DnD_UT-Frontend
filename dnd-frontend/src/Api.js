@@ -14,25 +14,17 @@ const api = axios.create({
 
 // Auth endpoints
 export const register = (email, username, password) =>
-    api.post("/auth/register", null, {
-        params: { email, username, password }
-    });
+    api.post("/auth/register", { email, username, password });
+
 export const saltSend = (email, salt) =>
-    api.post("/auth/salt-send", null, {
-        params: { email, salt },
-        headers: { "Content-Type": "application/json" }
-    });
+    api.post("/auth/salt-send", { email, salt });
 
 export const login = (email, password) =>
-    api.post("/auth/login", null, {
-        params: { email, password },
-        headers: { "Content-Type": "application/json" }
-    });
+    api.post("/auth/login", { email, password });
 
 export const getSalt = (email) =>
     api.get("/auth/salt", {
-        params: { email },
-        headers: { "Content-Type": "application/json" }
+        params: { email }
     });
 
 export const getUser = async (token) =>
