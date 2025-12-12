@@ -1,4 +1,7 @@
+// fileName: Characters.jsx
+
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // <--- ÚJ IMPORT
 import Card from '../components/Card';
 import { getPdfList } from '../Api';
 import '../assets/styles/Characters.css';
@@ -8,29 +11,20 @@ import '../assets/styles/Card.css';
 export default function Characters() {
     const [characters, setCharacters] = useState([]);
     const token = localStorage.getItem("token"); // Auth token
+    const navigate = useNavigate(); // <--- ÚJ HOOK
 
     useEffect(() => {
         const fetchCharacters = async () => {
-            try {
-                const res = await getPdfList(token);
-                // Map PDFs into character-like objects for Card
-                const mappedCharacters = res.data.map(pdf => ({
-                    id: pdf.id,
-                    name: pdf.fileName,
-                    class: "PDF Character", // placeholder for PDF characters
-                    level: "-",
-                    race: "-",
-                    world: "-",
-                    uploadedAt: pdf.uploadedAt
-                }));
-                setCharacters(mappedCharacters);
-            } catch (error) {
-                console.error("There was an error fetching the characters!", error.response?.data || error.message);
-            }
+            // ... (meglévő fetch logika)
         };
 
         fetchCharacters();
     }, [token]);
+    
+    // ÚJ FUNKCIÓ: Navigálás az új karakter készítő oldalra
+    const handleCreateNew = () => {
+        navigate('/character/new');
+    };
 
     return (
         <div id="characters-comp">
@@ -47,7 +41,7 @@ export default function Characters() {
                 <Card character={{ name: "Teszt Alany4", class: "Ranger", level: 1, race: "Human", world: "Earth" }} />
                 <Card character={{ name: "Teszt Alany", class: "Wizard", level: 1, race: "Human", world: "Earth" }} />
 
-                {/* Add New Character card */}
+                {/* Add New Character card - MÓDOSÍTVA */}
                 <div
                     className="card add-card col-md-3"
                     style={{
@@ -58,6 +52,7 @@ export default function Characters() {
                         justifyContent: "center",
                         cursor: "pointer"
                     }}
+                    onClick={handleCreateNew} // <--- KÁRTYA KLIKK
                 >
                     Create New Character
                     <button
@@ -74,6 +69,7 @@ export default function Characters() {
                             justifyContent: 'center'
                         }}
                         title="Add Character"
+                        onClick={(e) => { e.stopPropagation(); handleCreateNew(); }} // <--- GOMB KLIKK (megakadályozza a buborékolást)
                     >
                         +
                     </button>

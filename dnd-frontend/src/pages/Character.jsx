@@ -182,19 +182,25 @@ export default function Character() {
 
   // --- FUNCTION BUTTON HANDLERS ---
   
+  
+  
+  /**
+   * Karakter mentése és új karakter esetén átirányítás az ID-val ellátott oldalra.
+   */
   const handleSave = async () => {
-    const charToSave = { 
-        ...profile, 
-        id: id === 'new' ? null : profile.id || id
-    };
+    // Ha új karaktert hozunk létre, az id 'new', a mentés után megkapjuk az igazi id-t
+    const isNewCharacter = id === 'new';
 
     try {
-        const savedData = await saveCharacter(charToSave); 
+        const savedData = await saveCharacter(profile); 
         alert("Character successfully saved!");
         
-        if (id === 'new' && savedData.id) {
+        // Ha új karakter volt, átirányítunk az új, valós ID-val ellátott URL-re
+        if (isNewCharacter && savedData.id) {
             navigate(`/character/${savedData.id}`);
         }
+        
+        // Frissítjük a profile state-et a valós ID-val, ha 'new' volt az előző ID
         setProfile(prev => ({ ...prev, id: savedData.id }));
     } catch (error) {
         console.error("Save failed:", error);

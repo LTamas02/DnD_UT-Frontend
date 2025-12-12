@@ -669,3 +669,65 @@ export const CharacterApi = {
     return res.data;
   },
 };
+
+
+// =========================
+// === Backgrounds Endpoints
+// =========================
+
+const backgroundsBase = "/2014/backgrounds";
+
+// Get all backgrounds
+export const getAllBackgrounds = async () => {
+    try {
+        const res = await api.get(backgroundsBase);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch backgrounds:", err);
+        return [];
+    }
+};
+
+// Get background by index
+export const getBackgroundByIndex = async (index) => {
+    try {
+        const res = await api.get(`${backgroundsBase}/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch background ${index}:`, err);
+        return null;
+    }
+};
+
+// Get background feature by index
+export const getBackgroundFeature = async (index) => {
+    try {
+        const res = await api.get(`${backgroundsBase}/${index}/feature`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch feature for background ${index}:`, err);
+        return null;
+    }
+};
+
+// Get background starting equipment by index
+export const getBackgroundStartingEquipment = async (index) => {
+    try {
+        const res = await api.get(`${backgroundsBase}/${index}/starting-equipment`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch starting equipment for background ${index}:`, err);
+        return null;
+    }
+};
+
+// Get background proficiencies by index
+export const getBackgroundProficiencies = async (index) => {
+    try {
+        const res = await api.get(`${backgroundsBase}/${index}/proficiencies`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch proficiencies for background ${index}:`, err);
+        return null;
+    }
+};
