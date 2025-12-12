@@ -27,9 +27,11 @@ export const getSalt = (email) =>
     });
 
 export const saltSend = (email, salt) =>
-    api.post("Auth/salt-send", null, {
-        params: { email, salt }
+    api.post("auth/salt-send", {
+        email,
+        salt
     });
+
 
 export const getUser = (token) =>
     api.get("Auth/me", {
