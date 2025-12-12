@@ -91,7 +91,7 @@ const LogReg = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
 
             const clientHash = computeClientHash(password, salt);
             const response = await login(email, clientHash);
-
+            console.log(clientHash);
             const token = response.data?.token;
             if (!token) {
                 setErrorMessage("Login failed: No token received.");
