@@ -19,6 +19,14 @@ const wikiSections = [
   { name: 'UA', path: '/wiki/ua' }
 ];
 
+const baseInfoSection = [
+  { name: 'Ability Scores', path: '/wiki/ability-scores' },
+  { name: 'Alignments', path: '/wiki/alignments' },
+  { name: 'Conditions', path: '/wiki/conditions' },
+  { name: 'Damage Types', path: '/wiki/damage-types' },
+  { name: 'Languages', path: '/wiki/languages' }
+];
+
 const Wiki = () => {
   return (
     <div className="page-comp">
@@ -29,6 +37,16 @@ const Wiki = () => {
         {/* Card Grid */}
         <div className="wiki-grid">
           {wikiSections.map((section, index) => (
+            <Link key={index} to={section.path} className="wiki-card">
+              {section.name}
+            </Link>
+          ))}
+        </div>
+        <h1>Detailed Information</h1>
+
+        {/* Card Grid */}
+        <div className="wiki-grid">
+          {baseInfoSection.map((section, index) => (
             <Link key={index} to={section.path} className="wiki-card">
               {section.name}
             </Link>

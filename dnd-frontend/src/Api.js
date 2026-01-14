@@ -855,3 +855,174 @@ export const getBackgroundProficiencies = async (index) => {
         return null;
     }
 };
+
+
+
+
+
+
+
+
+
+// =========================
+// === Ability Scores Endpoints
+// =========================
+
+// Get all ability scores
+export const getAllAbilityScores = async () => {
+    try {
+        const res = await api.get('/2014/AbilityScores'); // correct endpoint for this API
+        return res.data || []; // API returns full array directly
+    } catch (err) {
+        console.error("Failed to fetch ability scores:", err);
+        return [];
+    }
+};
+
+
+
+
+
+
+
+
+
+// =========================
+// === Alignments Endpoints
+// =========================
+
+const alignmentsBase = "/2014/alignments";
+
+// Get all alignments
+export const getAllAlignments = async () => {
+    try {
+        const res = await api.get(alignmentsBase);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch alignments:", err);
+        return [];
+    }
+};
+
+
+
+
+
+
+
+
+
+// =========================
+// === Conditions Endpoints
+// =========================
+
+const conditionsBase = "/Conditions";
+
+// Get all conditions
+export const getAllConditions = async () => {
+    try {
+        const res = await api.get(conditionsBase);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch conditions:", err);
+        return [];
+    }
+};
+
+
+
+
+
+
+
+
+// =========================
+// === Damage Types Endpoints
+// =========================
+
+const damageTypesBase = "/2014/DamageTypes";
+
+// Get all damage types
+export const getAllDamageTypes = async () => {
+    try {
+        const res = await api.get(damageTypesBase);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch damage types:", err);
+        return [];
+    }
+};
+
+
+
+
+
+
+
+
+
+
+// =========================
+// === Languages Endpoints
+// =========================
+
+const languagesBase = "/Languages";
+
+// Get all languages
+export const getAllLanguages = async () => {
+    try {
+        const res = await api.get(languagesBase);
+        return res.data;
+    } catch (err) {
+        console.error("Failed to fetch languages:", err);
+        return [];
+    }
+};
+
+// Get language by index
+export const getLanguageByIndex = async (index) => {
+    try {
+        const res = await api.get(`${languagesBase}/${index}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch language with index "${index}":`, err);
+        return null;
+    }
+};
+
+// Get languages by type (Standard, Exotic)
+export const getLanguagesByType = async (type) => {
+    try {
+        const res = await api.get(`${languagesBase}/type/${type}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch languages of type "${type}":`, err);
+        return [];
+    }
+};
+
+// Get languages by script
+export const getLanguagesByScript = async (script) => {
+    try {
+        const res = await api.get(`${languagesBase}/script/${script}`);
+        return res.data;
+    } catch (err) {
+        console.error(`Failed to fetch languages with script "${script}":`, err);
+        return [];
+    }
+};
+
+// Optional: search languages by name or index (client-side)
+export const searchLanguages = async (query) => {
+    try {
+        const all = await getAllLanguages();
+        const q = query.toLowerCase();
+        return all.filter(l =>
+            l.name.toLowerCase().includes(q) ||
+            l.index.toLowerCase().includes(q)
+        );
+    } catch (err) {
+        console.error(`Failed to search languages with query "${query}":`, err);
+        return [];
+    }
+};

@@ -135,7 +135,7 @@ export default function Background() {
 
                 {/* Részletes kártya stílus */}
                 <div className="race-detail-card"> 
-                    <header className="race-header" style={{backgroundColor: '#8b5a2b', justifyContent: 'center'}}>
+                    <header className="race-header" style={{backgroundColor:    '#8b5a2b', justifyContent: 'center'}}>
                         <h2 className="wiki-title">{background.name}</h2>
                     </header>
                     
