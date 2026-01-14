@@ -1,0 +1,128 @@
+.dmtools-chooser {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dmtools-chooser-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.dmtools-input,
+.dmtools-textarea {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 2px solid #6b4226;
+  background: rgba(255, 240, 200, 0.9);
+  color: #3a1d0f;
+  font-family: 'IM Fell English SC', serif;
+  box-sizing: border-box;
+}
+
+.dmtools-textarea {
+  resize: vertical;
+}
+
+.dmtools-action {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 25px;
+  border: 3px solid #3a1d0f;
+  background: linear-gradient(to bottom, #a52a2a, #8b0000);
+  color: #e4c590;
+  font-family: 'IM Fell English SC', serif;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dmtools-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+}
+
+.dmtools-danger {
+  background: linear-gradient(to bottom, #7c1c1c, #4b0b0b);
+}
+
+.dmtools-map-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dmtools-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.dmtools-map-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dmtools-map-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.dmtools-panel {
+  background: rgba(58, 35, 20, 0.7);
+  border: 3px solid #6b4226;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+}
+
+.dmtools-panel h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #ffdd99;
+}
+
+.dmtools-label {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #e4c590;
+}
+
+.dmtools-map-canvas {
+  height: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid #6b4226;
+  background: rgba(45, 26, 13, 0.7);
+}
+
+.dmtools-map-canvas .react-flow__pane {
+  background: rgba(45, 26, 13, 0.7);
+}
+
+.dmtools-map-canvas .react-flow__minimap {
+  background: rgba(58, 35, 20, 0.9);
+}
+
+.dmtools-map-canvas .react-flow__controls button {
+  background: #4a321e;
+  color: #ffdd99;
+  border-color: #6b4226;
+}
+
+@media (max-width: 1100px) {
+  .dmtools-map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dmtools-map-canvas {
+    height: 480px;
+  }
+}

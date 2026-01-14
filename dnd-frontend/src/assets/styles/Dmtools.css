@@ -1,0 +1,102 @@
+.dmtools-overlay {
+  max-width: 1200px;
+}
+
+.dmtools-header {
+  margin-bottom: 20px;
+}
+
+.dmtools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.dmtools-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #ffdd99;
+  background: rgba(58, 35, 20, 0.7);
+  border-radius: 12px;
+  border: 3px solid #6b4226;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.dmtools-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.1) contrast(1.05);
+}
+
+.dmtools-card-body {
+  padding: 14px 16px 18px;
+  background: url('https://www.transparenttextures.com/patterns/old-map.png');
+  background-color: #4a321e;
+  background-blend-mode: multiply;
+}
+
+.dmtools-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: #ffdd99;
+}
+
+.dmtools-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #e4c590;
+}
+
+.dmtools-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(212, 175, 55, 0.35);
+}
+
+.dmtools-subpage {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.dmtools-subpage header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dmtools-subcard {
+  background: rgba(58, 35, 20, 0.7);
+  border: 3px solid #6b4226;
+  border-radius: 12px;
+  padding: 20px;
+  color: #ffdd99;
+}
+
+.dmtools-subcard p {
+  color: #e4c590;
+}
+
+.dmtools-back {
+  display: inline-block;
+  margin-bottom: 15px;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .dmtools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dmtools-card img {
+    height: 200px;
+  }
+
+  .dmtools-subpage {
+    text-align: center;
+  }
+}

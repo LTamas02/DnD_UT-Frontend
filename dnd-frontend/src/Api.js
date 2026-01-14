@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://api.dnd-tool.com/api/",
+    baseURL: "http://localhost:5188/api/",
     headers: {
         "Content-Type": "application/json"
     }

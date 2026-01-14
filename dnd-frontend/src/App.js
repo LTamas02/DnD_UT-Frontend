@@ -6,6 +6,10 @@ import Profile from "./pages/Profile";
 import LogReg from "./pages/LogReg";
 import Characters from "./pages/Characters";
 import Dmtools from "./pages/Dmtools";
+import DmtoolsEncounters from "./pages/DmtoolsEncounters";
+import DmtoolsNpcs from "./pages/DmtoolsNpcs";
+import DmtoolsLoot from "./pages/DmtoolsLoot";
+import DmtoolsMaps from "./pages/DmtoolsMaps";
 import Wiki from "./pages/Wiki";
 import Friends from "./pages/Friends";
 import { Navbar, NavbarLogin, NavbarProfile } from "./components/Navbar";
@@ -93,6 +97,10 @@ function AppWithRouter({
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
         <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/encounters" element={isAuthenticated ? <DmtoolsEncounters /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
 
         <Route path="/community" element={isAuthenticated ? <Community /> : <Navigate to="/logreg" />} />
