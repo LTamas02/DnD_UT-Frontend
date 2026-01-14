@@ -7,7 +7,6 @@ import LogReg from "./pages/LogReg";
 import Characters from "./pages/Characters";
 import Dmtools from "./pages/Dmtools";
 import DmtoolsEncounters from "./pages/DmtoolsEncounters";
-import DmtoolsNpcs from "./pages/DmtoolsNpcs";
 import DmtoolsLoot from "./pages/DmtoolsLoot";
 import DmtoolsMaps from "./pages/DmtoolsMaps";
 import Wiki from "./pages/Wiki";
@@ -26,6 +25,7 @@ import Monster from "./pages/wikiPages/Monster";
 import Equipments from './pages/wikiPages/Equipments'
 import Backgrounds from './pages/wikiPages/Backgrounds'
 import Background from './pages/wikiPages/Background'
+import DmtoolsDmScreen from "./pages/DmtoolsDmScreen";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -98,7 +98,7 @@ function AppWithRouter({
         <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/encounters" element={isAuthenticated ? <DmtoolsEncounters /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/dmscreen" element={isAuthenticated ? <DmtoolsDmScreen /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />

@@ -212,6 +212,99 @@ export const deleteCommunity = (id, token) =>
         headers: { Authorization: `Bearer ${token}` }
     });
 
+// =========================
+// === Community Realtime (Discord-style)
+// =========================
+
+export const getServers = (token) =>
+    api.get("/servers", {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const getServer = (id, token) =>
+    api.get(`/servers/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const getServerMembers = (id, token) =>
+    api.get(`/servers/${id}/members`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const createServer = (data, token) =>
+    api.post("/servers", data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+export const getServerChannels = (id, token) =>
+    api.get(`/servers/${id}/channels`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const createServerChannel = (id, data, token) =>
+    api.post(`/servers/${id}/channels`, data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+export const getChannelMessages = (channelId, token, beforeId, limit = 50) =>
+    api.get(`/channels/${channelId}/messages`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+            ...(beforeId ? { beforeId } : {}),
+            limit
+        }
+    });
+
+export const sendChannelMessage = (channelId, content, token) =>
+    api.post(
+        `/channels/${channelId}/messages`,
+        { content },
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+export const addCommunityReaction = (messageId, emoji, token) =>
+    api.post(
+        `/messages/${messageId}/reactions`,
+        { emoji },
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+export const removeCommunityReaction = (messageId, emoji, token) =>
+    api.delete(`/messages/${messageId}/reactions/${encodeURIComponent(emoji)}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const createCommunityInvite = (serverId, data, token) =>
+    api.post(`/servers/${serverId}/invites`, data || {}, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const joinCommunityInvite = (code, token) =>
+    api.post(`/invites/${code}/join`, null, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const joinVoiceChannel = (channelId, token) =>
+    api.post(`/voice/${channelId}/join`, null, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const leaveVoiceChannel = (channelId, token) =>
+    api.post(`/voice/${channelId}/leave`, null, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const updateVoiceState = (channelId, data, token) =>
+    api.patch(`/voice/${channelId}/state`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
 
 
 

@@ -18,7 +18,7 @@ export default function Dmtools() {
     {
       name: 'NPC Generator',
       description: 'Spin up memorable NPCs with quick details.',
-      path: '/dmtools/npcs',
+      path: '/dmtools/dmscreen',
       image: npcImage
     },
     {
