@@ -27,6 +27,13 @@ import Backgrounds from './pages/wikiPages/Backgrounds'
 import Background from './pages/wikiPages/Background'
 import DmtoolsDmScreen from "./pages/DmtoolsDmScreen";
 
+import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
+import Alignment from "./pages/wikiPages/Alignments";
+import Conditions from "./pages/wikiPages/Conditions";
+import DamageTypes from "./pages/wikiPages/DamageTypes";
+import Languages from "./pages/wikiPages/Languages";
+import Language from "./pages/wikiPages/Language";
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
@@ -122,6 +129,15 @@ function AppWithRouter({
 
 
         <Route path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/ability-scores" element={isAuthenticated ? <AbilityScoresWiki /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/alignments" element={isAuthenticated ? <Alignment /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/conditions" element={isAuthenticated ? <Conditions /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/damage-types" element={isAuthenticated ? <DamageTypes /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/languages" element={isAuthenticated ? <Languages /> : <Navigate to="/logreg" />} />
+        <Route path="/language/:index" element={isAuthenticated ? <Language /> : <Navigate to="/logreg" />} />
+
 
       </Routes>
     </>

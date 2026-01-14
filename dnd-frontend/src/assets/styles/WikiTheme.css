@@ -1017,3 +1017,44 @@ header h1, header h2 {
 .spell-class-badge.subclass:hover {
  background: rgba(139, 90, 43, 0.25);
 }
+
+
+
+
+
+
+
+
+.expand-btn {
+  background: #deb887;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.card-content {
+  max-height: 0;             /* collapsed */
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  padding: 0 0;              /* collapsed */
+}
+
+.card-content.open {
+  max-height: 1000px;        /* enough to fit content */
+  padding: 10px 0;           /* expanded padding */
+}
+
+.card-content strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.card-content p, 
+.card-content ul {
+  margin: 5px 0;
+}
+
+.card-content ul {
+  padding-left: 20px;
+}
