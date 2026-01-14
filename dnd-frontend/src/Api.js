@@ -239,6 +239,19 @@ export const createServer = (data, token) =>
         }
     });
 
+export const updateServer = (id, data, token) =>
+    api.put(`/servers/${id}`, data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+export const deleteServer = (id, token) =>
+    api.delete(`/servers/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
 export const getServerChannels = (id, token) =>
     api.get(`/servers/${id}/channels`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -250,6 +263,19 @@ export const createServerChannel = (id, data, token) =>
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json"
         }
+    });
+
+export const updateServerChannel = (serverId, channelId, data, token) =>
+    api.patch(`/servers/${serverId}/channels/${channelId}`, data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    });
+
+export const deleteServerChannel = (serverId, channelId, token) =>
+    api.delete(`/servers/${serverId}/channels/${channelId}`, {
+        headers: { Authorization: `Bearer ${token}` }
     });
 
 export const getChannelMessages = (channelId, token, beforeId, limit = 50) =>
@@ -282,6 +308,11 @@ export const removeCommunityReaction = (messageId, emoji, token) =>
 
 export const createCommunityInvite = (serverId, data, token) =>
     api.post(`/servers/${serverId}/invites`, data || {}, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+export const getCommunityInvites = (serverId, token) =>
+    api.get(`/servers/${serverId}/invites`, {
         headers: { Authorization: `Bearer ${token}` }
     });
 
