@@ -14,7 +14,7 @@ import '../assets/styles/Dmtools.css'
 import '../assets/styles/DmtoolsMaps.css'
 
 // ===== Backend config =====
-const API_BASE = 'http://localhost:5188' // <-- backend base url
+const API_BASE = 'https://api.dnd-tool.com' // <-- backend base url
 const NODE_TYPES = ['Location', 'NPC', 'Faction', 'Quest', 'Lore', 'Character(PC)', 'Item']
 
 const createId = () => `node-${Date.now()}-${Math.floor(Math.random() * 10000)}`
