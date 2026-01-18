@@ -15,9 +15,17 @@ import '../assets/styles/DmtoolsMaps.css'
 
 // ===== Backend config =====
 const API_BASE = 'https://api.dnd-tool.com' // <-- backend base url
-const NODE_TYPES = ['Location', 'NPC', 'Faction', 'Quest', 'Lore', 'Character(PC)', 'Item']
+const NODE_TYPES = ['Location', 'NPC', 'Faction', 'Quest', 'Lore', 'Character(PC)', 'Item', 'Monster']
 
 const createId = () => `node-${Date.now()}-${Math.floor(Math.random() * 10000)}`
+
+// --- URL helper (backend relative /uploads -> abs) ---
+const toAbsUrl = (url) => {
+  if (!url) return ''
+  if (typeof url !== 'string') return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `${API_BASE}${url}`
+}
 
 // ===== Minimal fetch helper (JWT + better errors) =====
 async function api(path, options = {}) {
@@ -44,7 +52,6 @@ async function api(path, options = {}) {
     : null
 
   if (!res.ok) {
-    // 401 -> tipikus bejelentkezési gond
     if (res.status === 401) {
       throw new Error('Unauthorized (401). Jelentkezz be újra, vagy hiányzik a token.')
     }
@@ -53,6 +60,48 @@ async function api(path, options = {}) {
       (data && (data.message || data.Message)) ||
       (typeof data === 'string' ? data : null) ||
       `Request failed: ${res.status}`
+    throw new Error(msg)
+  }
+
+  return data
+}
+
+// ===== Upload helper (multipart/form-data + JWT) =====
+async function apiUpload(path, file) {
+  const token = localStorage.getItem('token')
+
+  const form = new FormData()
+  form.append('file', file)
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+      // IMPORTANT: Do NOT set Content-Type for FormData
+    },
+    body: form
+  })
+
+  const text = await res.text()
+  const data = text
+    ? (() => {
+        try {
+          return JSON.parse(text)
+        } catch {
+          return text
+        }
+      })()
+    : null
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      throw new Error('Unauthorized (401). Jelentkezz be újra, vagy hiányzik a token.')
+    }
+
+    const msg =
+      (data && (data.message || data.Message)) ||
+      (typeof data === 'string' ? data : null) ||
+      `Upload failed: ${res.status}`
     throw new Error(msg)
   }
 
@@ -120,7 +169,21 @@ export default function DmtoolsMaps() {
         if (cancelled) return
 
         setCampaignName(campaign?.name || '')
-        setNodes(campaign?.nodes || [])
+
+        // ensure data shape for backend (imageUrl/statblock exist)
+        const normalizedNodes = (campaign?.nodes || []).map((n) => ({
+          ...n,
+          data: {
+            label: n?.data?.label ?? 'New Node',
+            type: n?.data?.type ?? 'Location',
+            tags: Array.isArray(n?.data?.tags) ? n.data.tags : [],
+            notes: n?.data?.notes ?? '',
+            imageUrl: n?.data?.imageUrl ?? null,
+            statblock: n?.data?.statblock ?? null
+          }
+        }))
+
+        setNodes(normalizedNodes)
         setEdges(campaign?.edges || [])
         setSelectedNodeId(null)
         setSearch('')
@@ -163,10 +226,12 @@ export default function DmtoolsMaps() {
           body: JSON.stringify(payload)
         })
 
-        // update list row
+        // update list row (backend returns coverImageUrl too; keep it)
         setCampaigns((prev) =>
           prev.map((c) =>
-            c.id === updated.id ? { ...c, name: updated.name, updatedAt: updated.updatedAt } : c
+            c.id === updated.id
+              ? { ...c, name: updated.name, updatedAt: updated.updatedAt, coverImageUrl: updated.coverImageUrl ?? c.coverImageUrl }
+              : c
           )
         )
       } catch (e) {
@@ -229,7 +294,6 @@ export default function DmtoolsMaps() {
         body: JSON.stringify({ name: trimmed, seedStarter: true })
       })
 
-      // friss listát kérünk (biztosan jó sorrend / count)
       await refreshCampaigns()
 
       setCreateName('')
@@ -259,11 +323,10 @@ export default function DmtoolsMaps() {
     setTypeFilter('all')
     setTagFilter('')
 
-    // list refresh (ha közben változott updatedAt)
     try {
       await refreshCampaigns()
     } catch {
-      // ne dobjon UI-t
+      // ignore
     }
   }
 
@@ -271,7 +334,14 @@ export default function DmtoolsMaps() {
     const newNode = {
       id: createId(),
       position: { x: Math.random() * 400 - 200, y: Math.random() * 300 - 150 },
-      data: { label: 'New Node', type: 'Location', tags: [], notes: '' }
+      data: {
+        label: 'New Node',
+        type: 'Location',
+        tags: [],
+        notes: '',
+        imageUrl: null,
+        statblock: null
+      }
     }
     setNodes((prev) => [...prev, newNode])
     setSelectedNodeId(newNode.id)
@@ -296,6 +366,80 @@ export default function DmtoolsMaps() {
       prev.filter((edge) => edge.source !== selectedNodeId && edge.target !== selectedNodeId)
     )
     setSelectedNodeId(null)
+  }
+
+  // ===== Campaign cover upload =====
+  const handleUploadCover = async (file) => {
+    if (!file || !activeCampaignId) return
+
+    try {
+      setLoading(true)
+      setErrorMsg('')
+
+      const out = await apiUpload(
+        `/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/cover`,
+        file
+      )
+
+      const coverImageUrl = out?.coverImageUrl
+      if (coverImageUrl) {
+        setCampaigns((prev) =>
+          prev.map((c) => (c.id === activeCampaignId ? { ...c, coverImageUrl } : c))
+        )
+      }
+    } catch (e) {
+      setErrorMsg(e.message || 'Cover upload failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ===== Node image upload/remove =====
+  const handleUploadNodeImage = async (file) => {
+    if (!file || !activeCampaignId || !selectedNode) return
+
+    try {
+      setLoading(true)
+      setErrorMsg('')
+
+      const out = await apiUpload(
+        `/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/nodes/${encodeURIComponent(
+          selectedNode.id
+        )}/image`,
+        file
+      )
+
+      const imageUrl = out?.imageUrl
+      if (imageUrl) {
+        updateNodeData(selectedNode.id, { imageUrl })
+      }
+    } catch (e) {
+      setErrorMsg(e.message || 'Node image upload failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRemoveNodeImage = async () => {
+    if (!activeCampaignId || !selectedNode) return
+
+    try {
+      setLoading(true)
+      setErrorMsg('')
+
+      await api(
+        `/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/nodes/${encodeURIComponent(
+          selectedNode.id
+        )}/image`,
+        { method: 'DELETE' }
+      )
+
+      updateNodeData(selectedNode.id, { imageUrl: null })
+    } catch (e) {
+      setErrorMsg(e.message || 'Remove image failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -342,6 +486,7 @@ export default function DmtoolsMaps() {
               <div className="dmtools-subcard">
                 <h2>Open Existing</h2>
                 <p>Pick a campaign already in progress.</p>
+
                 <select
                   className="dmtools-input"
                   value={existingId}
@@ -355,6 +500,7 @@ export default function DmtoolsMaps() {
                     </option>
                   ))}
                 </select>
+
                 <button
                   className="dmtools-action"
                   onClick={handleOpenExisting}
@@ -370,14 +516,52 @@ export default function DmtoolsMaps() {
         {activeCampaign && (
           <div className="dmtools-map-shell">
             <header className="dmtools-map-header">
-              <div>
-                <h1>{campaignName || activeCampaign?.name || 'Campaign'}</h1>
-                <p>
-                  Drag nodes, connect ideas, and filter the web.
-                  {saving && <span style={{ marginLeft: 10, opacity: 0.8 }}>Saving...</span>}
-                  {!saving && hydratedRef.current && <span style={{ marginLeft: 10, opacity: 0.6 }}>Saved</span>}
-                </p>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                {activeCampaign?.coverImageUrl ? (
+                  <img
+                    src={toAbsUrl(activeCampaign.coverImageUrl)}
+                    alt="cover"
+                    style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 12 }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 12,
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      opacity: 0.35
+                    }}
+                  />
+                )}
+
+                <div>
+                  <h1>{campaignName || activeCampaign?.name || 'Campaign'}</h1>
+                  <p>
+                    Drag nodes, connect ideas, and filter the web.
+                    {saving && <span style={{ marginLeft: 10, opacity: 0.8 }}>Saving...</span>}
+                    {!saving && hydratedRef.current && (
+                      <span style={{ marginLeft: 10, opacity: 0.6 }}>Saved</span>
+                    )}
+                  </p>
+
+                  <label className="dmtools-action" style={{ cursor: 'pointer', display: 'inline-flex' }}>
+                    Set Cover
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) handleUploadCover(file)
+                        e.target.value = ''
+                      }}
+                      disabled={loading}
+                    />
+                  </label>
+                </div>
               </div>
+
               <div className="dmtools-map-actions">
                 <button className="dmtools-action" onClick={handleAddNode} disabled={loading}>
                   Add Node
@@ -487,7 +671,15 @@ export default function DmtoolsMaps() {
                       id="dmtools-node-type"
                       className="dmtools-input"
                       value={selectedNode.data?.type || 'Location'}
-                      onChange={(event) => updateNodeData(selectedNode.id, { type: event.target.value })}
+                      onChange={(event) => {
+                        const newType = event.target.value
+                        // ha Monsterre váltasz, adunk egy default statblockot (üres object)
+                        if (newType === 'Monster' && !selectedNode.data?.statblock) {
+                          updateNodeData(selectedNode.id, { type: newType, statblock: {} })
+                        } else {
+                          updateNodeData(selectedNode.id, { type: newType })
+                        }
+                      }}
                       disabled={loading}
                     >
                       {NODE_TYPES.map((type) => (
@@ -496,6 +688,49 @@ export default function DmtoolsMaps() {
                         </option>
                       ))}
                     </select>
+
+                    {/* Node Image Upload */}
+                    <label className="dmtools-label">Image</label>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                      {selectedNode.data?.imageUrl ? (
+                        <img
+                          src={toAbsUrl(selectedNode.data.imageUrl)}
+                          alt="node"
+                          style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 12 }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: 12,
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            opacity: 0.35
+                          }}
+                        />
+                      )}
+
+                      <label className="dmtools-action" style={{ cursor: 'pointer' }}>
+                        Upload
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) handleUploadNodeImage(file)
+                            e.target.value = ''
+                          }}
+                          disabled={loading}
+                        />
+                      </label>
+
+                      {selectedNode.data?.imageUrl && (
+                        <button className="dmtools-action dmtools-danger" onClick={handleRemoveNodeImage} disabled={loading}>
+                          Remove
+                        </button>
+                      )}
+                    </div>
 
                     <label className="dmtools-label" htmlFor="dmtools-node-tags">
                       Tags (comma separated)
@@ -527,6 +762,36 @@ export default function DmtoolsMaps() {
                       rows={6}
                       disabled={loading}
                     />
+
+                    {/* Monster statblock JSON editor (backend NodeData.statblock) */}
+                    {(selectedNode.data?.type || '') === 'Monster' && (
+                      <>
+                        <label className="dmtools-label" htmlFor="dmtools-node-statblock">
+                          Statblock (JSON)
+                        </label>
+                        <textarea
+                          id="dmtools-node-statblock"
+                          className="dmtools-textarea"
+                          rows={10}
+                          value={JSON.stringify(selectedNode.data?.statblock || {}, null, 2)}
+                          onChange={(event) => {
+                            const raw = event.target.value
+                            try {
+                              const parsed = raw.trim() ? JSON.parse(raw) : {}
+                              updateNodeData(selectedNode.id, { statblock: parsed })
+                              // ha eddig JSON error volt, töröljük
+                              setErrorMsg('')
+                            } catch {
+                              setErrorMsg('Statblock JSON invalid.')
+                            }
+                          }}
+                          disabled={loading}
+                        />
+                        <div style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
+                          Tipp: ide bármilyen JSON-t írhatsz (AC, HP, actions, stb.). Autosave menti a kampányba.
+                        </div>
+                      </>
+                    )}
 
                     <button className="dmtools-action dmtools-danger" onClick={handleDeleteNode} disabled={loading}>
                       Delete Node
