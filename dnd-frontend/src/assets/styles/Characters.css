@@ -1,15 +1,14 @@
 
 
 #characters-comp {
-    background-image: url('https://i.pinimg.com/1200x/a1/9b/a9/a19ba9ed3ad1dd1f43b0a1870c3d46ad.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
+    background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://i.pinimg.com/1200x/a1/9b/a9/a19ba9ed3ad1dd1f43b0a1870c3d46ad.jpg'));
+    background-size: cover, cover;
+    background-repeat: no-repeat, no-repeat;
+    background-attachment: fixed, fixed;
+    background-position: center, center;
     height: 100vh;
 
-    color: black;
-
+    color: var(--app-text, black);
 
     overflow-x: hidden;
 }

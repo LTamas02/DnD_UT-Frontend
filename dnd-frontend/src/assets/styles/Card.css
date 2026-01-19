@@ -4,17 +4,17 @@
  */
 .card {
     /* Háttér: Elegáns, mélybarna gradient */
-    background: linear-gradient(135deg, #4e342e 0%, #3e2723 100%); 
+    background: linear-gradient(135deg, var(--app-card, #4e342e) 0%, var(--app-bg, #3e2723) 100%); 
     
     /* Keret: Finom, bronz/réz színű vonal */
-    border: 2px solid #a1887f; 
+    border: 2px solid var(--app-border, #a1887f); 
     border-radius: 12px; /* Lágyabb, modernebb sarok */
     
     /* Árnyék: Diszkrét, mély, texturált árnyék */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); 
     
     /* Szöveg: Krémfehér/világos arany */
-    color: #fff8e1; 
+    color: var(--app-button-text, #fff8e1); 
     
     /* Betűtípus: Elegáns, olvasható Serif */
     font-family: 'Georgia', serif; 
@@ -26,7 +26,7 @@
 .card:hover {
     /* Enyhe, elegáns emelkedés és ragyogás */
     transform: scale(1.02); 
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 10px #ffcc80; 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 10px var(--app-accent, #ffcc80); 
     text-decoration: none;
 }
 
@@ -42,7 +42,7 @@
     font-size: 1.5rem;
     font-family: 'Cinzel', serif; /* Megtartva az elegáns hangulatot */
     letter-spacing: 0.5px;
-    color: #ffcc80; /* Krém-arany */
+    color: var(--app-accent, #ffcc80); /* Krém-arany */
     text-shadow: 1px 1px 3px #000;
     margin-bottom: 0.5rem;
 }
@@ -53,7 +53,7 @@
  */
 .card-subtitle {
     font-size: 1rem;
-    color: #a1887f !important; /* Bronzos barna */
+    color: var(--app-border, #a1887f) !important; /* Bronzos barna */
     font-family: 'Georgia', serif;
     margin-bottom: 1rem;
 }
@@ -63,7 +63,7 @@
  */
 .card-text {
     font-size: 1rem;
-    color: #ffe0b2; /* Világos krém árnyalat */
+    color: var(--app-text, #ffe0b2); /* Világos krém árnyalat */
     font-family: 'Georgia', serif;
     line-height: 1.6;
 }

@@ -19,7 +19,7 @@
 
 .dm-screen-sheet {
   background: linear-gradient(180deg, rgba(255, 245, 224, 0.96), rgba(236, 214, 176, 0.94));
-  border: 4px solid #6b4226;
+  border: 4px solid var(--app-border, #6b4226);
   border-radius: 18px;
   padding: 20px;
   box-shadow: inset 0 0 60px rgba(91, 55, 28, 0.4);
@@ -43,7 +43,7 @@
   width: 100%;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 2px solid #6b4226;
+  border: 2px solid var(--app-border, #6b4226);
   background: rgba(255, 240, 200, 0.9);
   color: #3a1d0f;
   font-family: 'IM Fell English SC', serif;
@@ -58,7 +58,7 @@
 
 .dm-screen-card {
   border-radius: 14px;
-  border: 3px solid #6b4226;
+  border: 3px solid var(--app-border, #6b4226);
   padding: 14px;
   background: url('https://www.transparenttextures.com/patterns/old-map.png');
   background-color: rgba(255, 239, 210, 0.9);
@@ -76,7 +76,7 @@
   width: 100%;
   min-height: 140px;
   border-radius: 10px;
-  border: 2px solid #6b4226;
+  border: 2px solid var(--app-border, #6b4226);
   padding: 10px 12px;
   background: rgba(255, 250, 238, 0.92);
   color: #3a1d0f;

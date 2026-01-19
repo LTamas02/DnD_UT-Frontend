@@ -4,7 +4,7 @@
     right: 20px;
     width: 300px;
     height: 400px;
-    background: white;
+    background: var(--app-panel, white);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     display: flex;
@@ -15,8 +15,8 @@
 }
 
 .chat-header {
-    background: #007bff;
-    color: white;
+    background: var(--app-accent, #007bff);
+    color: var(--app-button-text, white);
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -26,7 +26,7 @@
 .chat-header button {
     background: transparent;
     border: none;
-    color: white;
+    color: var(--app-button-text, white);
     font-size: 16px;
     cursor: pointer;
 }
@@ -35,7 +35,7 @@
     flex: 1;
     padding: 10px;
     overflow-y: auto;
-    background: #f4f6f8;
+    background: rgba(0, 0, 0, 0.12);
 }
 
 .chat-message {
@@ -49,40 +49,40 @@
 .chat-message .sender {
     display: block;
     font-size: 0.75rem;
-    color: gray;
+    color: var(--app-muted, gray);
 }
 
 .chat-message .content {
     display: inline-block;
     padding: 6px 10px;
     border-radius: 12px;
-    background: #e4e6eb;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .chat-message.self .content {
-    background: #007bff;
-    color: white;
+    background: var(--app-accent, #007bff);
+    color: var(--app-button-text, white);
 }
 
 .chat-input {
     padding: 10px;
     display: flex;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid var(--app-border, #ccc);
 }
 
 .chat-input input {
     flex: 1;
     padding: 8px;
     border-radius: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--app-border, #ccc);
     outline: none;
 }
 
 .chat-input button {
     margin-left: 8px;
-    background: #007bff;
+    background: var(--app-accent, #007bff);
     border: none;
-    color: white;
+    color: var(--app-button-text, white);
     padding: 8px 12px;
     border-radius: 20px;
     cursor: pointer;

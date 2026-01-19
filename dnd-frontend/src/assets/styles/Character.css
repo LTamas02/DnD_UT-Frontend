@@ -10,11 +10,11 @@ body, html {
   height:100%;
   /* Use the dark wood/parchment background */
   /* !!! FONTOS: !important a felülírás megakadályozására !!! */
-  background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
-  background-color: #2d1a0d !important; /* SÖTÉT BARNA ALAPSZÍN */
+  background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+  background-color: var(--app-bg, #2d1a0d) !important; /* SÖTÉT BARNA ALAPSZÍN */
   background-size: auto !important;
   animation: none !important; /* Remove background animation */
-  color:#e4c590; /* Light gold for medieval feel */
+  color: var(--app-text, #e4c590); /* Light gold for medieval feel */
   overflow-y: auto; /* Ensure scrolling is possible */
 }
 
@@ -35,7 +35,7 @@ body, html {
   /* Dark brown border with gold glow */
   box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); 
   border-radius:0;
-  border-right: 3px solid #6b4226; 
+  border-right: 3px solid var(--app-border, #6b4226); 
   position: sticky; /* Keep sidebar visible */
   top: 0;
   height: 100vh;
@@ -45,17 +45,17 @@ body, html {
   margin-bottom:20px;
   text-align:center;
   padding-bottom:10px;
-  border-bottom: 2px solid #6b4226;
+  border-bottom: 2px solid var(--app-border, #6b4226);
 }
 .sidebar-name {
   font-size:1.8em;
   font-weight:bold;
-  color:#ffdd99; /* Lighter gold */
+  color:var(--app-text, #ffdd99); /* Lighter gold */
   text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
 }
 .sidebar-class {
   font-size:1em;
-  color:#e4c590;
+  color:var(--app-text, #e4c590);
 }
 .sidebar-nav {
   display:flex;
@@ -63,9 +63,9 @@ body, html {
   gap:8px;
 }
 .nav-btn {
-  background: #6b4226; /* Dark brown button */
-  color:#e4c590;
-  border:2px solid #8b5a2b;
+  background: var(--app-border, #6b4226); /* Dark brown button */
+  color:var(--app-text, #e4c590);
+  border:2px solid var(--app-button-bg, #8b5a2b);
   padding:10px;
   cursor:pointer;
   transition:background 0.2s, box-shadow 0.2s;
@@ -74,10 +74,10 @@ body, html {
   border-radius: 5px;
 }
 .nav-btn:hover {
-  background: #8b5a2b;
+  background: var(--app-button-bg, #8b5a2b);
 }
 .nav-btn.active {
-  background: #d4af37; /* Gold active color */
+  background: var(--app-accent, #d4af37); /* Gold active color */
   color:#3a1d0f; /* Dark text on gold */
   border-color:#3a1d0f;
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
@@ -94,14 +94,14 @@ body, html {
   padding:10px 0;
 }
 .tab-page h2 {
-  color:#ffdd99;
+  color:var(--app-text, #ffdd99);
   text-align:center;
   font-size: 2.2em;
   text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
   margin-bottom: 20px;
 }
 .tab-page label {
-    color: #e4c590;
+    color: var(--app-text, #e4c590);
     display: block;
     margin-bottom: 5px;
     font-size: 1.1em;
@@ -111,19 +111,19 @@ body, html {
 .card {
   /* Parchment background from LogReg.css */
   background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
-  background-color: #4a321e; /* MÉLYEBB, SÖTÉTEBB BARNA A KONTÉNERNEK */
+  background-color: var(--app-card, #4a321e); /* MÉLYEBB, SÖTÉTEBB BARNA A KONTÉNERNEK */
   background-blend-mode: multiply; 
   padding:15px;
   margin-bottom:20px;
-  border: 6px solid #6b4226; /* Dark brown border */
+  border: 6px solid var(--app-border, #6b4226); /* Dark brown border */
   border-radius:10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  color: #ffdd99; /* VILÁGOSABB SZÖVEG a sötét kártyán */
+  color: var(--app-text, #ffdd99); /* VILÁGOSABB SZÖVEG a sötét kártyán */
 }
 
 .card h2.section-title, .card h3 {
-    color: #e4c590; /* VILÁGOSABB címszín */
-    border-bottom: 2px solid #6b4226;
+    color: var(--app-text, #e4c590); /* VILÁGOSABB címszín */
+    border-bottom: 2px solid var(--app-border, #6b4226);
     padding-bottom: 5px;
     margin-top: 0;
     font-weight: bold;
@@ -134,7 +134,7 @@ body, html {
 .input-dark, .textarea-dark, .computed {
   /* Input style from LogReg.css */
   background: rgba(255, 240, 200, 0.9); /* A beviteli mezőket meghagyjuk világosnak a jó láthatóságért */
-  border: 2px solid #6b4226;
+  border: 2px solid var(--app-border, #6b4226);
   color: #3a1d0f; /* SÖTÉT SZÖVEG AZ INPUTON BELÜL */
   font-weight: bold;
   font-family: 'IM Fell English SC', serif;
@@ -147,8 +147,8 @@ body, html {
 }
 .input-dark:focus, .textarea-dark:focus {
   background: rgba(255, 240, 200, 1);
-  border-color: #d4af37; /* Gold outline when selected */
-  box-shadow: 0 0 8px #d4af37;
+  border-color: var(--app-accent, #d4af37); /* Gold outline when selected */
+  box-shadow: 0 0 8px var(--app-accent, #d4af37);
   outline: none;
 }
 .textarea-dark {
@@ -193,11 +193,11 @@ body, html {
 .ability-label {
     flex-grow: 1;
     font-weight: bold;
-    color: #ffdd99; /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
 }
 .mod-pill {
-    background: #8b5a2b;
-    color: #ffdd99;
+    background: var(--app-button-bg, #8b5a2b);
+    color: var(--app-text, #ffdd99);
     padding: 2px 8px;
     border-radius: 5px;
     font-weight: bold;
@@ -211,7 +211,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #ffdd99; /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
     font-weight: bold;
 }
 
@@ -220,7 +220,7 @@ body, html {
     /* Wax Seal Style from LogReg.css .btn-success */
     background: linear-gradient(to bottom, #a52a2a, #8b0000); 
     border: 3px solid #3a1d0f;
-    color: #e4c590;
+    color: var(--app-text, #e4c590);
     font-family: 'IM Fell English SC', serif;
     font-size: 16px;
     padding: 8px 15px;
@@ -246,10 +246,10 @@ body, html {
 
 /* Attack Table Specifics */
 .attack-header, .attack-row {
-    color: #ffdd99; /* VILÁGOSABB text for table content */
+    color: var(--app-text, #ffdd99); /* VILÁGOSABB text for table content */
 }
 .attack-header {
-    border-bottom: 2px solid #6b4226 !important;
+    border-bottom: 2px solid var(--app-border, #6b4226) !important;
     font-weight: bold;
 }
 .attack-row input {
@@ -260,21 +260,21 @@ body, html {
 .spell-slots-compact-grid div {
     /* Darker background for distinction */
     background: rgba(69, 37, 16, 0.7) !important; 
-    border: 1px solid #6b4226;
+    border: 1px solid var(--app-border, #6b4226);
 }
 .spell-slots-compact-grid span {
-    color: #ffdd99 !important;
+    color: var(--app-text, #ffdd99) !important;
 }
 .spell-detail-preview {
     background: rgba(69, 37, 16, 0.9);
-    color: #e4c590;
-    border-color: #ffdd99;
+    color: var(--app-text, #e4c590);
+    border-color: var(--app-text, #ffdd99);
 }
 .spell-detail-preview p {
-    color: #e4c590 !important;
+    color: var(--app-text, #e4c590) !important;
 }
 .spell-detail-preview h3 {
-    color: #e4c590 !important;
+    color: var(--app-text, #e4c590) !important;
 }
 
 .spell-table {
@@ -282,15 +282,15 @@ body, html {
     border-collapse: collapse;
 }
 .spell-table th {
-    background: #6b4226;
-    color: #ffdd99;
+    background: var(--app-border, #6b4226);
+    color: var(--app-text, #ffdd99);
     border: 1px solid #3a1d0f;
     padding: 8px;
 }
 .spell-table td {
     background: rgba(255, 240, 200, 0.7);
     color: #3a1d0f;
-    border: 1px solid #6b4226;
+    border: 1px solid var(--app-border, #6b4226);
     padding: 6px;
 }
 
@@ -304,7 +304,7 @@ body, html {
     /* Uses .card style */
 }
 .action-bar h1 {
-    color: #ffdd99; /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
     font-size: 1.8em;
     margin: 0;
 }
@@ -317,7 +317,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #ffdd99; /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
     font-weight: bold;
 }
 .prof-bonus-line input {
@@ -336,7 +336,7 @@ body, html {
     background: rgba(255, 240, 200, 0.5);
     padding: 5px;
     border-radius: 4px;
-    border: 1px solid #6b4226;
+    border: 1px solid var(--app-border, #6b4226);
 }
 .item-card label {
     color: #3a1d0f;

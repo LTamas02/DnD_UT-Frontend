@@ -1,7 +1,7 @@
 .footer {
-    background-color: rgb(155, 88, 34);
-    color: #ffffff;
-    border-top: 4px solid #d4af37; /* Gold border for a medieval touch */
+    background-color: var(--app-card, rgb(155, 88, 34));
+    color: var(--app-button-text, #ffffff);
+    border-top: 4px solid var(--app-accent, #d4af37); /* Gold border for a medieval touch */
     position: fixed;
     left: 0;
     bottom: 0;

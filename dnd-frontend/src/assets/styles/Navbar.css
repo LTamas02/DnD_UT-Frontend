@@ -4,10 +4,10 @@
  */
 .navbar {
     /* Alap: Mély, texturált barna (esetleg diófa vagy étcsokoládé) */
-    background: linear-gradient(to right, #4e342e, #6d4c41); /* Sötét kávé/Bécsi barna gradient */
+    background: linear-gradient(to right, var(--app-nav-start, #4e342e), var(--app-nav-end, #6d4c41)); /* Sötét kávé/Bécsi barna gradient */
     
     /* Vonal: Égett, karamell/réz árnyalat, finoman kiemeli az alját */
-    border-bottom: 2px solid #a1887f; 
+    border-bottom: 2px solid var(--app-border, #a1887f); 
     
     /* Pozíció: Felső, fix rögzítés, hogy mindig látható legyen */
     position: fixed;
@@ -25,7 +25,7 @@
  */
 .navbar-brand {
     /* Szín: Fényes, vanília/arany kiemelés */
-    color: #fff8e1 !important; 
+    color: var(--app-button-text, #fff8e1) !important; 
     font-size: 26px; /* Kicsit nagyobb méret */
     text-transform: uppercase;
     font-family: 'Georgia', serif; /* Elegánsabb betűtípus */
@@ -38,7 +38,7 @@
  */
 .navbar-nav .nav-link {
     /* Szín: Meleg, sárgásbarna/réz árnyalat */
-    color: #ffe0b2 !important; 
+    color: var(--app-text, #ffe0b2) !important; 
     font-weight: 500; /* Közepes vastagság */
     margin-left: 15px; /* Kicsit több térköz */
     transition: all 0.3s ease; /* Átmenet a hoverhez */
@@ -50,7 +50,7 @@
  */
 .navbar-nav .nav-link:hover {
     /* Szín: Tiszta arany/Karamell, nagyon világos */
-    color: #ffc107 !important; 
+    color: var(--app-accent, #ffc107) !important; 
     
     /* Árnyék: Elegáns mélység, mintha meg lenne nyomva */
     text-shadow: 0 0 8px rgba(255, 193, 7, 0.6); /* Lágy arany ragyogás */

@@ -1,3 +1,19 @@
+:root {
+  --app-bg: #2f1e16;
+  --app-text: #ffe7c2;
+  --app-muted: #c9a980;
+  --app-accent: #ffcc80;
+  --app-panel: rgba(255, 255, 255, 0.12);
+  --app-card: #4e342e;
+  --app-border: #795548;
+  --app-button-bg: #795548;
+  --app-button-text: #fff8e1;
+  --app-nav-start: #4e342e;
+  --app-nav-end: #5d4037;
+  --app-bg-image: none;
+  --app-bg-gradient: linear-gradient(130deg, rgba(10, 6, 4, 0.75), rgba(64, 36, 18, 0.85));
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,7 +21,16 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+  background-color: var(--app-bg);
+  background-image: var(--app-bg-gradient, none), var(--app-bg-image, none);
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+  color: var(--app-text);
+}
+
+a {
+  color: var(--app-accent);
 }
 
 code {

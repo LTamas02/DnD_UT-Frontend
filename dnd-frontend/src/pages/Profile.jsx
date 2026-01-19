@@ -18,26 +18,9 @@ import {
     getProfileTheme,
     updateProfileTheme
 } from "../Api";
+import { DEFAULT_THEME, THEME_KEY, applyTheme } from "../theme";
 
 const API_BASE = "https://api.dnd-tool.com";
-const THEME_KEY = "profileTheme";
-
-const DEFAULT_THEME = {
-    bgImage: "",
-    bgGradient: "linear-gradient(130deg, rgba(10,6,4,0.75), rgba(64,36,18,0.85))",
-    pageBg: "#2f1e16",
-    overlay: "rgba(0,0,0,0.35)",
-    cardBg: "#4e342e",
-    cardBorder: "#795548",
-    accent: "#ffcc80",
-    text: "#ffe7c2",
-    muted: "#c9a980",
-    panelBg: "rgba(255,255,255,0.12)",
-    panelText: "#ffe7c2",
-    buttonBg: "#795548",
-    buttonText: "#fff8e1",
-    friendBg: "#5d4037"
-};
 
 const THEME_PRESETS = [
     {
@@ -166,6 +149,7 @@ const Profile = () => {
 
     useEffect(() => {
         localStorage.setItem(THEME_KEY, JSON.stringify(theme));
+        applyTheme(theme);
     }, [theme]);
 
     useEffect(() => {
@@ -305,7 +289,7 @@ const Profile = () => {
     };
 
     const themeVars = {
-        "--profile-bg-image": theme.bgImage ? `url("${theme.bgImage}")` : "none",
+        "--profile-bg-image": theme.bgImage ? `url("${theme.bgImage}")` : undefined,
         "--profile-bg-gradient": theme.bgGradient,
         "--profile-bg-color": theme.pageBg,
         "--profile-overlay": theme.overlay,
@@ -320,6 +304,10 @@ const Profile = () => {
         "--profile-button-text": theme.buttonText,
         "--profile-friend-bg": theme.friendBg
     };
+
+    if (!theme.bgImage) {
+        delete themeVars["--profile-bg-image"];
+    }
 
     return (
         <div id="profile-comp" style={themeVars}>

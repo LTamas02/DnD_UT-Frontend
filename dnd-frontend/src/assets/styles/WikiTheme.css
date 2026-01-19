@@ -13,21 +13,21 @@
  overflow-y: auto;
  
   /* DARK MEDIEVAL BACKGROUND (Uses !important for stability) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important; 
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important; 
  background-size: auto !important;
  background-position: center !important;
  background-attachment: fixed !important;
  
  font-family: 'IM Fell English SC', serif !important;
- color: #e4c590 !important; /* Light gold text */
+ color: var(--app-text, #e4c590) !important; /* Light gold text */
 }
 
 /* Overlay for readability (DARK CARD STYLE) */
 .page-overlay {
  /* Dark Card Style */
  background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
- background-color: #4a321e; 
+ background-color: var(--app-card, #4a321e); 
  background-blend-mode: multiply;
  padding: 40px 30px;
  border-radius: 10px;
@@ -35,8 +35,8 @@
  margin: 20px auto;
  text-align: center;
  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
- border: 6px solid #6b4226;
-  color: #ffdd99;
+ border: 6px solid var(--app-border, #6b4226);
+  color: var(--app-text, #ffdd99);
 }
 
 /* ============================
@@ -45,13 +45,13 @@
 .page-overlay h1 {
  font-size: 2.5rem;
  margin-bottom: 10px;
- color: #ffdd99; /* Light gold */
+ color: var(--app-text, #ffdd99); /* Light gold */
 }
 
 .page-overlay p {
  font-size: 1rem;
  margin-bottom: 25px;
- color: #e4c590; /* Light parchment */
+ color: var(--app-text, #e4c590); /* Light parchment */
 }
 
 /* ============================
@@ -60,7 +60,7 @@
 .back-button {
  /* Wax Seal Style */
  background: linear-gradient(to bottom, #a52a2a, #8b0000); 
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  padding: 8px 16px;
  border-radius: 25px;
@@ -101,21 +101,21 @@
 .search-section select {
  /* Parchment Input Style */
  background: rgba(255, 240, 200, 0.9);
- border: 2px solid #6b4226;
+ border: 2px solid var(--app-border, #6b4226);
  color: #3a1d0f;
 }
 
 .search-section input:focus,
 .search-section select:focus {
  outline: none;
- border-color: #d4af37;
+ border-color: var(--app-accent, #d4af37);
  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.5);
 }
 
 .search-section button {
  /* Wax Seal Style */
  background: linear-gradient(to bottom, #a52a2a, #8b0000); 
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  cursor: pointer;
  font-weight: bold;
@@ -152,16 +152,16 @@
 .equipment-card {
  /* Dark Card Style */
  background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
- background-color: #4a321e; 
+ background-color: var(--app-card, #4a321e); 
  background-blend-mode: multiply;
  border-radius: 10px;
  padding: 15px;
  text-align: center;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  font-weight: bold;
  text-decoration: none;
  transition: transform 0.2s, box-shadow 0.2s;
- border: 3px solid #6b4226;
+ border: 3px solid var(--app-border, #6b4226);
  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
 }
 
@@ -173,7 +173,7 @@
  transform: translateY(-3px);
  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.5);
  background-color: #5d422e;
- color: #fff8e1;
+ color: var(--app-button-text, #fff8e1);
 }
 
 /* ============================
@@ -186,7 +186,7 @@
 .wiki-card h3 {
  font-size: 1.1rem;
  margin-bottom: 5px;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 .equipment-header p,
@@ -194,7 +194,7 @@
 .race-header p,
 .monster-header p {
  font-size: 0.85rem;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .info-grid {
@@ -209,19 +209,19 @@
  background-color: rgba(69, 37, 16, 0.85);
  padding: 10px 12px;
  border-radius: 8px;
-  border: 1px solid #6b4226;
+  border: 1px solid var(--app-border, #6b4226);
 }
 
 .info-label {
  font-weight: bold;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  margin-bottom: 3px;
 }
 
 .info-item p,
 .info-item ul {
  margin: 0;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* ============================
@@ -232,7 +232,7 @@
  text-align: center;
  padding: 40px;
  font-size: 1.2rem;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 /* ============================
@@ -280,8 +280,8 @@
  =============================== */
 #monsters-comp {
  /* DARK MEDIEVAL BACKGROUND (Redundant definition kept for structure) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important;
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important;
  background-size: auto !important;
  background-repeat: no-repeat !important;
  background-attachment: fixed !important;
@@ -289,7 +289,7 @@
  min-height: 100vh;
  padding: 40px 20px;
  font-family: 'IM Fell English SC', serif !important;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 #monsters-page {
@@ -303,7 +303,7 @@
  margin-bottom: 15px;
  padding: 8px 15px;
  background: linear-gradient(to bottom, #a52a2a, #8b0000); 
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  border-radius: 25px;
  cursor: pointer;
@@ -321,13 +321,13 @@
 
 .page-content header h1 {
  font-size: 2.5rem;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  margin-bottom: 5px;
 }
 
 .page-content header p.subtitle {
  font-size: 1rem;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* Search (Inputs styled above, buttons styled above) */
@@ -342,7 +342,7 @@
  /* Re-defining redundancy */
  padding: 8px 12px;
  border-radius: 6px;
- border: 2px solid #6b4226;
+ border: 2px solid var(--app-border, #6b4226);
  background: rgba(255, 240, 200, 0.9);
  color: #3a1d0f;
  font-size: 0.9rem;
@@ -350,7 +350,7 @@
 
 .search-section input:focus {
  outline: none;
- border-color: #d4af37;
+ border-color: var(--app-accent, #d4af37);
 }
 
 .search-section button {
@@ -358,7 +358,7 @@
  padding: 8px 12px;
  border-radius: 25px;
  background: linear-gradient(to bottom, #a52a2a, #8b0000); 
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  cursor: pointer;
  font-weight: bold;
@@ -377,7 +377,7 @@
 
 .monster-card {
  /* Already styled in Card Styles block */
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  cursor: pointer;
 }
 
@@ -393,7 +393,7 @@
 .monster-size-type,
 .monster-alignment {
  font-size: 0.9rem;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .monster-details {
@@ -418,7 +418,7 @@
  text-align: center;
  font-size: 1.2rem;
  margin-top: 50px;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 /* ===============================
@@ -426,8 +426,8 @@
  =============================== */
 #monster-comp {
  /* DARK MEDIEVAL BACKGROUND (Redundant definition kept for structure) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important;
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important;
  background-size: auto !important;
  background-repeat: no-repeat !important;
  background-attachment: fixed !important;
@@ -446,18 +446,18 @@
 .monster-detail-card {
  /* Dark Card Style - re-defining */
  background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
- background-color: #4a321e; 
+ background-color: var(--app-card, #4a321e); 
  background-blend-mode: multiply;
  border-radius: 10px;
  padding: 20px;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
- border: 6px solid #6b4226;
+ border: 6px solid var(--app-border, #6b4226);
 }
 
 /* Monster top header */
 .monster-header {
- background-color: #6b4226; /* Darker brown band */
+ background-color: var(--app-border, #6b4226); /* Darker brown band */
  padding: 15px;
  border-radius: 10px 10px 0 0;
  text-align: center;
@@ -465,13 +465,13 @@
 
 .monster-header h2 {
  margin-bottom: 10px;
- color: #fff8e1;
+ color: var(--app-button-text, #fff8e1);
 }
 
 .monster-image {
  max-width: 250px;
  border-radius: 8px;
- border: 1px solid #ffdd99;
+ border: 1px solid var(--app-text, #ffdd99);
  margin-bottom: 10px;
 }
 
@@ -479,7 +479,7 @@
  text-align: center;
  padding: 20px 0;
  font-style: italic;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* Monster info section */
@@ -501,19 +501,19 @@
  background-color: rgba(69, 37, 16, 0.85);
  border-radius: 8px;
  padding: 12px 15px;
-  border: 1px solid #6b4226;
+  border: 1px solid var(--app-border, #6b4226);
 }
 
 .info-label {
  font-weight: bold;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  margin-bottom: 5px;
  display: block;
 }
 
 .info-item p, .info-item ul {
  margin: 0;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .info-item ul {
@@ -548,13 +548,13 @@
  width: 100%;
  min-height: 100vh;
  /* DARK MEDIEVAL BACKGROUND (Redundant definition kept for structure) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important;
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important;
  background-size: cover;
  background-position: center;
  background-repeat: no-repeat;
  background-attachment: fixed;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  padding: 20px;
  box-sizing: border-box;
  font-family: 'IM Fell English SC', serif !important;
@@ -576,7 +576,7 @@
 /* Back button is styled above, redundancy re-defined */
 .back-button {
  background: linear-gradient(to bottom, #a52a2a, #8b0000);
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  padding: 8px 12px;
  border-radius: 25px;
@@ -592,10 +592,10 @@
 header h1, header h2 {
  margin: 0;
  padding: 5px 0;
- color: #ffdd99; /* Light gold */
+ color: var(--app-text, #ffdd99); /* Light gold */
 }
 .subtitle {
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  margin-bottom: 15px;
 }
 
@@ -610,7 +610,7 @@ header h1, header h2 {
  /* Parchment Input Style - re-defining redundancy */
  padding: 6px 10px;
  border-radius: 6px;
- border: 2px solid #6b4226;
+ border: 2px solid var(--app-border, #6b4226);
  background: rgba(255, 240, 200, 0.9);
  color: #3a1d0f;
  flex: 1;
@@ -620,7 +620,7 @@ header h1, header h2 {
  padding: 6px 12px;
  border-radius: 25px;
  background: linear-gradient(to bottom, #a52a2a, #8b0000);
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  cursor: pointer;
  transition: background-color 0.2s;
@@ -638,12 +638,12 @@ header h1, header h2 {
 
 /* Race card is styled in Card Styles block */
 .race-card {
- background-color: #4a321e;
+ background-color: var(--app-card, #4a321e);
 }
 
 /* Race card header */
 .race-header {
- background-color: #6b4226; /* Darker brown band */
+ background-color: var(--app-border, #6b4226); /* Darker brown band */
  padding: 10px;
  display: flex;
  justify-content: space-between;
@@ -656,7 +656,7 @@ header h1, header h2 {
 }
 .race-size {
  font-size: 0.9em;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* Race card details */
@@ -670,27 +670,27 @@ header h1, header h2 {
 }
 .detail-label {
  font-weight: bold;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 .detail-value {
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* Individual Race page */
 .race-detail-card {
  /* Dark Card Style - re-defining */
  background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
- background-color: #4a321e; 
+ background-color: var(--app-card, #4a321e); 
  background-blend-mode: multiply;
  border-radius: 10px;
  overflow: hidden;
  padding: 15px;
-  border: 6px solid #6b4226;
+  border: 6px solid var(--app-border, #6b4226);
 }
 .race-detail-card .race-header {
- background-color: #6b4226;
+ background-color: var(--app-border, #6b4226);
  padding: 15px;
- border-bottom: 1px solid #6b4226;
+ border-bottom: 1px solid var(--app-border, #6b4226);
 }
 .race-detail-card .race-header h2 {
  margin: 0 0 5px 0;
@@ -698,7 +698,7 @@ header h1, header h2 {
 }
 .race-detail-card .race-header p {
  margin: 0;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* Race info section */
@@ -712,11 +712,11 @@ header h1, header h2 {
 }
 
 .info-label {
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 .info-item p, .info-item ul {
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .abilities {
@@ -725,7 +725,7 @@ header h1, header h2 {
  gap: 5px;
 }
 .ability-bonus {
- background-color: #6b4226; /* Dark brown */
+ background-color: var(--app-border, #6b4226); /* Dark brown */
  padding: 3px 6px;
  border-radius: 5px;
  font-weight: bold;
@@ -737,8 +737,8 @@ header h1, header h2 {
 
 #classes-comp {
  /* DARK MEDIEVAL BACKGROUND (Redundant definition kept for structure) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important;
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important;
  background-size: cover;
  background-position: center;
  background-repeat: no-repeat;
@@ -746,7 +746,7 @@ header h1, header h2 {
  min-height: 100vh;
  padding: 40px 20px;
  font-family: 'IM Fell English SC', serif !important;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .classes-grid {
@@ -764,7 +764,7 @@ header h1, header h2 {
  justify-content: center;
  text-align: center;
  border-radius: 10px;
- color: #ffdd99; /* Light gold */
+ color: var(--app-text, #ffdd99); /* Light gold */
  font-weight: bold;
  font-size: 1.1em;
  padding: 10px;
@@ -784,14 +784,14 @@ header h1, header h2 {
 .class-detail-card {
  /* Dark Card Style - re-defining */
  background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
- background-color: #4a321e; 
+ background-color: var(--app-card, #4a321e); 
  background-blend-mode: multiply;
  border-radius: 10px;
  padding: 20px;
  max-width: 900px;
  margin: 0 auto;
- color: #ffdd99;
-  border: 6px solid #6b4226;
+ color: var(--app-text, #ffdd99);
+  border: 6px solid var(--app-border, #6b4226);
 }
 
 .class-header h2 {
@@ -800,7 +800,7 @@ header h1, header h2 {
 
 .class-header p {
  margin: 0;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .class-info {
@@ -813,13 +813,13 @@ header h1, header h2 {
 }
 
 .info-label {
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 .info-item p,
 .info-item ul {
  margin: 0;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 /* Responsive (Class specific, kept for structure) */
@@ -836,25 +836,25 @@ header h1, header h2 {
 
 #spells-comp {
  /* DARK MEDIEVAL BACKGROUND (Redundant definition kept for structure) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important;
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important;
  background-size: cover;
  background-position: center;
  background-repeat: no-repeat;
  background-attachment: fixed;
  padding: 40px 20px;
  font-family: 'IM Fell English SC', serif !important;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 #spells-comp h1 {
  text-align: center;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 #spells-comp p {
  text-align: center;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  margin-bottom: 20px;
 }
 
@@ -872,19 +872,19 @@ header h1, header h2 {
  cursor: pointer;
  padding: 6px 12px;
  border-radius: 6px;
- background-color: #6b4226; /* Dark brown for levels */
- color: #ffdd99;
+ background-color: var(--app-border, #6b4226); /* Dark brown for levels */
+ color: var(--app-text, #ffdd99);
  font-weight: bold;
  transition: background 0.2s, transform 0.2s;
 }
 
 .spell-levels li:hover {
- background-color: #8b5a2b;
+ background-color: var(--app-button-bg, #8b5a2b);
  transform: translateY(-2px);
 }
 
 .spell-levels li.selected {
- background-color: #d4af37; /* Gold active color */
+ background-color: var(--app-accent, #d4af37); /* Gold active color */
  color: #3a1d0f; /* Dark text on gold */
 }
 
@@ -899,25 +899,25 @@ header h1, header h2 {
  background-color: rgba(69, 37, 16, 0.7);
  border-radius: 10px;
  overflow: hidden;
-  border: 3px solid #6b4226;
+  border: 3px solid var(--app-border, #6b4226);
 }
 
 .spells-table th,
 .spells-table td {
  padding: 10px 12px;
  text-align: left;
- color: #ffdd99;
- border-bottom: 1px solid #6b4226;
+ color: var(--app-text, #ffdd99);
+ border-bottom: 1px solid var(--app-border, #6b4226);
 }
 
 .spells-table th {
- background-color: #6b4226;
- color: #ffdd99;
+ background-color: var(--app-border, #6b4226);
+ color: var(--app-text, #ffdd99);
  font-weight: bold;
 }
 
 .spells-table td {
-    color: #e4c590;
+    color: var(--app-text, #e4c590);
 }
 
 .spells-table tr:hover {
@@ -931,42 +931,42 @@ header h1, header h2 {
 
 #spell-detail {
  /* DARK MEDIEVAL BACKGROUND (Redundant definition kept for structure) */
- background: url('https://www.transparenttextures.com/patterns/aged-paper.png') !important;
- background-color: #2d1a0d !important;
+ background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
+ background-color: var(--app-bg, #2d1a0d) !important;
  background-size: cover;
  background-position: center;
  background-repeat: no-repeat;
  background-attachment: fixed;
  padding: 40px 20px;
  font-family: 'IM Fell English SC', serif !important;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .spell-details {
  /* Dark Card Style - re-defining */
  background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
- background-color: #4a321e; 
+ background-color: var(--app-card, #4a321e); 
  background-blend-mode: multiply;
  max-width: 900px;
  margin: 0 auto;
  padding: 25px;
  border-radius: 10px;
-  border: 6px solid #6b4226;
- color: #ffdd99;
+  border: 6px solid var(--app-border, #6b4226);
+ color: var(--app-text, #ffdd99);
 }
 
 .spell-details h1 {
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
  margin-bottom: 10px;
 }
 
 .spell-details p {
  margin: 5px 0;
- color: #e4c590;
+ color: var(--app-text, #e4c590);
 }
 
 .spell-details strong {
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 
 /* Back Button is styled above, redundancy re-defined */
@@ -974,7 +974,7 @@ header h1, header h2 {
  margin-bottom: 15px;
  padding: 8px 15px;
  background: linear-gradient(to bottom, #a52a2a, #8b0000);
- color: #e4c590;
+ color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  border-radius: 25px;
  cursor: pointer;
@@ -999,19 +999,19 @@ header h1, header h2 {
 
 .spell-class-badge {
  background: rgba(212, 175, 55, 0.15);
- border: 1px solid #d4af37;
+ border: 1px solid var(--app-accent, #d4af37);
  padding: 4px 8px;
  border-radius: 6px;
  font-weight: bold;
- color: #ffdd99;
+ color: var(--app-text, #ffdd99);
 }
 .spell-class-badge:hover {
  background: rgba(212, 175, 55, 0.3);
 }
 /* Make subclass badges slightly different (but still matching) */
 .spell-class-badge.subclass {
- border-color: #8b5a2b;
- color: #e4c590;
+ border-color: var(--app-button-bg, #8b5a2b);
+ color: var(--app-text, #e4c590);
 }
 
 .spell-class-badge.subclass:hover {

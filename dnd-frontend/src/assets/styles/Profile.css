@@ -13,10 +13,10 @@
     min-height: 100vh; /* Teljes magass??g */
     
     /* Visszafogott, m?cly, s? t?ct barna text?­ra mint fallback/overlay */
-    background-color: var(--profile-bg-color, #3e2723); 
+    background-color: var(--profile-bg-color, var(--app-bg, #3e2723)); 
     
     padding: 20px 0; /* Egy kis t?crk? z fel?•l ?cs alul */
-    color: var(--profile-text, #ffcc80);
+    color: var(--profile-text, var(--app-accent, #ffcc80));
 }
 
 /*
@@ -27,7 +27,7 @@
     text-align: center;
     /* Áttetsző, de sötét alap a kontrasztért */
     background-color: rgba(30, 30, 30, 0.65); 
-    color: #ffcc80; /* Lágy, krémszínű arany */
+    color: var(--app-accent, #ffcc80); /* Lágy, krémszínű arany */
     padding: 30px 20px;
     margin: 50px auto 30px auto; /* Középre igazítás, térköz */
     max-width: 900px;
@@ -41,12 +41,12 @@
  */
 .profile-box {
     /* Mélybarna, texturált háttér */
-    background-color: var(--profile-card-bg, #4e342e); 
+    background-color: var(--profile-card-bg, var(--app-card, #4e342e)); 
     padding: 25px;
     border-radius: 12px;
     display: inline-block;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--profile-card-border, #795548); /* Finom barna keret */
+    border: 1px solid var(--profile-card-border, var(--app-button-bg, #795548)); /* Finom barna keret */
 }
 
 /*
@@ -58,7 +58,7 @@
     border-radius: 50%;
     margin: 10px;
     /* Keret: Fényes arany (bronz/réz) a kiemelésért */
-    border: 5px solid var(--profile-accent, #ffcc80); 
+    border: 5px solid var(--profile-accent, var(--app-accent, #ffcc80)); 
     object-fit: cover;
     box-shadow: 0 0 10px rgba(255, 204, 128, 0.6); /* Lágy ragyogás */
 }/*
@@ -74,14 +74,14 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     margin-top: 40px;
-    color: #ffcc80; /* Szöveg alapértelmezett színe */
+    color: var(--app-accent, #ffcc80); /* Szöveg alapértelmezett színe */
 }
 
 .allies-section h3 {
     font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 25px;
-    color: #ffcc80; /* Címsor színe */
+    color: var(--app-accent, #ffcc80); /* Címsor színe */
     text-shadow: 1px 1px 2px #000;
 }
 
@@ -91,7 +91,7 @@
  */
 .friend {
     /* Szín: Meleg barna, mint egy prémium bőr ülés */
-    background: var(--profile-friend-bg, #5d4037); 
+    background: var(--profile-friend-bg, var(--app-card, #5d4037)); 
     border-radius: 8px;
     padding: 15px;
     display: flex;
@@ -100,7 +100,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     flex: 1 1 280px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-left: 5px solid #ffcc80; /* Kiemelő vonal */
+    border-left: 5px solid var(--app-accent, #ffcc80); /* Kiemelő vonal */
 }
 
 .friend:hover {
@@ -113,13 +113,13 @@
     height: 60px;
     object-fit: cover;
     border-radius: 50%;
-    border: 3px solid var(--profile-accent, #ffcc80); /* Arany keret */
+    border: 3px solid var(--profile-accent, var(--app-accent, #ffcc80)); /* Arany keret */
 }
 
 .friend span {
     flex-grow: 1;
     font-weight: 500;
-    color: #ffe0b2; /* Világosabb szöveg a sötét kártyán */
+    color: var(--app-text, #ffe0b2); /* Világosabb szöveg a sötét kártyán */
     font-size: 1.1rem;
 }
 
@@ -127,8 +127,8 @@
     font-size: 0.9rem;
     padding: 8px 12px;
     /* Gomb stílus: Elegáns barna alapon arany szöveg */
-    background-color: var(--profile-button-bg, #795548); 
-    color: var(--profile-button-text, #fff8e1);
+    background-color: var(--profile-button-bg, var(--app-button-bg, #795548)); 
+    color: var(--profile-button-text, var(--app-button-text, #fff8e1));
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -141,7 +141,7 @@
 
 .no-allies {
     font-style: italic;
-    color: #a1887f; /* Lágy barna szín */
+    color: var(--app-border, #a1887f); /* Lágy barna szín */
 }
 
 /*
@@ -174,7 +174,7 @@
     border-radius: 12px;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    color: #4e342e; /* Sötét szöveg a világos alapon */
+    color: var(--app-card, #4e342e); /* Sötét szöveg a világos alapon */
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -184,7 +184,7 @@
     right: 20px;
     font-size: 24px;
     cursor: pointer;
-    color: #795548; /* Barna X */
+    color: var(--app-button-bg, #795548); /* Barna X */
 }
 
 /*
@@ -197,13 +197,13 @@
     margin: 8px;
     cursor: pointer;
     object-fit: cover;
-    border: 3px solid #795548;
+    border: 3px solid var(--app-button-bg, #795548);
     transition: transform 0.2s ease-in-out, border-color 0.2s;
 }
 
 .image-options img:hover, .selectable-pic:hover {
     transform: scale(1.15);
-    border-color: #ffcc80; /* Arany kiemelés hoverre */
+    border-color: var(--app-accent, #ffcc80); /* Arany kiemelés hoverre */
     box-shadow: 0 0 10px rgba(255, 204, 128, 0.8);
 }
 
@@ -239,7 +239,7 @@
 
 .profile-customizer-header h3 {
     margin: 0 0 6px 0;
-    color: var(--profile-accent, #ffcc80);
+    color: var(--profile-accent, var(--app-accent, #ffcc80));
 }
 
 .profile-customizer-header p {

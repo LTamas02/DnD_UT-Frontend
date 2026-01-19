@@ -153,7 +153,7 @@
 }
 
 .encounter-add {
-  background: linear-gradient(135deg, #f5b03a, #f27b5c);
+  background: linear-gradient(135deg, var(--app-accent, #f5b03a), #f27b5c);
   color: #1b120a;
 }
 

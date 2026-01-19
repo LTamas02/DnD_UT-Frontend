@@ -45,7 +45,7 @@
 }
 
 .npc-primary {
-  background: linear-gradient(135deg, #f5b03a, #f27b5c);
+  background: linear-gradient(135deg, var(--app-accent, #f5b03a), #f27b5c);
   color: #1b1109;
   box-shadow: 0 12px 24px rgba(242, 123, 92, 0.25);
 }

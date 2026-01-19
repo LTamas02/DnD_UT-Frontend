@@ -1,23 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Marcellus&display=swap');
 
 :root {
-  --home-bg: #0d0b08;
-  --home-ink: #f4efe6;
-  --home-muted: rgba(244, 239, 230, 0.65);
-  --home-accent: #f5b03a;
-  --home-accent-soft: rgba(245, 176, 58, 0.22);
-  --home-panel: rgba(20, 17, 12, 0.88);
-  --home-border: rgba(244, 239, 230, 0.12);
+  --home-bg: var(--app-bg, #0d0b08);
+  --home-ink: var(--app-text, #f4efe6);
+  --home-muted: var(--app-muted, rgba(244, 239, 230, 0.65));
+  --home-accent: var(--app-accent, #f5b03a);
+  --home-accent-soft: var(--app-accent-soft, rgba(245, 176, 58, 0.22));
+  --home-panel: var(--app-panel, rgba(20, 17, 12, 0.88));
+  --home-border: var(--app-border, rgba(244, 239, 230, 0.12));
 }
 
 #home-comp {
   min-height: 100vh;
   color: var(--home-ink);
   background:
-    radial-gradient(circle at 10% 10%, rgba(245, 176, 58, 0.18), transparent 42%),
-    radial-gradient(circle at 85% 15%, rgba(112, 186, 255, 0.14), transparent 45%),
-    linear-gradient(180deg, rgba(10, 8, 6, 0.86), rgba(13, 11, 8, 0.98)),
-    url('https://images.unsplash.com/photo-1527600478564-488952effedb?q=80&w=2000&auto=format&fit=crop');
+    radial-gradient(circle at 10% 10%, var(--home-accent-soft), transparent 42%),
+    radial-gradient(circle at 85% 15%, var(--home-accent-soft), transparent 45%),
+    var(--app-bg-gradient, linear-gradient(180deg, rgba(10, 8, 6, 0.86), rgba(13, 11, 8, 0.98))),
+    var(--app-bg-image, url('https://images.unsplash.com/photo-1527600478564-488952effedb?q=80&w=2000&auto=format&fit=crop'));
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

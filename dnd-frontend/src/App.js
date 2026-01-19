@@ -1,6 +1,7 @@
 import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getUser } from "./Api";
+import { getUser, getProfileTheme } from "./Api";
+import { DEFAULT_THEME, THEME_KEY, applyTheme } from "./theme";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import LogReg from "./pages/LogReg";
@@ -41,6 +42,20 @@ function App() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
+    const raw = localStorage.getItem(THEME_KEY);
+    if (!raw) {
+      applyTheme(DEFAULT_THEME);
+      return;
+    }
+    try {
+      const saved = JSON.parse(raw);
+      applyTheme({ ...DEFAULT_THEME, ...saved });
+    } catch {
+      applyTheme(DEFAULT_THEME);
+    }
+  }, []);
+
+  useEffect(() => {
     if (token) {
       getUser(token)
         .then(res => {
@@ -53,6 +68,18 @@ function App() {
           setProfilePicture(nextProfilePicture);
           localStorage.setItem("profilePicture", nextProfilePicture);
           localStorage.setItem("username", res.data.username || "Guest");
+
+          getProfileTheme(token)
+            .then(themeRes => {
+              if (themeRes.data?.theme) {
+                const merged = { ...DEFAULT_THEME, ...themeRes.data.theme };
+                localStorage.setItem(THEME_KEY, JSON.stringify(merged));
+                applyTheme(merged);
+              }
+            })
+            .catch(() => {
+              // ignore theme fetch errors
+            });
         })
         .catch(() => {
           setIsAuthenticated(false);
