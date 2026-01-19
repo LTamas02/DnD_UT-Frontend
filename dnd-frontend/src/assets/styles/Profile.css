@@ -3,18 +3,20 @@
  * A profil komponens (ID) határozza meg a teljes oldal textúráját.
  */
 #profile-comp {
-    /* A háttérkép URL-t meg kell tartani, de az alábbiak finomítják */
-    background-image: url('../img/BG/ProfileBG.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-    min-height: 100vh; /* Teljes magasság */
+    /* A h??tt?crk?cp URL-t meg kell tartani, de az al??bbiak finom??tj??k */
+    background-image: var(--profile-bg-gradient, linear-gradient(130deg, rgba(10, 6, 4, 0.75), rgba(64, 36, 18, 0.85))),
+        var(--profile-bg-image, url('../img/BG/ProfileBG.png'));
+    background-size: cover, cover;
+    background-repeat: no-repeat, no-repeat;
+    background-attachment: fixed, fixed;
+    background-position: center, center;
+    min-height: 100vh; /* Teljes magass??g */
     
-    /* Visszafogott, mély, sötét barna textúra mint fallback/overlay */
-    background-color: #3e2723; 
+    /* Visszafogott, m?cly, s? t?ct barna text?­ra mint fallback/overlay */
+    background-color: var(--profile-bg-color, #3e2723); 
     
-    padding: 20px 0; /* Egy kis térköz felül és alul */
+    padding: 20px 0; /* Egy kis t?crk? z fel?•l ?cs alul */
+    color: var(--profile-text, #ffcc80);
 }
 
 /*
@@ -39,12 +41,12 @@
  */
 .profile-box {
     /* Mélybarna, texturált háttér */
-    background-color: #4e342e; 
+    background-color: var(--profile-card-bg, #4e342e); 
     padding: 25px;
     border-radius: 12px;
     display: inline-block;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-    border: 1px solid #795548; /* Finom barna keret */
+    border: 1px solid var(--profile-card-border, #795548); /* Finom barna keret */
 }
 
 /*
@@ -56,7 +58,7 @@
     border-radius: 50%;
     margin: 10px;
     /* Keret: Fényes arany (bronz/réz) a kiemelésért */
-    border: 5px solid #ffcc80; 
+    border: 5px solid var(--profile-accent, #ffcc80); 
     object-fit: cover;
     box-shadow: 0 0 10px rgba(255, 204, 128, 0.6); /* Lágy ragyogás */
 }/*
@@ -65,7 +67,7 @@
  */
 .allies-section {
     /* Szín: Nagyon világos kávé, vagy krémfehér, enyhe áttetszőséggel */
-    background: rgba(255, 255, 255, 0.1); 
+    background: var(--profile-panel-bg, rgba(255, 255, 255, 0.1)); 
     backdrop-filter: blur(5px); /* Enyhe elmosás a háttérkép miatt */
     padding: 30px;
     border-radius: 12px;
@@ -89,7 +91,7 @@
  */
 .friend {
     /* Szín: Meleg barna, mint egy prémium bőr ülés */
-    background: #5d4037; 
+    background: var(--profile-friend-bg, #5d4037); 
     border-radius: 8px;
     padding: 15px;
     display: flex;
@@ -111,7 +113,7 @@
     height: 60px;
     object-fit: cover;
     border-radius: 50%;
-    border: 3px solid #ffcc80; /* Arany keret */
+    border: 3px solid var(--profile-accent, #ffcc80); /* Arany keret */
 }
 
 .friend span {
@@ -125,8 +127,8 @@
     font-size: 0.9rem;
     padding: 8px 12px;
     /* Gomb stílus: Elegáns barna alapon arany szöveg */
-    background-color: #795548; 
-    color: #fff8e1;
+    background-color: var(--profile-button-bg, #795548); 
+    color: var(--profile-button-text, #fff8e1);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -134,7 +136,7 @@
 }
 
 .friend button:hover {
-    background-color: #6d4c41;
+    background-color: var(--profile-card-border, #6d4c41);
 }
 
 .no-allies {
@@ -216,4 +218,114 @@
     font-size: 0.9rem;
     margin-left: 8px;
     box-shadow: 0 0 5px rgba(183, 28, 28, 0.8); /* Enyhe ragyogás */
+}
+
+.profile-customizer {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    color: var(--profile-text, #ffe7c2);
+    backdrop-filter: blur(6px);
+}
+
+.profile-customizer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-customizer-header h3 {
+    margin: 0 0 6px 0;
+    color: var(--profile-accent, #ffcc80);
+}
+
+.profile-customizer-header p {
+    margin: 0;
+    color: var(--profile-muted, #c9a980);
+    font-size: 0.95rem;
+}
+
+.profile-reset {
+    background: transparent;
+    color: var(--profile-text, #ffe7c2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.profile-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 20px 0;
+}
+
+.profile-preset {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--profile-text, #ffe7c2);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-preset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+.profile-customizer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.profile-customizer-grid-wide {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--profile-muted, #c9a980);
+}
+
+.profile-field input[type="color"] {
+    width: 100%;
+    height: 42px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.profile-field select,
+.profile-text-input {
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--profile-text, #ffe7c2);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.profile-field.wide {
+    grid-column: span 2;
+}
+
+@media (max-width: 720px) {
+    .profile-customizer-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-field.wide {
+        grid-column: span 1;
+    }
 }

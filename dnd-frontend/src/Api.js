@@ -58,6 +58,20 @@ export const updateProfilePictureFile = (token, file) => {
     });
 };
 
+export const getProfileTheme = (token) =>
+    api.get("Auth/me/theme", {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+export const updateProfileTheme = (token, theme) =>
+    api.put(
+        "Auth/me/theme",
+        { theme },
+        {
+            headers: { "Authorization": `Bearer ${token}` }
+        }
+    );
+
 
 
 

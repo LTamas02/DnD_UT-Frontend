@@ -14,10 +14,91 @@ import {
     getFriendRequests,
     respondFriendRequest,
     updateProfilePicture,
-    updateProfilePictureFile
+    updateProfilePictureFile,
+    getProfileTheme,
+    updateProfileTheme
 } from "../Api";
 
 const API_BASE = "https://api.dnd-tool.com";
+const THEME_KEY = "profileTheme";
+
+const DEFAULT_THEME = {
+    bgImage: "",
+    bgGradient: "linear-gradient(130deg, rgba(10,6,4,0.75), rgba(64,36,18,0.85))",
+    pageBg: "#2f1e16",
+    overlay: "rgba(0,0,0,0.35)",
+    cardBg: "#4e342e",
+    cardBorder: "#795548",
+    accent: "#ffcc80",
+    text: "#ffe7c2",
+    muted: "#c9a980",
+    panelBg: "rgba(255,255,255,0.12)",
+    panelText: "#ffe7c2",
+    buttonBg: "#795548",
+    buttonText: "#fff8e1",
+    friendBg: "#5d4037"
+};
+
+const THEME_PRESETS = [
+    {
+        id: "ember",
+        name: "Ember Hearth",
+        theme: {
+            bgGradient: "linear-gradient(135deg, rgba(14,8,6,0.85), rgba(64,20,12,0.92))",
+            pageBg: "#281813",
+            accent: "#ffb36b",
+            text: "#ffe3c4",
+            muted: "#d0a578",
+            panelBg: "rgba(255,190,120,0.08)",
+            buttonBg: "#6b3b2a"
+        }
+    },
+    {
+        id: "forest",
+        name: "Wyrdwood",
+        theme: {
+            bgGradient: "linear-gradient(140deg, rgba(6,12,10,0.9), rgba(18,60,48,0.85))",
+            pageBg: "#0f1a15",
+            accent: "#7ce0b4",
+            text: "#d7fff0",
+            muted: "#98c7b4",
+            cardBg: "#1d2f29",
+            friendBg: "#223a32",
+            buttonBg: "#2f4d41"
+        }
+    },
+    {
+        id: "midnight",
+        name: "Night Ledger",
+        theme: {
+            bgGradient: "linear-gradient(140deg, rgba(8,8,16,0.9), rgba(40,28,72,0.88))",
+            pageBg: "#141123",
+            accent: "#f0b9ff",
+            text: "#f8e9ff",
+            muted: "#cab4e6",
+            cardBg: "#2a223d",
+            buttonBg: "#3d2f5c"
+        }
+    },
+    {
+        id: "sunlit",
+        name: "Sunlit Archive",
+        theme: {
+            bgGradient: "linear-gradient(135deg, rgba(255,242,224,0.85), rgba(218,170,110,0.82))",
+            pageBg: "#f6e1c8",
+            accent: "#7c2f1c",
+            text: "#3b1f14",
+            muted: "#7c5841",
+            cardBg: "#fdf6eb",
+            cardBorder: "#d6b087",
+            panelBg: "rgba(60,30,15,0.08)",
+            panelText: "#3b1f14",
+            buttonBg: "#7c2f1c",
+            buttonText: "#fff0d6",
+            friendBg: "#f2dbc0"
+        }
+    }
+];
 
 const toAbsUrl = (url) => {
     if (!url || typeof url !== "string") return "";
@@ -42,6 +123,9 @@ const Profile = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [loadingSearch, setLoadingSearch] = useState(false);
+    const [theme, setTheme] = useState(DEFAULT_THEME);
+    const themeReadyRef = React.useRef(false);
+    const themeSaveTimerRef = React.useRef(null);
 
     useEffect(() => {
         if (!token) {
@@ -68,6 +152,73 @@ const Profile = () => {
             .then(res => setFriendRequests(res.data || []))
             .catch(err => console.error("Error loading friend requests:", err));
     }, [token, navigate]);
+
+    useEffect(() => {
+        const raw = localStorage.getItem(THEME_KEY);
+        if (!raw) return;
+        try {
+            const saved = JSON.parse(raw);
+            setTheme({ ...DEFAULT_THEME, ...saved });
+        } catch {
+            // ignore invalid saved theme
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem(THEME_KEY, JSON.stringify(theme));
+    }, [theme]);
+
+    useEffect(() => {
+        if (!token) return;
+        let cancelled = false;
+        let hasServerTheme = false;
+        themeReadyRef.current = false;
+
+        getProfileTheme(token)
+            .then(res => {
+                if (cancelled) return;
+                if (res.data?.theme) {
+                    hasServerTheme = true;
+                    const merged = { ...DEFAULT_THEME, ...res.data.theme };
+                    setTheme(merged);
+                    localStorage.setItem(THEME_KEY, JSON.stringify(merged));
+                }
+            })
+            .catch(err => console.error("Error loading profile theme:", err))
+            .finally(() => {
+                if (cancelled) return;
+                themeReadyRef.current = true;
+                if (!hasServerTheme) {
+                    updateProfileTheme(token, theme).catch(err =>
+                        console.error("Error saving profile theme:", err)
+                    );
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [token]);
+
+    useEffect(() => {
+        if (!token || !themeReadyRef.current) return;
+
+        if (themeSaveTimerRef.current) {
+            clearTimeout(themeSaveTimerRef.current);
+        }
+
+        themeSaveTimerRef.current = setTimeout(() => {
+            updateProfileTheme(token, theme).catch(err =>
+                console.error("Error saving profile theme:", err)
+            );
+        }, 700);
+
+        return () => {
+            if (themeSaveTimerRef.current) {
+                clearTimeout(themeSaveTimerRef.current);
+            }
+        };
+    }, [theme, token]);
 
     const logout = () => {
         localStorage.removeItem("token");
@@ -153,8 +304,25 @@ const Profile = () => {
             .catch(err => console.error("Error responding to friend request:", err));
     };
 
+    const themeVars = {
+        "--profile-bg-image": theme.bgImage ? `url("${theme.bgImage}")` : "none",
+        "--profile-bg-gradient": theme.bgGradient,
+        "--profile-bg-color": theme.pageBg,
+        "--profile-overlay": theme.overlay,
+        "--profile-card-bg": theme.cardBg,
+        "--profile-card-border": theme.cardBorder,
+        "--profile-accent": theme.accent,
+        "--profile-text": theme.text,
+        "--profile-muted": theme.muted,
+        "--profile-panel-bg": theme.panelBg,
+        "--profile-panel-text": theme.panelText,
+        "--profile-button-bg": theme.buttonBg,
+        "--profile-button-text": theme.buttonText,
+        "--profile-friend-bg": theme.friendBg
+    };
+
     return (
-        <div id="profile-comp">
+        <div id="profile-comp" style={themeVars}>
 
             <div className="container">
                 <div className="row justify-content-center">
@@ -177,6 +345,120 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
+
+                <section className="profile-customizer mt-4">
+                    <div className="profile-customizer-header">
+                        <div>
+                            <h3>Theme Forge</h3>
+                            <p>Customize colors, background, and surfaces. Changes save automatically.</p>
+                        </div>
+                        <button
+                            className="profile-reset"
+                            onClick={() => setTheme(DEFAULT_THEME)}
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    <div className="profile-presets">
+                        {THEME_PRESETS.map((preset) => (
+                            <button
+                                key={preset.id}
+                                className="profile-preset"
+                                onClick={() => setTheme((prev) => ({ ...prev, ...preset.theme }))}
+                            >
+                                {preset.name}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="profile-customizer-grid">
+                        <label className="profile-field">
+                            Accent
+                            <input
+                                type="color"
+                                value={theme.accent}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, accent: event.target.value }))}
+                            />
+                        </label>
+                        <label className="profile-field">
+                            Text
+                            <input
+                                type="color"
+                                value={theme.text}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, text: event.target.value }))}
+                            />
+                        </label>
+                        <label className="profile-field">
+                            Muted
+                            <input
+                                type="color"
+                                value={theme.muted}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, muted: event.target.value }))}
+                            />
+                        </label>
+                        <label className="profile-field">
+                            Card
+                            <input
+                                type="color"
+                                value={theme.cardBg}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, cardBg: event.target.value }))}
+                            />
+                        </label>
+                        <label className="profile-field">
+                            Panel
+                            <input
+                                type="color"
+                                value={theme.panelBg}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, panelBg: event.target.value }))}
+                            />
+                        </label>
+                        <label className="profile-field">
+                            Buttons
+                            <input
+                                type="color"
+                                value={theme.buttonBg}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, buttonBg: event.target.value }))}
+                            />
+                        </label>
+                    </div>
+
+                    <div className="profile-customizer-grid profile-customizer-grid-wide">
+                        <label className="profile-field wide">
+                            Background image URL
+                            <input
+                                type="text"
+                                value={theme.bgImage}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, bgImage: event.target.value }))}
+                                placeholder="https://..."
+                                className="profile-text-input"
+                            />
+                        </label>
+                        <label className="profile-field wide">
+                            Background gradient
+                            <select
+                                value={theme.bgGradient}
+                                onChange={(event) => setTheme((prev) => ({ ...prev, bgGradient: event.target.value }))}
+                            >
+                                <option value="linear-gradient(130deg, rgba(10,6,4,0.75), rgba(64,36,18,0.85))">
+                                    Smoked amber
+                                </option>
+                                <option value="linear-gradient(135deg, rgba(6,12,10,0.9), rgba(18,60,48,0.85))">
+                                    Verdant shadow
+                                </option>
+                                <option value="linear-gradient(140deg, rgba(8,8,16,0.9), rgba(40,28,72,0.88))">
+                                    Arcane night
+                                </option>
+                                <option value="linear-gradient(135deg, rgba(255,242,224,0.85), rgba(218,170,110,0.82))">
+                                    Sunlit vellum
+                                </option>
+                                <option value="linear-gradient(120deg, rgba(15,20,30,0.82), rgba(10,10,10,0.9))">
+                                    Inked steel
+                                </option>
+                            </select>
+                        </label>
+                    </div>
+                </section>
 
                 <div className="row mt-5">
                     <div className="col-12">
