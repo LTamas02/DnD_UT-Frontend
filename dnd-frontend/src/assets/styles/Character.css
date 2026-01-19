@@ -218,7 +218,7 @@ body, html {
 /* Buttons (btn-aura - Wax Seal Style) */
 .btn-aura {
     /* Wax Seal Style from LogReg.css .btn-success */
-    background: linear-gradient(to bottom, #a52a2a, #8b0000); 
+    background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000)); 
     border: 3px solid #3a1d0f;
     color: var(--app-text, #e4c590);
     font-family: 'IM Fell English SC', serif;
@@ -230,7 +230,7 @@ body, html {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
 }
 .btn-aura:hover:not(:disabled) {
-    background: linear-gradient(to bottom, #b22222, #600000);
+    background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
     transform: scale(1.05);
     box-shadow: 0 0 10px rgba(218, 165, 32, 0.8); /* Gold hover effect */
 }

@@ -51,7 +51,7 @@ export default function Classes() {
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
-                  color: '#FFD700'
+                  color: 'var(--app-accent, #FFD700)'
                 }}
               >
                 <h3 className="class-name">{cls.name}</h3>

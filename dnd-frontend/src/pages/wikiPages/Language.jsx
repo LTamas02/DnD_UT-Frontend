@@ -47,7 +47,7 @@ export default function Language() {
                 </button>
 
                 <div className="race-detail-card">
-                    <header className="race-header" style={{backgroundColor: '#8b5a2b', justifyContent: 'center'}}>
+                    <header className="race-header" style={{backgroundColor: 'var(--app-button-bg, #8b5a2b)', justifyContent: 'center'}}>
                         <h2 className="wiki-title">{language.name}</h2>
                     </header>
 
@@ -58,7 +58,7 @@ export default function Language() {
                         {language.desc && (
                             <section className="wiki-section">
                                 <h3 className="info-label">Description</h3>
-                                <div className="info-item" style={{backgroundColor: 'rgba(69, 37, 16, 0.5)'}}>
+                                <div className="info-item" style={{backgroundColor: 'var(--app-panel, rgba(69, 37, 16, 0.5))'}}>
                                     {Array.isArray(language.desc)
                                         ? language.desc.map((d, i) => <p key={i}>{d}</p>)
                                         : <p>{language.desc}</p>}

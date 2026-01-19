@@ -754,9 +754,9 @@ export default function DmtoolsMaps() {
           ? {
               ...edge,
               label: nextLabel,
-              labelStyle: { fill: '#f5f5f5', fontSize: 12 },
+              labelStyle: { fill: 'var(--app-text, #f5f5f5)', fontSize: 12 },
               labelBgPadding: [8, 4],
-              labelBgStyle: { fill: 'rgba(0,0,0,0.6)' }
+              labelBgStyle: { fill: 'var(--app-panel, rgba(0,0,0,0.6))' }
             }
           : edge
       )
@@ -1068,11 +1068,11 @@ export default function DmtoolsMaps() {
                     height: 100,
                     borderRadius: 16,
                     border: coverDragging
-                      ? '2px dashed rgba(255,255,255,0.8)'
-                      : '1px solid rgba(255,255,255,0.15)',
+                      ? '2px dashed var(--app-border, rgba(255,255,255,0.8))'
+                      : '1px solid var(--app-border, rgba(255,255,255,0.15))',
                     overflow: 'hidden',
                     position: 'relative',
-                    background: 'rgba(255,255,255,0.04)'
+                    background: 'var(--app-panel, rgba(255,255,255,0.04))'
                   }}
                 >
                   {activeCampaign?.coverImageUrl ? (
@@ -1135,7 +1135,7 @@ export default function DmtoolsMaps() {
                       <span style={{ marginLeft: 10, opacity: 0.6 }}>Saved</span>
                     )}
                     {isDirty && !saving && (
-                      <span style={{ marginLeft: 10, color: '#ffcf6f', fontWeight: 600 }}>Unsaved changes</span>
+                      <span style={{ marginLeft: 10, color: 'var(--app-accent, #ffcf6f)', fontWeight: 600 }}>Unsaved changes</span>
                     )}
                   </p>
 
@@ -1320,8 +1320,8 @@ export default function DmtoolsMaps() {
                       pointerEvents: 'none',
                       width: 220,
                       padding: 12,
-                      background: 'rgba(10,10,10,0.92)',
-                      border: '1px solid rgba(255,255,255,0.15)',
+                      background: 'var(--app-panel, rgba(10,10,10,0.92))',
+                      border: '1px solid var(--app-border, rgba(255,255,255,0.15))',
                       borderRadius: 12,
                       boxShadow: '0 12px 24px rgba(0,0,0,0.35)'
                     }}
@@ -1344,7 +1344,7 @@ export default function DmtoolsMaps() {
                           width: '100%',
                           height: 100,
                           borderRadius: 10,
-                          border: '1px solid rgba(255,255,255,0.1)',
+                          border: '1px solid var(--app-border, rgba(255,255,255,0.1))',
                           opacity: 0.4
                         }}
                       />
@@ -1357,7 +1357,7 @@ export default function DmtoolsMaps() {
                             fontSize: 10,
                             padding: '4px 6px',
                             borderRadius: 10,
-                            background: 'rgba(255,255,255,0.12)'
+                            background: 'var(--app-panel, rgba(255,255,255,0.12))'
                           }}
                         >
                           {tag}
@@ -1375,8 +1375,8 @@ export default function DmtoolsMaps() {
                       left: contextMenu.x,
                       top: contextMenu.y,
                       zIndex: 40,
-                      background: 'rgba(16,16,16,0.96)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      background: 'var(--app-panel, rgba(16,16,16,0.96))',
+                      border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
                       borderRadius: 12,
                       padding: 8,
                       display: 'grid',
@@ -1408,8 +1408,8 @@ export default function DmtoolsMaps() {
                       top: Math.min(edgeEditorPos.y + 12, (typeof window !== 'undefined' ? window.innerHeight : 900) - 140),
                       zIndex: 40,
                       width: 240,
-                      background: 'rgba(16,16,16,0.96)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      background: 'var(--app-panel, rgba(16,16,16,0.96))',
+                      border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
                       borderRadius: 12,
                       padding: 10,
                       boxShadow: '0 16px 32px rgba(0,0,0,0.4)'
@@ -1451,7 +1451,7 @@ export default function DmtoolsMaps() {
               position: 'fixed',
               inset: 0,
               zIndex: 70,
-              background: 'rgba(0,0,0,0.55)',
+              background: 'var(--app-overlay, rgba(0,0,0,0.55))',
               display: 'grid',
               placeItems: 'center'
             }}
@@ -1463,8 +1463,8 @@ export default function DmtoolsMaps() {
                 width: 'min(900px, 92vw)',
                 maxHeight: '86vh',
                 overflow: 'auto',
-                background: 'rgba(16,16,16,0.98)',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'var(--app-panel, rgba(16,16,16,0.98))',
+                border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
                 borderRadius: 18,
                 boxShadow: '0 24px 60px rgba(0,0,0,0.45)',
                 padding: 20
@@ -1487,7 +1487,7 @@ export default function DmtoolsMaps() {
                       width: '100%',
                       height: 260,
                       objectFit: 'contain',
-                      background: 'rgba(0,0,0,0.35)',
+                      background: 'var(--app-overlay, rgba(0,0,0,0.35))',
                       borderRadius: 16,
                       cursor: 'pointer'
                     }}
@@ -1499,7 +1499,7 @@ export default function DmtoolsMaps() {
                       width: '100%',
                       height: 260,
                       borderRadius: 16,
-                      border: '1px solid rgba(255,255,255,0.15)',
+                      border: '1px solid var(--app-border, rgba(255,255,255,0.15))',
                       opacity: 0.35
                     }}
                   />
@@ -1670,7 +1670,7 @@ export default function DmtoolsMaps() {
               position: 'fixed',
               inset: 0,
               zIndex: 80,
-              background: 'rgba(0,0,0,0.8)',
+              background: 'var(--app-overlay, rgba(0,0,0,0.8))',
               display: 'grid',
               placeItems: 'center'
             }}

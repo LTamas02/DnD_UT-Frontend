@@ -29,8 +29,8 @@ const Spell = () => {
     fetchSpell();
   }, [index]);
 
-  if (loading) return <p style={{ color: '#f5deb3' }}>Loading spell...</p>;
-  if (error) return <p style={{ color: '#f5deb3' }}>{error}</p>;
+  if (loading) return <p style={{ color: 'var(--app-text, #f5deb3)' }}>Loading spell...</p>;
+  if (error) return <p style={{ color: 'var(--app-text, #f5deb3)' }}>{error}</p>;
   if (!spell) return null;
 
   return (

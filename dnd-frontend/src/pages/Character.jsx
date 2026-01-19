@@ -579,7 +579,7 @@ export default function Character() {
                             <div><label>Alignment</label><input value={profile.alignment} onChange={e => setField("alignment", e.target.value)} className="input-dark" /></div>
                             <div><label>XP</label><input type="number" value={profile.xp} onChange={e => setField("xp", Number(e.target.value))} className="input-dark" /></div>
                         </div>
-                        <div className="prof-bonus-line mt-2" style={{borderTop: '1px solid #444', paddingTop: '10px'}}>
+                        <div className="prof-bonus-line mt-2" style={{borderTop: '1px solid var(--app-border, #444)', paddingTop: '10px'}}>
                             <span>Proficiency Bonus</span>
                             <input type="number" value={profile.profBonus} onChange={e => setField("profBonus", Number(e.target.value))} className="input-dark" style={{width: '60px', textAlign: 'center'}} />
                         </div>
@@ -620,7 +620,7 @@ export default function Character() {
                             reader.readAsDataURL(file);
                         }} />
                         {profile.portraitDataUrl && (
-                            <img src={profile.portraitDataUrl} alt="Character Portrait Preview" style={{ maxWidth: '100%', marginTop: '10px', border: '2px solid #6b4226' }} />
+                            <img src={profile.portraitDataUrl} alt="Character Portrait Preview" style={{ maxWidth: '100%', marginTop: '10px', border: '2px solid var(--app-border, #6b4226)' }} />
                         )}
                     </section>
                 </div>
@@ -656,7 +656,7 @@ export default function Character() {
                         </div>
                         ))}
                     </div>
-                    <div className="passive-line mt-3" style={{borderTop: '1px solid #6b4226', paddingTop: '10px'}}>
+                    <div className="passive-line mt-3" style={{borderTop: '1px solid var(--app-border, #6b4226)', paddingTop: '10px'}}>
                         <span>Passive Perception</span>
                         <input value={profile.passivePerception} readOnly className="input-dark" style={{ width: '60px', textAlign: 'center' }} />
                     </div>
@@ -781,7 +781,7 @@ export default function Character() {
                     </div>
                     
                     <div id="attacksContainer" className="mt-2">
-                        <div className="attack-header" style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 3fr 30px', fontWeight: 'bold', borderBottom: '1px solid #6b4226', paddingBottom: '5px' }}>
+                        <div className="attack-header" style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 3fr 30px', fontWeight: 'bold', borderBottom: '1px solid var(--app-border, #6b4226)', paddingBottom: '5px' }}>
                             <span>Name</span>
                             <span>Bonus</span>
                             <span>Damage / Type</span>
@@ -827,12 +827,12 @@ export default function Character() {
                                 display: 'flex', 
                                 alignItems: 'center', 
                                 justifyContent: 'space-between', 
-                                background: 'rgba(30, 15, 50, 0.7)', 
+                                background: 'var(--app-panel, rgba(30, 15, 50, 0.7))', 
                                 padding: '5px', 
                                 borderRadius: '4px' 
                             }}
                         >
-                            <span style={{ color: '#ffdd99', fontWeight: 'bold', minWidth: '40px' }}>Lvl {level}:</span>
+                            <span style={{ color: 'var(--app-text, #ffdd99)', fontWeight: 'bold', minWidth: '40px' }}>Lvl {level}:</span>
                             <div style={{ display: 'flex', gap: '5px' }}>
                                 <input 
                                 type="number" 
@@ -890,17 +890,17 @@ export default function Character() {
                     )}
                     
                     {spellSearchTerm.length > 2 && filteredSpells.length === 0 && (
-                        <p style={{marginTop: '10px', color: '#3a1d0f'}}>No results found.</p>
+                        <p style={{marginTop: '10px', color: 'var(--app-bg, #3a1d0f)'}}>No results found.</p>
                     )}
                 </div>
                 
                 {selectedSpellDetail && (
                     <div className="spell-detail-preview card mt-3 p-3">
-                        <h3 style={{color: '#8b5a2b', borderBottom: '1px solid #6b4226', paddingBottom: '5px'}}>{selectedSpellDetail.name} (Lvl {selectedSpellDetail.level === 0 ? "Cantrip" : selectedSpellDetail.level})</h3>
-                        <p style={{color: '#3a1d0f'}}><strong>Casting Time:</strong> {selectedSpellDetail.casting_time}</p>
-                        <p style={{color: '#3a1d0f'}}><strong>Range:</strong> {selectedSpellDetail.range}</p>
-                        <p style={{color: '#3a1d0f'}}><strong>Duration:</strong> {selectedSpellDetail.duration}</p>
-                        {selectedSpellDetail.desc && <p style={{color: '#3a1d0f'}}><strong>Description (Excerpt):</strong> {selectedSpellDetail.desc[0].substring(0, 150)}...</p>}
+                        <h3 style={{color: 'var(--app-button-bg, #8b5a2b)', borderBottom: '1px solid var(--app-border, #6b4226)', paddingBottom: '5px'}}>{selectedSpellDetail.name} (Lvl {selectedSpellDetail.level === 0 ? "Cantrip" : selectedSpellDetail.level})</h3>
+                        <p style={{color: 'var(--app-bg, #3a1d0f)'}}><strong>Casting Time:</strong> {selectedSpellDetail.casting_time}</p>
+                        <p style={{color: 'var(--app-bg, #3a1d0f)'}}><strong>Range:</strong> {selectedSpellDetail.range}</p>
+                        <p style={{color: 'var(--app-bg, #3a1d0f)'}}><strong>Duration:</strong> {selectedSpellDetail.duration}</p>
+                        {selectedSpellDetail.desc && <p style={{color: 'var(--app-bg, #3a1d0f)'}}><strong>Description (Excerpt):</strong> {selectedSpellDetail.desc[0].substring(0, 150)}...</p>}
                         
                         <button 
                             className="btn-aura mt-2" 

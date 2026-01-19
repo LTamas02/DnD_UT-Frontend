@@ -31,7 +31,7 @@
   padding: 8px 16px;
   border-radius: 25px;
   border: 3px solid #3a1d0f;
-  background: linear-gradient(to bottom, #a52a2a, #8b0000);
+  background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000));
   color: var(--app-text, #e4c590);
   font-family: 'IM Fell English SC', serif;
   cursor: pointer;
@@ -44,7 +44,7 @@
 }
 
 .dmtools-danger {
-  background: linear-gradient(to bottom, #7c1c1c, #4b0b0b);
+  background: linear-gradient(to bottom, var(--app-button-bg, #7c1c1c), var(--app-border, #4b0b0b));
 }
 
 .dmtools-map-shell {
@@ -125,4 +125,34 @@
   .dmtools-map-canvas {
     height: 480px;
   }
+}
+.react-flow__node,
+.dmtools-node {
+  background: var(--app-card, #4e342e);
+  color: var(--app-text, #e4c590);
+  border: 1px solid var(--app-border, #6b4226);
+}
+
+.dmtools-node-selected,
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px var(--app-accent, #ffcc80);
+}
+
+.react-flow__edge-textbg {
+  fill: var(--app-panel, rgba(0, 0, 0, 0.6));
+}
+
+.react-flow__edge-text {
+  fill: var(--app-text, #e4c590);
+}
+
+.react-flow__controls button {
+  background: var(--app-card, #4e342e);
+  color: var(--app-text, #e4c590);
+  border: 1px solid var(--app-border, #6b4226);
+}
+
+.react-flow__minimap {
+  background: var(--app-panel, rgba(0, 0, 0, 0.5));
+  border: 1px solid var(--app-border, #6b4226);
 }

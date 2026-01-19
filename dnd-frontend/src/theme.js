@@ -58,6 +58,7 @@ export const applyTheme = (theme) => {
     "--app-accent": merged.accent,
     "--app-accent-soft": accentSoft,
     "--app-panel": merged.panelBg,
+    "--app-overlay": merged.overlay,
     "--app-card": merged.cardBg,
     "--app-border": merged.cardBorder,
     "--app-button-bg": merged.buttonBg,

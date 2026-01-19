@@ -72,9 +72,9 @@ const Spells = () => {
       {/* Spell table */}
       <div className="spells-table">
         {loading ? (
-          <p style={{ color: '#f5deb3', textAlign: 'center' }}>Loading spells...</p>
+          <p style={{ color: 'var(--app-text, #f5deb3)', textAlign: 'center' }}>Loading spells...</p>
         ) : error ? (
-          <p style={{ color: '#f5deb3', textAlign: 'center' }}>{error}</p>
+          <p style={{ color: 'var(--app-text, #f5deb3)', textAlign: 'center' }}>{error}</p>
         ) : (
           <table>
             <thead>
@@ -105,7 +105,7 @@ const Spells = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', color: '#f5deb3' }}>
+                  <td colSpan="6" style={{ textAlign: 'center', color: 'var(--app-text, #f5deb3)' }}>
                     No spells of this level.
                   </td>
                 </tr>

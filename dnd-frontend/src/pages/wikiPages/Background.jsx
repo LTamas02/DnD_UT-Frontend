@@ -135,7 +135,7 @@ export default function Background() {
 
                 {/* Részletes kártya stílus */}
                 <div className="race-detail-card"> 
-                    <header className="race-header" style={{backgroundColor:    '#8b5a2b', justifyContent: 'center'}}>
+                    <header className="race-header" style={{backgroundColor: 'var(--app-button-bg, #8b5a2b)', justifyContent: 'center'}}>
                         <h2 className="wiki-title">{background.name}</h2>
                     </header>
                     
@@ -146,7 +146,7 @@ export default function Background() {
                             <section className="wiki-section">
                                 <h3 className="info-label">Feature: {feature.name}</h3>
                                 {/* info-item a belső, sötétebb háttérhez */}
-                                <div className="info-item" style={{backgroundColor: 'rgba(69, 37, 16, 0.5)'}}>
+                                <div className="info-item" style={{backgroundColor: 'var(--app-panel, rgba(69, 37, 16, 0.5))'}}>
                                     {feature.desc && Array.isArray(feature.desc) && feature.desc.map((desc, i) => (
                                         <p key={i}>{desc}</p>
                                     ))}

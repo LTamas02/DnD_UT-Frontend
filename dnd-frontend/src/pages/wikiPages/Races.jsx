@@ -97,7 +97,7 @@ export default function Races() {
           ) : (
             races.map(race => (
               <div key={race.index} className="race-card" onClick={() => navigate(`/race/${race.index}`)}>
-                <div className="race-header" style={{ backgroundColor: "#878787" }}>
+                <div className="race-header" style={{ backgroundColor: "var(--app-border, #878787)" }}>
                   <h3 className="race-name">{race.name}</h3>
                   <div className="race-size">{race.size}</div>
                 </div>

@@ -59,7 +59,7 @@
 ============================ */
 .back-button {
  /* Wax Seal Style */
- background: linear-gradient(to bottom, #a52a2a, #8b0000); 
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000)); 
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  padding: 8px 16px;
@@ -72,7 +72,7 @@
 }
 
 .back-button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
  transform: translateY(-2px);
  box-shadow: 0 0 10px rgba(218, 165, 32, 0.8);
 }
@@ -114,7 +114,7 @@
 
 .search-section button {
  /* Wax Seal Style */
- background: linear-gradient(to bottom, #a52a2a, #8b0000); 
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000)); 
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  cursor: pointer;
@@ -124,7 +124,7 @@
 }
 
 .search-section button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
 }
 
 /* ============================
@@ -302,7 +302,7 @@
 .back-button {
  margin-bottom: 15px;
  padding: 8px 15px;
- background: linear-gradient(to bottom, #a52a2a, #8b0000); 
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000)); 
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  border-radius: 25px;
@@ -311,7 +311,7 @@
 }
 
 .back-button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
 }
 
 .page-content header {
@@ -357,7 +357,7 @@
  /* Re-defining redundancy */
  padding: 8px 12px;
  border-radius: 25px;
- background: linear-gradient(to bottom, #a52a2a, #8b0000); 
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000)); 
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  cursor: pointer;
@@ -365,7 +365,7 @@
 }
 
 .search-section button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
 }
 
 /* Monsters grid */
@@ -575,7 +575,7 @@
 
 /* Back button is styled above, redundancy re-defined */
 .back-button {
- background: linear-gradient(to bottom, #a52a2a, #8b0000);
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000));
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  padding: 8px 12px;
@@ -585,7 +585,7 @@
  transition: background-color 0.2s;
 }
 .back-button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
 }
 
 /* Headers */
@@ -619,14 +619,14 @@ header h1, header h2 {
  /* Wax Seal Style - re-defining redundancy */
  padding: 6px 12px;
  border-radius: 25px;
- background: linear-gradient(to bottom, #a52a2a, #8b0000);
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000));
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  cursor: pointer;
  transition: background-color 0.2s;
 }
 .search-section button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
 }
 
 /* Races grid */
@@ -973,7 +973,7 @@ header h1, header h2 {
 .back-button {
  margin-bottom: 15px;
  padding: 8px 15px;
- background: linear-gradient(to bottom, #a52a2a, #8b0000);
+ background: linear-gradient(to bottom, var(--app-accent, #a52a2a), var(--app-button-bg, #8b0000));
  color: var(--app-text, #e4c590);
  border: 3px solid #3a1d0f;
  border-radius: 25px;
@@ -982,7 +982,7 @@ header h1, header h2 {
 }
 
 .back-button:hover {
- background: linear-gradient(to bottom, #b22222, #600000);
+ background: linear-gradient(to bottom, var(--app-button-bg, #b22222), var(--app-border, #600000));
 }
 
 @media (max-width: 768px) {

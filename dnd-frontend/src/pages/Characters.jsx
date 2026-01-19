@@ -57,7 +57,7 @@ export default function Characters() {
                     Create New Character
                     <button
                         style={{
-                            backgroundColor: '#007bff',
+                            backgroundColor: 'var(--app-accent, #007bff)',
                             color: 'white',
                             border: 'none',
                             borderRadius: '0.5rem',
