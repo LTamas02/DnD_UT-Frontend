@@ -46,8 +46,12 @@ function App() {
         .then(res => {
           setIsAuthenticated(true);
           setUsername(res.data.username || "Guest");
-          setProfilePicture(res.data.profilePicture || "/defaults/profile_picture.jpg");
-          localStorage.setItem("profilePicture", res.data.profilePicture || "/defaults/profile_picture.jpg");
+          const nextProfilePicture =
+            res.data.profilePictureUrl ||
+            res.data.profilePicture ||
+            "/defaults/profile_picture.jpg";
+          setProfilePicture(nextProfilePicture);
+          localStorage.setItem("profilePicture", nextProfilePicture);
           localStorage.setItem("username", res.data.username || "Guest");
         })
         .catch(() => {

@@ -17,6 +17,15 @@ import {
     updateProfilePictureFile
 } from "../Api";
 
+const API_BASE = "https://api.dnd-tool.com";
+
+const toAbsUrl = (url) => {
+    if (!url || typeof url !== "string") return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
+    return url;
+};
+
 const Profile = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
@@ -43,7 +52,11 @@ const Profile = () => {
         getUser(token)
             .then(res => {
                 setUser(res.data);
-                setProfilePic(res.data.profilePicture || "/defaults/profile_picture.jpg");
+                setProfilePic(
+                    res.data.profilePictureUrl ||
+                    res.data.profilePicture ||
+                    "/defaults/profile_picture.jpg"
+                );
             })
             .catch(err => console.error("Error loading user:", err));
 
@@ -148,7 +161,7 @@ const Profile = () => {
                     <div className="col-md-6">
                         <div className="profile-box text-center">
                             <img
-                                src={profilePic}
+                                src={toAbsUrl(profilePic)}
                                 alt="Profile"
                                 className="profile-pic mb-3"
                             />
@@ -201,7 +214,7 @@ const Profile = () => {
                                         {friends.map(friend => (
                                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
                                                 <img
-                                                    src={friend.profilePicture || friend.profile_picture || "/defaults/profile_picture.jpg"}
+                                                    src={toAbsUrl(friend.profilePicture || friend.profile_picture || "/defaults/profile_picture.jpg")}
                                                     alt="Friend"
                                                     className="friend-pic rounded-circle"
                                                 />
@@ -301,7 +314,7 @@ const Profile = () => {
                             {friendRequests.map(req => (
                                 <li key={req.id} className="d-flex align-items-center mb-2 request-item">
                                     <img
-                                        src={req.requesterProfilePicture || "/defaults/profile_picture.jpg"}
+                                        src={toAbsUrl(req.requesterProfilePicture || "/defaults/profile_picture.jpg")}
                                         alt="Sender"
                                         className="friend-request-pic"
                                     />

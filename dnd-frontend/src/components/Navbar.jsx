@@ -4,6 +4,15 @@ import "../assets/styles/Navbar.css"; // Import your CSS file for styling
 import {href, Link} from "react-router-dom";
 import ppic from "../assets/img/profile_picture.jpg"; // Default profile picture
 
+const API_BASE = "https://api.dnd-tool.com";
+
+const toAbsUrl = (url) => {
+    if (!url || typeof url !== "string") return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
+    return url;
+};
+
 const Navbar = ({username, profilePicture}) => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark">
@@ -59,7 +68,7 @@ const Navbar = ({username, profilePicture}) => {
                             <img
                                 className="profKep"
                                 id="profkep"
-                                src={localStorage.getItem("profilePicture") ?? ppic}
+                                src={toAbsUrl(localStorage.getItem("profilePicture") ?? ppic)}
                                 style={{ width: "30px", height: "30px", borderRadius: "50%" }}
                             />
                             {localStorage.getItem("username") || "Profile"}
