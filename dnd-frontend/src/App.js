@@ -13,7 +13,6 @@ import Wiki from "./pages/Wiki";
 import Friends from "./pages/Friends";
 import { Navbar, NavbarLogin, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
-import Community from "./pages/Community";
 import Spells from "./pages/wikiPages/Spells";
 import Spell from "./pages/wikiPages/Spell";
 import Classes from "./pages/wikiPages/Classes";
@@ -25,7 +24,7 @@ import Monster from "./pages/wikiPages/Monster";
 import Equipments from './pages/wikiPages/Equipments'
 import Backgrounds from './pages/wikiPages/Backgrounds'
 import Background from './pages/wikiPages/Background'
-import DmtoolsDmScreen from "./pages/DmtoolsDmScreen";
+import DmtoolsNpcs from "./pages/DmtoolsNpcs";
 
 import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
 import Alignment from "./pages/wikiPages/Alignments";
@@ -105,12 +104,11 @@ function AppWithRouter({
         <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/encounters" element={isAuthenticated ? <DmtoolsEncounters /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools/dmscreen" element={isAuthenticated ? <DmtoolsDmScreen /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
 
-        <Route path="/community" element={isAuthenticated ? <Community /> : <Navigate to="/logreg" />} />
 
         <Route path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />
         <Route path="/spell/:index" element={isAuthenticated ? <Spell /> : <Navigate to="/logreg" />} />

@@ -146,7 +146,7 @@
  * 📝 Modális Ablak Alapja 📝
  * Fél-átlátszó sötét overlay (ugyanaz a stílus mindkét modálra)
  */
-.modal {
+.profile-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -163,7 +163,7 @@
  * 📄 Modális Tartalom Box 📄
  * Prémium, világos háttér a sötét overlay-en.
  */
-.modal-content {
+.profile-modal-content {
     /* Világos krém/kávé szín */
     background: #fdfaf0; 
     padding: 30px;

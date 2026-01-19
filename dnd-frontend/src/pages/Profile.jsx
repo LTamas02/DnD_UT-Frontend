@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../assets/styles/Profile.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/styles/Login.css";
 import "../assets/styles/Footer.css";
-import ChatPopup from "../components/ChatPopUp";
-import { href, Link } from "react-router-dom";
-
-
 import Footer from "../components/Footer";
-import { Navbar } from "../components/Navbar";
 import {
     getUser,
     getFriends,
@@ -17,7 +12,9 @@ import {
     searchFriends,
     addFriend,
     getFriendRequests,
-    respondFriendRequest
+    respondFriendRequest,
+    updateProfilePicture,
+    updateProfilePictureFile
 } from "../Api";
 
 const Profile = () => {
@@ -30,7 +27,7 @@ const Profile = () => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [friendSearchModal, setFriendSearchModal] = useState(false);
-    const [friendRequestsModal, setFriendRequestsModal] = useState(false); // NEW STATE
+    const [friendRequestsModal, setFriendRequestsModal] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -82,10 +79,33 @@ const Profile = () => {
 
     const toggleFriendRequestsModal = () => setFriendRequestsModal(!friendRequestsModal);
 
-    const selectImage = (imageName) => {
+    const selectImage = async (imageName) => {
         if (!window.confirm("Are you sure you want to select this picture?")) return;
-        setProfilePic(`/defaults/${imageName}`);
-        closeModal();
+        const nextPicture = `/defaults/${imageName}`;
+        try {
+            await updateProfilePicture(token, nextPicture);
+            setProfilePic(nextPicture);
+            closeModal();
+        } catch (err) {
+            console.error("Error updating profile picture:", err);
+            alert("Failed to update profile picture.");
+        }
+    };
+
+    const handleUploadProfilePicture = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+            const res = await updateProfilePictureFile(token, file);
+            const nextPicture = res.data?.profilePicture || res.data?.profilePictureUrl || profilePic;
+            setProfilePic(nextPicture);
+            closeModal();
+        } catch (err) {
+            console.error("Error uploading profile picture:", err);
+            alert("Failed to upload profile picture.");
+        } finally {
+            event.target.value = "";
+        }
     };
 
     const handleSearch = () => {
@@ -128,7 +148,7 @@ const Profile = () => {
                     <div className="col-md-6">
                         <div className="profile-box text-center">
                             <img
-                                src={user?.profilePicture || "/defaults/profile_picture.jpg"}
+                                src={profilePic}
                                 alt="Profile"
                                 className="profile-pic mb-3"
                             />
@@ -140,8 +160,6 @@ const Profile = () => {
                                 <button className="btn btn-outline-danger" onClick={logout}>
                                     Logout
                                 </button>
-
-
                             </div>
                         </div>
                     </div>
@@ -150,10 +168,7 @@ const Profile = () => {
                 <div className="row mt-5">
                     <div className="col-12">
                         <div className="allies-section">
-
                             <h3 className="mb-3">Your Allies</h3>
-
-
 
                             {friends.length === 0 ? (
                                 <>
@@ -161,41 +176,39 @@ const Profile = () => {
                                     <button className="btn btn-primary" onClick={openFriendSearch}>
                                         Add Friend
                                     </button>
-                                    <button className="  btn btn-outline-secondary position-relative" onClick={toggleFriendRequestsModal}>
-                                        🔔
+                                    <button className="btn btn-outline-secondary position-relative" onClick={toggleFriendRequestsModal}>
+                                        Requests
                                         {friendRequests.length > 0 && (
                                             <span className="friend-request-badge">{friendRequests.length}</span>
                                         )}
                                     </button>
-
                                 </>
-
                             ) : (
                                 <>
                                     <button className="btn btn-primary mb-3" onClick={openFriendSearch}>
                                         Add Friend
                                     </button>
-                                    <button className=" mb-3 btn btn-outline-secondary position-relative" onClick={toggleFriendRequestsModal}>
-                                        🔔
+                                    <button className="btn btn-outline-secondary position-relative mb-3" onClick={toggleFriendRequestsModal}>
+                                        Requests
                                         {friendRequests.length > 0 && (
                                             <span className="friend-request-badge">{friendRequests.length}</span>
                                         )}
                                     </button>
-                                    <Link to="/friends" className=" btn btn-primary mb-3">
+                                    <Link to="/friends" className="btn btn-primary mb-3">
                                         Friends Page
                                     </Link>
                                     <ul className="friends-list list-unstyled">
                                         {friends.map(friend => (
                                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
                                                 <img
-                                                    src={friend.profile_picture || "/defaults/profile_picture.jpg"}
+                                                    src={friend.profilePicture || friend.profile_picture || "/defaults/profile_picture.jpg"}
                                                     alt="Friend"
                                                     className="friend-pic rounded-circle"
                                                 />
                                                 <span className="ms-2 flex-grow-1">{friend.username}</span>
                                                 <button
                                                     className="btn btn-danger btn-sm me-2"
-                                                    onClick={() => deleteFriend(friend.id)}
+                                                    onClick={() => removeFriend(friend.id)}
                                                 >
                                                     Remove
                                                 </button>
@@ -217,24 +230,20 @@ const Profile = () => {
 
             <Footer />
 
-
-
-
-
-
-
-            {/*-------------------------------------------------------------------------------------------------------------------------------------------------------*/}
-
-
-
-
-
-            {/* Profile picture modal */}
             {modalVisible && (
-                <div className="modal d-block">
-                    <div className="modal-content">
-                        <span className="close-btn" onClick={closeModal}>×</span>
+                <div className="profile-modal">
+                    <div className="profile-modal-content">
+                        <span className="close-btn" onClick={closeModal}>&times;</span>
                         <h2>Select a Profile Picture</h2>
+                        <label className="btn btn-primary mb-3">
+                            Upload your own
+                            <input
+                                type="file"
+                                accept="image/*"
+                                style={{ display: "none" }}
+                                onChange={handleUploadProfilePicture}
+                            />
+                        </label>
                         <div className="image-options d-flex flex-wrap gap-2">
                             {["profile1.jpg", "profile2.jpg", "profile3.jpg"].map(img => (
                                 <img
@@ -250,11 +259,10 @@ const Profile = () => {
                 </div>
             )}
 
-            {/* Friend search modal */}
             {friendSearchModal && (
-                <div className="modal d-block">
-                    <div className="modal-content">
-                        <span className="close-btn" onClick={closeFriendSearch}>×</span>
+                <div className="profile-modal">
+                    <div className="profile-modal-content">
+                        <span className="close-btn" onClick={closeFriendSearch}>&times;</span>
                         <h2>Search for Friends</h2>
                         <input
                             type="text"
@@ -284,11 +292,10 @@ const Profile = () => {
                 </div>
             )}
 
-            {/* Friend Requests Modal */}
             {friendRequestsModal && (
-                <div className="modal d-block friend-requests-modal">
-                    <div className="modal-content">
-                        <span className="close-btn" onClick={toggleFriendRequestsModal}>×</span>
+                <div className="profile-modal friend-requests-modal">
+                    <div className="profile-modal-content">
+                        <span className="close-btn" onClick={toggleFriendRequestsModal}>&times;</span>
                         <h2>Friend Requests</h2>
                         <ul className="list-unstyled friend-requests-list">
                             {friendRequests.map(req => (

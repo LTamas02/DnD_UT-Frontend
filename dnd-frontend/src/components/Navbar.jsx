@@ -52,9 +52,6 @@ const Navbar = ({username, profilePicture}) => {
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/community" className="nav-link active">
-                                Community
-                            </Link>
                         </li>
                     </ul>
                     <form className="d-flex">
@@ -122,9 +119,6 @@ const NavbarProfile = ({username, profilePicture}) => {
                             </Link>
                         </li>                        
                         <li className="nav-item">
-                            <Link to="/community" className="nav-link active">
-                                Community
-                            </Link>
                         </li>
                     </ul>
                 </div>

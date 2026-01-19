@@ -1,0 +1,258 @@
+.npc-page {
+  background: radial-gradient(circle at 10% 20%, rgba(245, 176, 58, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(84, 180, 255, 0.15), transparent 45%),
+    linear-gradient(180deg, rgba(9, 8, 6, 0.92), rgba(12, 10, 7, 0.98));
+  min-height: 100vh;
+}
+
+.npc-overlay {
+  padding: 40px 24px 80px;
+}
+
+.npc-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 24px;
+  padding: 32px;
+  border-radius: 24px;
+  background: rgba(12, 10, 8, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.npc-kicker {
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 0.8rem;
+  color: rgba(245, 176, 58, 0.85);
+}
+
+.npc-hero-copy h1 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  margin: 12px 0;
+}
+
+.npc-hero-copy p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.npc-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.npc-primary {
+  background: linear-gradient(135deg, #f5b03a, #f27b5c);
+  color: #1b1109;
+  box-shadow: 0 12px 24px rgba(242, 123, 92, 0.25);
+}
+
+.npc-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.npc-status {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  color: rgba(245, 176, 58, 0.8);
+}
+
+.npc-hint {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.npc-hero-orbs span {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 176, 58, 0.5), transparent 60%);
+  animation: npc-orb 6s ease-in-out infinite;
+}
+
+.npc-hero-orbs span:nth-child(1) {
+  width: 180px;
+  height: 180px;
+  top: -40px;
+  right: 120px;
+}
+
+.npc-hero-orbs span:nth-child(2) {
+  width: 140px;
+  height: 140px;
+  bottom: -40px;
+  right: 30px;
+  animation-delay: 1.5s;
+}
+
+.npc-hero-orbs span:nth-child(3) {
+  width: 90px;
+  height: 90px;
+  top: 40px;
+  right: 30px;
+  animation-delay: 3s;
+}
+
+@keyframes npc-orb {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(10px); opacity: 0.9; }
+}
+
+.npc-layout {
+  margin-top: 36px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  gap: 26px;
+}
+
+.npc-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.npc-field {
+  display: grid;
+  gap: 6px;
+}
+
+.npc-field-full {
+  grid-column: span 2;
+}
+
+.npc-field label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.npc-field input,
+.npc-field textarea {
+  background: rgba(8, 7, 5, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.npc-field textarea {
+  min-height: 90px;
+}
+
+.npc-preview {
+  display: grid;
+  gap: 18px;
+}
+
+.npc-card {
+  background: rgba(15, 12, 9, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.35);
+}
+
+.npc-card-title {
+  font-size: 1.6rem;
+}
+
+.npc-card-subtitle {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.npc-card-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.npc-card-grid span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.npc-card-grid strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.npc-card-notes {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.npc-card-notes h4 {
+  margin-bottom: 6px;
+}
+
+.npc-note-preview {
+  margin-top: 18px;
+  background: rgba(9, 8, 6, 0.8);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.npc-note-preview pre {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.npc-vault {
+  background: rgba(14, 12, 9, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.npc-vault-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.npc-vault-item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: left;
+  color: white;
+  cursor: pointer;
+  transition: transform 160ms ease, border 160ms ease;
+}
+
+.npc-vault-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 176, 58, 0.6);
+}
+
+.npc-vault-item span {
+  display: block;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 980px) {
+  .npc-hero {
+    grid-template-columns: 1fr;
+  }
+  .npc-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .npc-form {
+    grid-template-columns: 1fr;
+  }
+  .npc-field-full {
+    grid-column: span 1;
+  }
+}
