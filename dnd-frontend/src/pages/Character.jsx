@@ -109,10 +109,40 @@ const mapFromApi = (charData) => ({
   generalEquipment: parseJsonList(charData.featuresFeats)
 });
 
+const toInt = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
+
 const buildSavePayload = (profile) => ({
   ...profile,
   inspiration: profile.inspiration ? 1 : 0,
-  int_stat: profile.int,
+  int_stat: toInt(profile.int),
+  xp: toInt(profile.xp),
+  age: toInt(profile.age),
+  str: toInt(profile.str),
+  dex: toInt(profile.dex),
+  con: toInt(profile.con),
+  wis: toInt(profile.wis),
+  cha: toInt(profile.cha),
+  profBonus: toInt(profile.profBonus),
+  profBonusDuplicate: toInt(profile.profBonusDuplicate),
+  armor: toInt(profile.armor),
+  initiative: toInt(profile.initiative),
+  speed: toInt(profile.speed),
+  hpMax: toInt(profile.hpMax),
+  hpCurrent: toInt(profile.hpCurrent),
+  hpTemp: toInt(profile.hpTemp),
+  hitDiceTotal: toInt(profile.hitDiceTotal),
+  hitDiceCurrent: toInt(profile.hitDiceCurrent),
+  deathSuccesses: toInt(profile.deathSuccesses),
+  deathFailures: toInt(profile.deathFailures),
+  passivePerception: toInt(profile.passivePerception),
+  cp: toInt(profile.cp),
+  sp: toInt(profile.sp),
+  ep: toInt(profile.ep),
+  gp: toInt(profile.gp),
+  pp: toInt(profile.pp),
   saveProf_str: !!profile.saveProf?.str,
   saveProf_dex: !!profile.saveProf?.dex,
   saveProf_con: !!profile.saveProf?.con,
@@ -139,7 +169,8 @@ const buildSavePayload = (profile) => ({
   skillProf_survival: !!profile.skillProf?.survival,
   attacks: JSON.stringify(profile.attacks || []),
   spellbook: JSON.stringify(profile.selectedSpells || []),
-  featuresFeats: JSON.stringify(profile.generalEquipment || [])
+  featuresFeats: JSON.stringify(profile.generalEquipment || []),
+  equipment: typeof profile.equipment === "string" ? profile.equipment : JSON.stringify(profile.equipment ?? "")
 });
 
 function normalizeArrayResponse(res) {
@@ -1116,6 +1147,8 @@ export default function Character() {
     </div>
   );
 }
+
+
 
 
 
