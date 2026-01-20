@@ -114,35 +114,40 @@ const toInt = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 
+const safeString = (value) => {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value);
+};
+
 const buildSavePayload = (profile) => ({
-  ...profile,
-  inspiration: profile.inspiration ? 1 : 0,
-  int_stat: toInt(profile.int),
+  id: profile.id ?? 0,
+  characterName: safeString(profile.characterName),
+  classLevel: safeString(profile.classLevel),
+  race: safeString(profile.race),
+  background: safeString(profile.background),
+  playerName: safeString(profile.playerName),
+  alignment: safeString(profile.alignment),
   xp: toInt(profile.xp),
+  inspiration: profile.inspiration ? 1 : 0,
   age: toInt(profile.age),
+  height: safeString(profile.height),
+  weight: safeString(profile.weight),
+  eyes: safeString(profile.eyes),
+  skin: safeString(profile.skin),
+  hair: safeString(profile.hair),
+  symbol: safeString(profile.symbol),
+  appearance: safeString(profile.appearance),
   str: toInt(profile.str),
   dex: toInt(profile.dex),
   con: toInt(profile.con),
+  int_stat: toInt(profile.int),
   wis: toInt(profile.wis),
   cha: toInt(profile.cha),
   profBonus: toInt(profile.profBonus),
   profBonusDuplicate: toInt(profile.profBonusDuplicate),
-  armor: toInt(profile.armor),
-  initiative: toInt(profile.initiative),
-  speed: toInt(profile.speed),
-  hpMax: toInt(profile.hpMax),
-  hpCurrent: toInt(profile.hpCurrent),
-  hpTemp: toInt(profile.hpTemp),
-  hitDiceTotal: toInt(profile.hitDiceTotal),
-  hitDiceCurrent: toInt(profile.hitDiceCurrent),
-  deathSuccesses: toInt(profile.deathSuccesses),
-  deathFailures: toInt(profile.deathFailures),
-  passivePerception: toInt(profile.passivePerception),
-  cp: toInt(profile.cp),
-  sp: toInt(profile.sp),
-  ep: toInt(profile.ep),
-  gp: toInt(profile.gp),
-  pp: toInt(profile.pp),
   saveProf_str: !!profile.saveProf?.str,
   saveProf_dex: !!profile.saveProf?.dex,
   saveProf_con: !!profile.saveProf?.con,
@@ -167,10 +172,36 @@ const buildSavePayload = (profile) => ({
   skillProf_sleightOfHand: !!profile.skillProf?.sleightOfHand,
   skillProf_stealth: !!profile.skillProf?.stealth,
   skillProf_survival: !!profile.skillProf?.survival,
+  armor: toInt(profile.armor),
+  initiative: toInt(profile.initiative),
+  speed: toInt(profile.speed),
+  hpMax: toInt(profile.hpMax),
+  hpCurrent: toInt(profile.hpCurrent),
+  hpTemp: toInt(profile.hpTemp),
+  hitDiceTotal: toInt(profile.hitDiceTotal),
+  hitDiceCurrent: toInt(profile.hitDiceCurrent),
+  deathSuccesses: toInt(profile.deathSuccesses),
+  deathFailures: toInt(profile.deathFailures),
+  passivePerception: toInt(profile.passivePerception),
+  cp: toInt(profile.cp),
+  sp: toInt(profile.sp),
+  ep: toInt(profile.ep),
+  gp: toInt(profile.gp),
+  pp: toInt(profile.pp),
+  otherProfs: safeString(profile.otherProfs),
+  personalityTraits: safeString(profile.personalityTraits),
+  ideals: safeString(profile.ideals),
+  bonds: safeString(profile.bonds),
+  flaws: safeString(profile.flaws),
+  allies: safeString(profile.allies),
+  additionalFeatures: safeString(profile.additionalFeatures),
+  treasure: safeString(profile.treasure),
+  backstory: safeString(profile.backstory),
+  portraitDataUrl: safeString(profile.portraitDataUrl),
+  equipment: typeof profile.equipment === "string" ? profile.equipment : JSON.stringify(profile.equipment ?? ""),
   attacks: JSON.stringify(profile.attacks || []),
   spellbook: JSON.stringify(profile.selectedSpells || []),
-  featuresFeats: JSON.stringify(profile.generalEquipment || []),
-  equipment: typeof profile.equipment === "string" ? profile.equipment : JSON.stringify(profile.equipment ?? "")
+  featuresFeats: JSON.stringify(profile.generalEquipment || [])
 });
 
 function normalizeArrayResponse(res) {
@@ -1147,6 +1178,7 @@ export default function Character() {
     </div>
   );
 }
+
 
 
 
