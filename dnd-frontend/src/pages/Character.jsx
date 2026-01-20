@@ -7,53 +7,9 @@ import {
   getClassByIndex,
   getWeapons,
   getAllRaces,
-  getRaceByIndex
+  getRaceByIndex,
+  CharacterApi
 } from "../Api";
-
-// ==========================================================
-// === API Placeholders ===
-// ==========================================================
-
-async function getCharacterById(id) {
-  const token = localStorage.getItem("token");
-  const response = await fetch(`/api/characters/${id}`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  if (response.status === 404) return null;
-  if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Character not found or access denied: ${errorText}`);
-  }
-  const data = await response.json();
-  return data;
-}
-
-async function saveCharacter(characterData) {
-  const token = localStorage.getItem("token");
-  const method = characterData.id && characterData.id !== 'new' ? 'PUT' : 'POST'; 
-  const url = characterData.id && characterData.id !== 'new' ? `/api/characters/${characterData.id}` : `/api/characters`;
-  
-  const response = await fetch(url, {
-    method: method,
-    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify(characterData)
-  });
-  if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to save character: ${errorText}`);
-  }
-  const data = await response.json(); 
-  return data;
-}
-
-async function deleteCharacter(id) {
-  const token = localStorage.getItem("token");
-  const response = await fetch(`/api/characters/${id}`, {
-    method: 'DELETE',
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  if (response.status >= 400) throw new Error("Failed to delete character."); 
-}
 
 // ==========================================================
 // === DEFAULT PROFILE & Helper Data ===
@@ -102,6 +58,89 @@ const DEFAULT_PROFILE = {
   selectedSpells: [], 
   portraitDataUrl: ""
 };
+const parseJsonList = (value) => {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (typeof value !== "string") return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const mapFromApi = (charData) => ({
+  ...DEFAULT_PROFILE,
+  ...charData,
+  id: charData.id ?? null,
+  inspiration: !!charData.inspiration,
+  int: charData.int_stat ?? charData.int ?? DEFAULT_PROFILE.int,
+  saveProf: {
+    str: !!charData.saveProf_str,
+    dex: !!charData.saveProf_dex,
+    con: !!charData.saveProf_con,
+    int: !!charData.saveProf_int,
+    wis: !!charData.saveProf_wis,
+    cha: !!charData.saveProf_cha
+  },
+  skillProf: {
+    acrobatics: !!charData.skillProf_acrobatics,
+    animalHandling: !!charData.skillProf_animalHandling,
+    arcana: !!charData.skillProf_arcana,
+    athletics: !!charData.skillProf_athletics,
+    deception: !!charData.skillProf_deception,
+    history: !!charData.skillProf_history,
+    insight: !!charData.skillProf_insight,
+    intimidation: !!charData.skillProf_intimidation,
+    investigation: !!charData.skillProf_investigation,
+    medicine: !!charData.skillProf_medicine,
+    nature: !!charData.skillProf_nature,
+    perception: !!charData.skillProf_perception,
+    performance: !!charData.skillProf_performance,
+    persuasion: !!charData.skillProf_persuasion,
+    religion: !!charData.skillProf_religion,
+    sleightOfHand: !!charData.skillProf_sleightOfHand,
+    stealth: !!charData.skillProf_stealth,
+    survival: !!charData.skillProf_survival
+  },
+  attacks: parseJsonList(charData.attacks),
+  selectedSpells: parseJsonList(charData.spellbook),
+  generalEquipment: parseJsonList(charData.featuresFeats)
+});
+
+const buildSavePayload = (profile) => ({
+  ...profile,
+  inspiration: profile.inspiration ? 1 : 0,
+  int_stat: profile.int,
+  saveProf_str: !!profile.saveProf?.str,
+  saveProf_dex: !!profile.saveProf?.dex,
+  saveProf_con: !!profile.saveProf?.con,
+  saveProf_int: !!profile.saveProf?.int,
+  saveProf_wis: !!profile.saveProf?.wis,
+  saveProf_cha: !!profile.saveProf?.cha,
+  skillProf_acrobatics: !!profile.skillProf?.acrobatics,
+  skillProf_animalHandling: !!profile.skillProf?.animalHandling,
+  skillProf_arcana: !!profile.skillProf?.arcana,
+  skillProf_athletics: !!profile.skillProf?.athletics,
+  skillProf_deception: !!profile.skillProf?.deception,
+  skillProf_history: !!profile.skillProf?.history,
+  skillProf_insight: !!profile.skillProf?.insight,
+  skillProf_intimidation: !!profile.skillProf?.intimidation,
+  skillProf_investigation: !!profile.skillProf?.investigation,
+  skillProf_medicine: !!profile.skillProf?.medicine,
+  skillProf_nature: !!profile.skillProf?.nature,
+  skillProf_perception: !!profile.skillProf?.perception,
+  skillProf_performance: !!profile.skillProf?.performance,
+  skillProf_persuasion: !!profile.skillProf?.persuasion,
+  skillProf_religion: !!profile.skillProf?.religion,
+  skillProf_sleightOfHand: !!profile.skillProf?.sleightOfHand,
+  skillProf_stealth: !!profile.skillProf?.stealth,
+  skillProf_survival: !!profile.skillProf?.survival,
+  attacks: JSON.stringify(profile.attacks || []),
+  spellbook: JSON.stringify(profile.selectedSpells || []),
+  featuresFeats: JSON.stringify(profile.generalEquipment || [])
+});
 
 function normalizeArrayResponse(res) {
   if (!res) return [];
@@ -192,7 +231,10 @@ export default function Character() {
     const isNewCharacter = id === 'new';
 
     try {
-        const savedData = await saveCharacter(profile); 
+        const payload = buildSavePayload(profile);
+        const savedData = isNewCharacter
+            ? await CharacterApi.create(payload)
+            : await CharacterApi.update(profile.id, payload); 
         alert("Character successfully saved!");
         
         // Ha új karakter volt, átirányítunk az új, valós ID-val ellátott URL-re
@@ -201,7 +243,7 @@ export default function Character() {
         }
         
         // Frissítjük a profile state-et a valós ID-val, ha 'new' volt az előző ID
-        setProfile(prev => ({ ...prev, id: savedData.id }));
+        setProfile(mapFromApi(savedData));
     } catch (error) {
         console.error("Save failed:", error);
         alert(`Error during save: ${error.message}`);
@@ -216,7 +258,7 @@ export default function Character() {
     if (!window.confirm(`Are you sure you want to delete ${profile.characterName}?`)) return;
     
     try {
-        await deleteCharacter(profile.id);
+        await CharacterApi.remove(profile.id);
         alert("Character successfully deleted!");
         navigate('/characters'); 
     } catch (error) {
@@ -298,21 +340,12 @@ export default function Character() {
 
         let charData = null;
         if (id && id !== 'new') { 
-            charData = await getCharacterById(id);
+            charData = await CharacterApi.get(id);
         }
 
         if (mounted) {
           if (charData) {
-            setProfile(prev => ({
-              ...DEFAULT_PROFILE,
-              ...charData,
-              id: id, 
-              saveProf: charData.saveProf || {},
-              skillProf: charData.skillProf || {},
-              attacks: charData.attacks || [],
-              selectedSpells: charData.selectedSpells || [],
-              generalEquipment: charData.generalEquipment || [], 
-            }));
+            setProfile(mapFromApi(charData));
           } else if (id === 'new') {
             setProfile(DEFAULT_PROFILE);
           }
@@ -1083,3 +1116,7 @@ export default function Character() {
     </div>
   );
 }
+
+
+
+

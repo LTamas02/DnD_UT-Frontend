@@ -4,11 +4,14 @@ import { getPdf } from '../Api';
 
 export default function Card({ character }) {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token"); // Auth token
+    const token = localStorage.getItem("token");
+
+    const displayName = character.characterName || character.name || "Unnamed";
+    const displayClass = character.classLevel || character.class || "";
+    const displayRace = character.race || "";
 
     const handleClick = async () => {
         if (character.id && character.name && character.class === "PDF Character") {
-            // This is a PDF character → Download PDF
             try {
                 const res = await getPdf(character.id, token, { responseType: "blob" });
                 const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
@@ -21,9 +24,8 @@ export default function Card({ character }) {
             } catch (error) {
                 console.error("Failed to download PDF:", error);
             }
-        } else {
-            // Normal card → Navigate to character details
-            navigate(`../pages/character/${character.id}`);
+        } else if (character.id) {
+            navigate(`/character/${character.id}`);
         }
     };
 
@@ -40,14 +42,13 @@ export default function Card({ character }) {
             title={character.class === "PDF Character" ? "Download PDF" : "View Character"}
         >
             <div className="card-body">
-                <h5 className="card-title">{character.name}</h5>
-                <h6 className="card-subtitle mb-2 text-muted">
-                    {character.class} (Level {character.level})
-                </h6>
-                <p className="card-text">
-                    {character.race}
-                    {character.world ? ` | World: ${character.world}` : ''}
-                </p>
+                <h5 className="card-title">{displayName}</h5>
+                {displayClass && (
+                    <h6 className="card-subtitle mb-2 text-muted">{displayClass}</h6>
+                )}
+                {displayRace && (
+                    <p className="card-text">{displayRace}</p>
+                )}
             </div>
         </div>
     );

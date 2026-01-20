@@ -639,29 +639,34 @@ export const getWeaponPropertyByIndex = async (index) => {
 // =========================
 
 
+const withAuth = () => {
+    const token = localStorage.getItem("token");
+    return token ? { headers: { "Authorization": `Bearer ${token}` } } : {};
+};
+
 export const CharacterApi = {
   async getAll() {
-    const res = await api.get("/character");
+    const res = await api.get("/characters", withAuth());
     return res.data;
   },
 
   async get(id) {
-    const res = await api.get(`/character/${id}`);
+    const res = await api.get(`/characters/${id}`, withAuth());
     return res.data;
   },
 
   async create(data) {
-    const res = await api.post("/character", data);
+    const res = await api.post("/characters", data, withAuth());
     return res.data;
   },
 
   async update(id, data) {
-    const res = await api.put(`/character/${id}`, data);
+    const res = await api.put(`/characters/${id}`, data, withAuth());
     return res.data;
   },
 
   async remove(id) {
-    const res = await api.delete(`/character/${id}`);
+    const res = await api.delete(`/characters/${id}`, withAuth());
     return res.data;
   },
 };
@@ -898,3 +903,4 @@ export const searchLanguages = async (query) => {
         return [];
     }
 };
+
