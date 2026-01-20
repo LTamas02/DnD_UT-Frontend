@@ -45,7 +45,7 @@ const Spell = () => {
 
         <p><strong>School:</strong> {spell.school?.name}</p>
         <p><strong>Level:</strong> {spell.level}</p>
-        <p><strong>Casting Time:</strong> {spell.castingTime}</p>
+        <p><strong>Casting Time:</strong> {spell.castingTime ?? spell.casting_time}</p>
         <p><strong>Range:</strong> {spell.range}</p>
         <p><strong>Duration:</strong> {spell.duration}</p>
         <p><strong>Components:</strong> {spell.components?.join(', ')}</p>

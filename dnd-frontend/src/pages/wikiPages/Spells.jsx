@@ -97,7 +97,7 @@ const Spells = () => {
                   >
                     <td>{spell.name}</td>
                     <td>{spell.school?.name}</td>
-                    <td>{spell.castingTime}</td>
+                    <td>{spell.castingTime ?? spell.casting_time}</td>
                     <td>{spell.range}</td>
                     <td>{spell.duration}</td>
                     <td>{spell.components?.join(', ')}</td>
