@@ -171,8 +171,8 @@
 .monster-card:hover,
 .equipment-card:hover {
  transform: translateY(-3px);
- box-shadow: 0 5px 15px rgba(212, 175, 55, 0.5);
- background-color: #5d422e;
+ box-shadow: 0 5px 15px var(--app-accent-soft, rgba(212, 175, 55, 0.5));
+ background-color: var(--app-panel, rgba(0, 0, 0, 0.35));
  color: var(--app-button-text, #fff8e1);
 }
 
@@ -206,7 +206,7 @@
 
 .info-item {
  /* Darker brown sub-section background */
- background-color: rgba(69, 37, 16, 0.85);
+ background-color: var(--app-panel, rgba(69, 37, 16, 0.85));
  padding: 10px 12px;
  border-radius: 8px;
   border: 1px solid var(--app-border, #6b4226);
@@ -498,7 +498,7 @@
 
 .info-item {
  /* Darker brown sub-section background - re-defining */
- background-color: rgba(69, 37, 16, 0.85);
+ background-color: var(--app-panel, rgba(69, 37, 16, 0.85));
  border-radius: 8px;
  padding: 12px 15px;
   border: 1px solid var(--app-border, #6b4226);
@@ -708,7 +708,7 @@ header h1, header h2 {
 
 /* info-grid and info-item are styled in General block, redundancy re-defined */
 .info-item {
- background-color: rgba(69, 37, 16, 0.85);
+ background-color: var(--app-panel, rgba(69, 37, 16, 0.85));
 }
 
 .info-label {
@@ -777,7 +777,7 @@ header h1, header h2 {
 
 .class-card:hover {
  transform: translateY(-3px);
- box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+ box-shadow: 0 4px 15px var(--app-accent-soft, rgba(212, 175, 55, 0.5));
 }
 
 /* Class detail page overlay */
@@ -809,7 +809,7 @@ header h1, header h2 {
 
 /* info-grid and info-item are styled in General block, redundancy re-defined */
 .info-item {
- background-color: rgba(69, 37, 16, 0.7);
+ background-color: var(--app-panel, rgba(69, 37, 16, 0.7));
 }
 
 .info-label {
@@ -872,14 +872,14 @@ header h1, header h2 {
  cursor: pointer;
  padding: 6px 12px;
  border-radius: 6px;
- background-color: var(--app-border, #6b4226); /* Dark brown for levels */
+ background-color: var(--app-button-bg, #6b4226); /* Dark brown for levels */
  color: var(--app-text, #ffdd99);
  font-weight: bold;
  transition: background 0.2s, transform 0.2s;
 }
 
 .spell-levels li:hover {
- background-color: var(--app-button-bg, #8b5a2b);
+ background-color: var(--app-accent-soft, rgba(212, 175, 55, 0.25));
  transform: translateY(-2px);
 }
 
@@ -896,7 +896,7 @@ header h1, header h2 {
 .spells-table table {
  width: 100%;
  border-collapse: collapse;
- background-color: rgba(69, 37, 16, 0.7);
+ background-color: var(--app-panel, rgba(69, 37, 16, 0.7));
  border-radius: 10px;
  overflow: hidden;
   border: 3px solid var(--app-border, #6b4226);
@@ -921,7 +921,7 @@ header h1, header h2 {
 }
 
 .spells-table tr:hover {
- background-color: rgba(212, 175, 55, 0.2);
+ background-color: var(--app-accent-soft, rgba(212, 175, 55, 0.2));
  cursor: pointer;
 }
 
@@ -1026,8 +1026,9 @@ header h1, header h2 {
 
 
 .expand-btn {
-  background: #deb887;
-  border: none;
+  background: var(--app-button-bg, #deb887);
+  color: var(--app-button-text, #3a1d0f);
+  border: 1px solid var(--app-border, #6b4226);
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
