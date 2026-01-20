@@ -122,6 +122,35 @@ const safeString = (value) => {
   return String(value);
 };
 
+const safeJsonArrayString = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return "[]";
+  }
+
+  if (Array.isArray(value)) {
+    return JSON.stringify(value);
+  }
+
+  if (typeof value === "object") {
+    return JSON.stringify([value]);
+  }
+
+  if (typeof value !== "string") {
+    return "[]";
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return JSON.stringify(parsed);
+    }
+  } catch {
+    return "[]";
+  }
+
+  return "[]";
+};
+
 const buildSavePayload = (profile) => ({
   id: profile.id ?? 0,
   characterName: safeString(profile.characterName),
@@ -198,7 +227,7 @@ const buildSavePayload = (profile) => ({
   treasure: safeString(profile.treasure),
   backstory: safeString(profile.backstory),
   portraitDataUrl: safeString(profile.portraitDataUrl),
-  equipment: typeof profile.equipment === "string" ? profile.equipment : JSON.stringify(profile.equipment ?? ""),
+  equipment: safeJsonArrayString(profile.equipment),
   attacks: JSON.stringify(profile.attacks || []),
   spellbook: JSON.stringify(profile.selectedSpells || []),
   featuresFeats: JSON.stringify(profile.generalEquipment || [])
