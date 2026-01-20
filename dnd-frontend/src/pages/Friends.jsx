@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+    getUser,
     getFriends,
     deleteFriend,
     searchFriends,
@@ -17,6 +18,7 @@ import {
 } from "../Api";
 import { Navbar } from "../components/Navbar";
 import Footer from "../components/Footer";
+import DirectMessagePopup from "../components/DirectMessagePopup";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/styles/Friends.css";
@@ -26,6 +28,8 @@ const Friends = () => {
     const token = localStorage.getItem("token");
 
     const [friends, setFriends] = useState([]);
+    const [meId, setMeId] = useState(null);
+    const [activeChat, setActiveChat] = useState(null);
     const [friendRequests, setFriendRequests] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -50,6 +54,7 @@ const Friends = () => {
             return;
         }
 
+        getUser(token).then(res => setMeId(res.data?.id ?? null));
         getFriends(token).then(res => setFriends(res.data || []));
         getFriendRequests(token).then(res => setFriendRequests(res.data || []));
     }, [token, navigate]);
@@ -159,7 +164,7 @@ const Friends = () => {
                                     className="me-2"
                                 />
                                 <img
-                                    src={friend.profile_picture || "/defaults/profile_picture.jpg"}
+                                    src={friend.profilePictureUrl || friend.profile_picture || "/defaults/profile_picture.jpg"}
                                     alt="Friend"
                                     className="friend-pic rounded-circle"
                                 />
@@ -172,7 +177,7 @@ const Friends = () => {
                                 ) : (
                                     <button className="btn btn-warning btn-sm me-1" onClick={() => handleBlockFriend(friend.id)}>Block</button>
                                 )}
-                                <button className="btn btn-primary btn-sm" onClick={() => alert(`Chat with ${friend.username}`)}>Chat</button>
+                                <button className="btn btn-primary btn-sm" onClick={() => setActiveChat(friend)}>Chat</button>
                             </li>
                         ))}
                     </ul>
@@ -180,6 +185,15 @@ const Friends = () => {
             </div>
 
             <Footer />
+
+            {activeChat && (
+                <DirectMessagePopup
+                    token={token}
+                    meId={meId}
+                    friend={activeChat}
+                    onClose={() => setActiveChat(null)}
+                />
+            )}
 
             {/* Friend Search Modal */}
             {friendSearchModal && (

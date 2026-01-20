@@ -1,7 +1,9 @@
 import axios from "axios";
 
+export const API_BASE = "https://api.dnd-tool.com";
+
 const api = axios.create({
-    baseURL: "https://api.dnd-tool.com/api",
+    baseURL: `${API_BASE}/api`,
     headers: {
         "Content-Type": "application/json"
     }
@@ -163,6 +165,11 @@ export const getMessages = (roomId) =>
 
 export const sendMessage = (roomId, content) =>
     api.post("/chat/send", content, { params: { roomId } });
+
+export const getDmHistory = (token, friendId) =>
+    api.get(`/dm/with/${friendId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
 
 
 export default api;

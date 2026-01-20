@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "../assets/styles/Login.css";
 import "../assets/styles/Footer.css";
 import Footer from "../components/Footer";
+import DirectMessagePopup from "../components/DirectMessagePopup";
 import {
     getUser,
     getFriends,
@@ -97,6 +98,7 @@ const Profile = () => {
     const [user, setUser] = useState(null);
     const [friends, setFriends] = useState([]);
     const [profilePic, setProfilePic] = useState("/defaults/profile_picture.jpg");
+    const [activeChat, setActiveChat] = useState(null);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [friendSearchModal, setFriendSearchModal] = useState(false);
@@ -484,7 +486,7 @@ const Profile = () => {
                                         {friends.map(friend => (
                                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
                                                 <img
-                                                    src={toAbsUrl(friend.profilePicture || friend.profile_picture || "/defaults/profile_picture.jpg")}
+                                                    src={toAbsUrl(friend.profilePictureUrl || friend.profilePicture || friend.profile_picture || "/defaults/profile_picture.jpg")}
                                                     alt="Friend"
                                                     className="friend-pic rounded-circle"
                                                 />
@@ -497,7 +499,7 @@ const Profile = () => {
                                                 </button>
                                                 <button
                                                     className="btn btn-primary btn-sm"
-                                                    onClick={() => alert(`Open chat with ${friend.username}`)}
+                                                    onClick={() => setActiveChat(friend)}
                                                 >
                                                     Chat
                                                 </button>
@@ -606,6 +608,15 @@ const Profile = () => {
                         </ul>
                     </div>
                 </div>
+            )}
+
+            {activeChat && (
+                <DirectMessagePopup
+                    token={token}
+                    meId={user?.id}
+                    friend={activeChat}
+                    onClose={() => setActiveChat(null)}
+                />
             )}
         </div>
     );
