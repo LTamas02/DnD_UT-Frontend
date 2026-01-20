@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllRaces, getRaceSizes, getRacesByMinSpeed, searchRacesByName } from "../../Api";
+import { getAllRaces, getRaceSizes } from "../../Api";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/WikiTheme.css";
 

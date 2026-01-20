@@ -8,7 +8,6 @@ export default function DamageTypesWiki() {
   const [damageTypes, setDamageTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedCards, setExpandedCards] = useState([]);
 
   useEffect(() => {
     const fetchDamageTypes = async () => {
@@ -39,41 +38,27 @@ export default function DamageTypesWiki() {
   if (damageTypes.length === 0)
     return <p>No damage types found. Check API server status.</p>;
 
-  const toggleCard = (index) => {
-    if (expandedCards.includes(index)) {
-      setExpandedCards(expandedCards.filter(i => i !== index));
-    } else {
-      setExpandedCards([...expandedCards, index]);
-    }
-  };
-
   return (
     <div id="damage-types-wiki" className="page-comp">
       <div className="page-overlay">
-
-        {/* Wax Seal Back Button */}
         <button onClick={() => navigate(-1)} className="back-button">
-          ← Back to Damage Types List
+          Back to Damage Types List
         </button>
 
         <h1>Damage Types</h1>
         <p>Browse all Dungeons & Dragons 5th Edition damage types.</p>
 
         <div className="wiki-grid">
-          {damageTypes.map(type => {
-            const isOpen = expandedCards.includes(type.index);
-            return (
-              <div key={type.index} className="wiki-card">
-                <div className="card-header" onClick={() => toggleCard(type.index)}>
-                  <div>
-                    <h2>{type.name}</h2>
-                    {type.desc && <p>{type.desc}</p>}
-                  </div>
+          {damageTypes.map(damage => (
+            <div key={damage.index} className="wiki-card">
+              <div className="card-header">
+                <div>
+                  <h2>{damage.name}</h2>
+                  {damage.desc && <p>{damage.desc}</p>}
                 </div>
-
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

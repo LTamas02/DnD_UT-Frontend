@@ -561,7 +561,6 @@ export default function DmtoolsMaps() {
       let cursor = xStart
       kids.forEach((childId) => {
         const childWidth = widthMap.get(childId) || 1
-        const childCenter = cursor + childWidth / 2
         assignPositions(childId, children, widthMap, positions, depth + 1, cursor)
         cursor += childWidth
       })

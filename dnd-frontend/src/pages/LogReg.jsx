@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../assets/styles/Login.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { sha256 } from 'js-sha256';
-import api, { register, login, getSalt, saltSend } from '../Api';
+import { register, login, getSalt, saltSend } from '../Api';
 import Footer from '../components/Footer';
 import { NavbarLogin } from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +11,7 @@ const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
-const LogReg = ({ setUsername, setProfilePicture, setIsAuthenticated }) => {
+const LogReg = ({ setIsAuthenticated }) => {
     const [errorMessage, setErrorMessage] = useState('');
 
     const [email, setEmail] = useState('');

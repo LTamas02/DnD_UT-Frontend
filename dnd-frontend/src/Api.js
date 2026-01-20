@@ -136,16 +136,6 @@ export const getMutualFriends = (token, otherUserId) =>
         headers: { "Authorization": `Bearer ${token}` }
     });
 
-export const getOnlineFriends = (token) =>
-    api.get("/friend/online", {
-        headers: { "Authorization": `Bearer ${token}` }
-    });
-
-export const getFriendNotifications = (token) =>
-    api.get("/friend/notifications", {
-        headers: { "Authorization": `Bearer ${token}` }
-    });
-
 export const inviteMultipleFriends = (token, userIds) =>
     api.post("/friend/invite-multiple", null, {
         headers: { "Authorization": `Bearer ${token}` },

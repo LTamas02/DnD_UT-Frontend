@@ -1,7 +1,7 @@
 
 import React from "react";
 import "../assets/styles/Navbar.css"; // Import your CSS file for styling
-import {href, Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import ppic from "../assets/img/profile_picture.jpg"; // Default profile picture
 
 const API_BASE = "https://api.dnd-tool.com";
@@ -13,7 +13,11 @@ const toAbsUrl = (url) => {
     return url;
 };
 
-const Navbar = ({username, profilePicture}) => {
+const Navbar = ({ username, profilePicture }) => {
+    const displayName = username || localStorage.getItem("username") || "Profile";
+    const storedPicture = localStorage.getItem("profilePicture");
+    const displayPicture = profilePicture || storedPicture || ppic;
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark">
             <div className="container-fluid">
@@ -68,10 +72,11 @@ const Navbar = ({username, profilePicture}) => {
                             <img
                                 className="profKep"
                                 id="profkep"
-                                src={toAbsUrl(localStorage.getItem("profilePicture") ?? ppic)}
+                                src={toAbsUrl(displayPicture)}
                                 style={{ width: "30px", height: "30px", borderRadius: "50%" }}
+                                alt=""
                             />
-                            {localStorage.getItem("username") || "Profile"}
+                            {displayName}
                         </Link>
                     </form>
                 </div>
@@ -80,7 +85,7 @@ const Navbar = ({username, profilePicture}) => {
     );
 };
 
-const NavbarProfile = ({username, profilePicture}) => {
+const NavbarProfile = ({ username, profilePicture }) => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark">
             <div className="container-fluid">

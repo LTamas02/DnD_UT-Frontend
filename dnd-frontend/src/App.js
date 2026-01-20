@@ -12,7 +12,7 @@ import DmtoolsLoot from "./pages/DmtoolsLoot";
 import DmtoolsMaps from "./pages/DmtoolsMaps";
 import Wiki from "./pages/Wiki";
 import Friends from "./pages/Friends";
-import { Navbar, NavbarLogin, NavbarProfile } from "./components/Navbar";
+import { Navbar, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
 import Spells from "./pages/wikiPages/Spells";
 import Spell from "./pages/wikiPages/Spell";
@@ -89,7 +89,7 @@ function App() {
     } else {
       setLoading(false); // <-- No token, done loading
     }
-  }, []);
+  }, [token]);
 
   if (loading) return null; // or a loading spinner
 
@@ -126,7 +126,7 @@ function AppWithRouter({
       ) : null}
 
       <Routes>
-        <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} setUsername={setUsername} setProfilePicture={setProfilePicture} />} />
+        <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="*" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/logreg" />} />

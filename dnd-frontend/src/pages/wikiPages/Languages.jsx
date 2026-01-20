@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAllLanguages } from '../../Api';
 import '../../assets/styles/WikiTheme.css';
-import { useNavigate } from 'react-router-dom';
 
 export default function LanguagesWiki() {
+  const navigate = useNavigate();
   const [languages, setLanguages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedCards, setExpandedCards] = useState([]); // track expanded cards
-  
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -40,45 +38,27 @@ export default function LanguagesWiki() {
   if (languages.length === 0)
     return <p>No languages found. Check API server status.</p>;
 
-  const toggleCard = (index) => {
-    if (expandedCards.includes(index)) {
-      setExpandedCards(expandedCards.filter(i => i !== index));
-    } else {
-      setExpandedCards([...expandedCards, index]);
-    }
-  };
-
   return (
     <div id="languages-wiki" className="page-comp">
       <div className="page-overlay">
-        {/* Wax Seal Back Button */}
         <button onClick={() => navigate(-1)} className="back-button">
-          ← Back to Backgrounds List
+          Back to Languages List
         </button>
 
         <h1>Languages</h1>
-        <p>Browse all Dungeons & Dragons 5th Edition languages and their details.</p>
+        <p>Browse all Dungeons & Dragons 5th Edition languages.</p>
 
         <div className="wiki-grid">
-          {languages.map(lang => {
-            const isOpen = expandedCards.includes(lang.index);
-            return (
-              <div key={lang.index} className="wiki-card">
-                <div className="card-header" onClick={() => toggleCard(lang.index)}>
-                  <h2>{lang.name}</h2>
+          {languages.map(language => (
+            <div key={language.index} className="wiki-card">
+              <div className="card-header">
+                <div>
+                  <h2>{language.name}</h2>
+                  {language.desc && <p>{language.desc}</p>}
                 </div>
-
-                
-                  <div className="card-body">
-                    {lang.desc && (
-                      Array.isArray(lang.desc)
-                        ? lang.desc.map((d, i) => <p key={i}>{d}</p>)
-                        : <p>{lang.desc}</p>
-                    )}
-                  </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>

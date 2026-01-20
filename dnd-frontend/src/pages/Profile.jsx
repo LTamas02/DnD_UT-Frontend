@@ -111,6 +111,7 @@ const Profile = () => {
     const [theme, setTheme] = useState(DEFAULT_THEME);
     const themeReadyRef = React.useRef(false);
     const themeSaveTimerRef = React.useRef(null);
+    const themeRef = React.useRef(theme);
 
     useEffect(() => {
         if (!token) {
@@ -150,6 +151,7 @@ const Profile = () => {
     }, []);
 
     useEffect(() => {
+        themeRef.current = theme;
         localStorage.setItem(THEME_KEY, JSON.stringify(theme));
         applyTheme(theme);
     }, [theme]);
@@ -175,7 +177,7 @@ const Profile = () => {
                 if (cancelled) return;
                 themeReadyRef.current = true;
                 if (!hasServerTheme) {
-                    updateProfileTheme(token, theme).catch(err =>
+                    updateProfileTheme(token, themeRef.current).catch(err =>
                         console.error("Error saving profile theme:", err)
                     );
                 }
