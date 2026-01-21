@@ -6,14 +6,17 @@ import "../assets/styles/Login.css";
 import "../assets/styles/Footer.css";
 import Footer from "../components/Footer";
 import DirectMessagePopup from "../components/DirectMessagePopup";
+import { sha256 } from "js-sha256";
 import {
     getUser,
     getFriends,
     deleteFriend,
     searchFriends,
     addFriend,
+    getSalt,
     getFriendRequests,
     respondFriendRequest,
+    updateProfile,
     updateProfilePicture,
     updateProfilePictureFile,
     getProfileTheme,
@@ -91,7 +94,7 @@ const toAbsUrl = (url) => {
     return url;
 };
 
-const Profile = () => {
+const Profile = ({ onStartTutorial }) => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
@@ -100,7 +103,17 @@ const Profile = () => {
     const [profilePic, setProfilePic] = useState("/defaults/profile_picture.jpg");
     const [activeChat, setActiveChat] = useState(null);
 
-    const [modalVisible, setModalVisible] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const [settingsTab, setSettingsTab] = useState("profile");
+    const [settingsError, setSettingsError] = useState("");
+    const [settingsNote, setSettingsNote] = useState("");
+    const [settingsSaving, setSettingsSaving] = useState(false);
+    const [profileForm, setProfileForm] = useState({ username: "", email: "" });
+    const [passwordForm, setPasswordForm] = useState({
+        current: "",
+        next: "",
+        confirm: ""
+    });
     const [friendSearchModal, setFriendSearchModal] = useState(false);
     const [friendRequestsModal, setFriendRequestsModal] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
@@ -138,6 +151,14 @@ const Profile = () => {
             .then(res => setFriendRequests(res.data || []))
             .catch(err => console.error("Error loading friend requests:", err));
     }, [token, navigate]);
+
+    useEffect(() => {
+        if (!user) return;
+        setProfileForm({
+            username: user.username || "",
+            email: user.email || ""
+        });
+    }, [user]);
 
     useEffect(() => {
         const raw = localStorage.getItem(THEME_KEY);
@@ -208,6 +229,8 @@ const Profile = () => {
         };
     }, [theme, token]);
 
+    const computeClientHash = (plainPassword, salt) => sha256(plainPassword + salt);
+
     const logout = () => {
         localStorage.removeItem("token");
         navigate("/logreg");
@@ -223,8 +246,13 @@ const Profile = () => {
             .catch(err => console.error("Error removing friend:", err));
     };
 
-    const openModal = () => setModalVisible(true);
-    const closeModal = () => setModalVisible(false);
+    const openSettings = () => {
+        setSettingsOpen(true);
+        setSettingsTab("profile");
+        setSettingsError("");
+        setSettingsNote("");
+    };
+    const closeSettings = () => setSettingsOpen(false);
 
     const openFriendSearch = () => setFriendSearchModal(true);
     const closeFriendSearch = () => setFriendSearchModal(false);
@@ -237,7 +265,9 @@ const Profile = () => {
         try {
             await updateProfilePicture(token, nextPicture);
             setProfilePic(nextPicture);
-            closeModal();
+            localStorage.setItem("profilePicture", nextPicture);
+            setUser((prev) => (prev ? { ...prev, profilePictureUrl: nextPicture } : prev));
+            setSettingsNote("Profile picture updated.");
         } catch (err) {
             console.error("Error updating profile picture:", err);
             alert("Failed to update profile picture.");
@@ -251,7 +281,9 @@ const Profile = () => {
             const res = await updateProfilePictureFile(token, file);
             const nextPicture = res.data?.profilePicture || res.data?.profilePictureUrl || profilePic;
             setProfilePic(nextPicture);
-            closeModal();
+            localStorage.setItem("profilePicture", nextPicture);
+            setUser((prev) => (prev ? { ...prev, profilePictureUrl: nextPicture } : prev));
+            setSettingsNote("Profile picture updated.");
         } catch (err) {
             console.error("Error uploading profile picture:", err);
             alert("Failed to upload profile picture.");
@@ -292,6 +324,104 @@ const Profile = () => {
             .catch(err => console.error("Error responding to friend request:", err));
     };
 
+    const handleSaveProfile = async () => {
+        if (!token || !user) return;
+        setSettingsError("");
+        setSettingsNote("");
+
+        const nextUsername = profileForm.username.trim();
+        const nextEmail = profileForm.email.trim();
+        const payload = {};
+
+        if (nextUsername && nextUsername !== user.username) {
+            payload.username = nextUsername;
+        }
+        if (nextEmail && nextEmail !== user.email) {
+            payload.email = nextEmail;
+        }
+
+        if (Object.keys(payload).length === 0) {
+            setSettingsNote("No profile changes to save.");
+            return;
+        }
+
+        if (payload.email && !passwordForm.current) {
+            setSettingsError("Current password is required to change email.");
+            return;
+        }
+
+        setSettingsSaving(true);
+        try {
+            if (payload.email) {
+                const saltRes = await getSalt(user.email);
+                const salt = saltRes?.data?.salt;
+                if (!salt) {
+                    setSettingsError("Salt not found for this account.");
+                    setSettingsSaving(false);
+                    return;
+                }
+                payload.currentPassword = computeClientHash(passwordForm.current, salt);
+            }
+
+            const res = await updateProfile(token, payload);
+            if (res?.data) {
+                setUser(res.data);
+                setProfileForm({
+                    username: res.data.username || "",
+                    email: res.data.email || ""
+                });
+                localStorage.setItem("username", res.data.username || "");
+            }
+            setSettingsNote("Profile updated.");
+        } catch (err) {
+            const msg = err?.response?.data || "Failed to update profile.";
+            setSettingsError(msg);
+        } finally {
+            setSettingsSaving(false);
+        }
+    };
+
+    const handleUpdatePassword = async () => {
+        if (!token || !user) return;
+        setSettingsError("");
+        setSettingsNote("");
+
+        if (!passwordForm.current || !passwordForm.next || !passwordForm.confirm) {
+            setSettingsError("Fill in all password fields.");
+            return;
+        }
+
+        if (passwordForm.next !== passwordForm.confirm) {
+            setSettingsError("New password and confirmation do not match.");
+            return;
+        }
+
+        setSettingsSaving(true);
+        try {
+            const saltRes = await getSalt(user.email);
+            const salt = saltRes?.data?.salt;
+            if (!salt) {
+                setSettingsError("Salt not found for this account.");
+                setSettingsSaving(false);
+                return;
+            }
+
+            const payload = {
+                currentPassword: computeClientHash(passwordForm.current, salt),
+                newPassword: computeClientHash(passwordForm.next, salt)
+            };
+
+            await updateProfile(token, payload);
+            setPasswordForm({ current: "", next: "", confirm: "" });
+            setSettingsNote("Password updated.");
+        } catch (err) {
+            const msg = err?.response?.data || "Failed to update password.";
+            setSettingsError(msg);
+        } finally {
+            setSettingsSaving(false);
+        }
+    };
+
     const themeVars = {
         "--profile-bg-image": theme.bgImage ? `url("${theme.bgImage}")` : undefined,
         "--profile-bg-gradient": theme.bgGradient,
@@ -316,7 +446,7 @@ const Profile = () => {
     return (
         <div id="profile-comp" style={themeVars}>
 
-            <div className="container">
+            <div className="container profile-shell">
                 <div className="row justify-content-center">
                     <div className="col-md-6">
                         <div className="profile-box text-center">
@@ -326,15 +456,21 @@ const Profile = () => {
                                 className="profile-pic mb-3"
                             />
                             <h2 className="username">{user?.username || "Loading..."}</h2>
-                            <div className="d-flex justify-content-center gap-2 mt-2">
-                                <button className="btn btn-outline-primary" onClick={openModal}>
-                                    Change Picture
+                            <div className="d-flex justify-content-center gap-2 mt-2 profile-actions">
+                                <button className="btn btn-outline-primary" onClick={openSettings}>
+                                    Settings
                                 </button>
-                                <button className="btn btn-outline-danger" onClick={logout}>
-                                    Logout
-                                </button>
-                            </div>
+                            <button className="btn btn-outline-danger" onClick={logout}>
+                                Logout
+                            </button>
+                            <button
+                                className="btn btn-outline-info"
+                                onClick={() => onStartTutorial?.()}
+                            >
+                                Restart tutorial
+                            </button>
                         </div>
+                    </div>
                     </div>
                 </div>
 
@@ -517,30 +653,358 @@ const Profile = () => {
 
             <Footer />
 
-            {modalVisible && (
-                <div className="profile-modal">
-                    <div className="profile-modal-content">
-                        <span className="close-btn" onClick={closeModal}>&times;</span>
-                        <h2>Select a Profile Picture</h2>
-                        <label className="btn btn-primary mb-3">
-                            Upload your own
-                            <input
-                                type="file"
-                                accept="image/*"
-                                style={{ display: "none" }}
-                                onChange={handleUploadProfilePicture}
-                            />
-                        </label>
-                        <div className="image-options d-flex flex-wrap gap-2">
-                            {["profile1.jpg", "profile2.jpg", "profile3.jpg"].map(img => (
-                                <img
-                                    key={img}
-                                    src={`/defaults/${img}`}
-                                    alt="Default Profile"
-                                    className="selectable-pic"
-                                    onClick={() => selectImage(img)}
-                                />
+            {settingsOpen && (
+                <div className="profile-modal profile-settings-modal">
+                    <div className="profile-modal-content profile-settings-card">
+                        <span className="close-btn" onClick={closeSettings}>&times;</span>
+                        <div className="profile-settings-header">
+                            <div>
+                                <h2>Settings</h2>
+                                <p>Update your account, theme, and avatar.</p>
+                            </div>
+                            <div className="profile-settings-status">
+                                {settingsError && (
+                                    <div className="profile-settings-alert is-error">
+                                        {settingsError}
+                                    </div>
+                                )}
+                                {settingsNote && (
+                                    <div className="profile-settings-alert">
+                                        {settingsNote}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="profile-settings-tabs">
+                            {[
+                                { id: "profile", label: "Profile" },
+                                { id: "security", label: "Security" },
+                                { id: "theme", label: "Theme" },
+                                { id: "picture", label: "Picture" }
+                            ].map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    className={`profile-settings-tab ${
+                                        settingsTab === tab.id ? "is-active" : ""
+                                    }`}
+                                    onClick={() => {
+                                        setSettingsTab(tab.id);
+                                        setSettingsError("");
+                                        setSettingsNote("");
+                                    }}
+                                >
+                                    {tab.label}
+                                </button>
                             ))}
+                        </div>
+
+                        <div className="profile-settings-body">
+                            {settingsTab === "profile" && (
+                                <div className="profile-settings-section">
+                                    <h3>Account Info</h3>
+                                    <div className="profile-form-grid">
+                                        <label className="profile-form-field">
+                                            Username
+                                            <input
+                                                type="text"
+                                                value={profileForm.username}
+                                                onChange={(event) =>
+                                                    setProfileForm((prev) => ({
+                                                        ...prev,
+                                                        username: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-form-field">
+                                            Email
+                                            <input
+                                                type="email"
+                                                value={profileForm.email}
+                                                onChange={(event) =>
+                                                    setProfileForm((prev) => ({
+                                                        ...prev,
+                                                        email: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-form-field">
+                                            Current password
+                                            <input
+                                                type="password"
+                                                value={passwordForm.current}
+                                                onChange={(event) =>
+                                                    setPasswordForm((prev) => ({
+                                                        ...prev,
+                                                        current: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+                                    <p className="profile-settings-hint">
+                                        Current password is required to change email.
+                                    </p>
+                                    <button
+                                        className="profile-action primary"
+                                        onClick={handleSaveProfile}
+                                        disabled={settingsSaving}
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            )}
+
+                            {settingsTab === "security" && (
+                                <div className="profile-settings-section">
+                                    <h3>Change Password</h3>
+                                    <div className="profile-form-grid">
+                                        <label className="profile-form-field">
+                                            Current password
+                                            <input
+                                                type="password"
+                                                value={passwordForm.current}
+                                                onChange={(event) =>
+                                                    setPasswordForm((prev) => ({
+                                                        ...prev,
+                                                        current: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-form-field">
+                                            New password
+                                            <input
+                                                type="password"
+                                                value={passwordForm.next}
+                                                onChange={(event) =>
+                                                    setPasswordForm((prev) => ({
+                                                        ...prev,
+                                                        next: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-form-field">
+                                            Confirm new password
+                                            <input
+                                                type="password"
+                                                value={passwordForm.confirm}
+                                                onChange={(event) =>
+                                                    setPasswordForm((prev) => ({
+                                                        ...prev,
+                                                        confirm: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+                                    <button
+                                        className="profile-action primary"
+                                        onClick={handleUpdatePassword}
+                                        disabled={settingsSaving}
+                                    >
+                                        Update Password
+                                    </button>
+                                </div>
+                            )}
+
+                            {settingsTab === "theme" && (
+                                <section className="profile-customizer profile-customizer-modal">
+                                    <div className="profile-customizer-header">
+                                        <div>
+                                            <h3>Theme Forge</h3>
+                                            <p>Customize colors, background, and surfaces.</p>
+                                        </div>
+                                        <button
+                                            className="profile-reset"
+                                            onClick={() => setTheme(DEFAULT_THEME)}
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+
+                                    <div className="profile-presets">
+                                        {THEME_PRESETS.map((preset) => (
+                                            <button
+                                                key={preset.id}
+                                                className="profile-preset"
+                                                onClick={() =>
+                                                    setTheme((prev) => ({ ...prev, ...preset.theme }))
+                                                }
+                                            >
+                                                {preset.name}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="profile-customizer-grid">
+                                        <label className="profile-field">
+                                            Accent
+                                            <input
+                                                type="color"
+                                                value={theme.accent}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        accent: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            Text
+                                            <input
+                                                type="color"
+                                                value={theme.text}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        text: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            Muted
+                                            <input
+                                                type="color"
+                                                value={theme.muted}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        muted: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            Card
+                                            <input
+                                                type="color"
+                                                value={theme.cardBg}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        cardBg: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            Panel
+                                            <input
+                                                type="color"
+                                                value={theme.panelBg}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        panelBg: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            Buttons
+                                            <input
+                                                type="color"
+                                                value={theme.buttonBg}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        buttonBg: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div className="profile-customizer-grid profile-customizer-grid-wide">
+                                        <label className="profile-field wide">
+                                            Background image URL
+                                            <input
+                                                type="text"
+                                                value={theme.bgImage}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        bgImage: event.target.value
+                                                    }))
+                                                }
+                                                placeholder="https://..."
+                                                className="profile-text-input"
+                                            />
+                                        </label>
+                                        <label className="profile-field wide">
+                                            Background gradient
+                                            <select
+                                                value={theme.bgGradient}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        bgGradient: event.target.value
+                                                    }))
+                                                }
+                                            >
+                                                <option value="linear-gradient(130deg, rgba(10,6,4,0.75), rgba(64,36,18,0.85))">
+                                                    Smoked amber
+                                                </option>
+                                                <option value="linear-gradient(135deg, rgba(6,12,10,0.9), rgba(18,60,48,0.85))">
+                                                    Verdant shadow
+                                                </option>
+                                                <option value="linear-gradient(140deg, rgba(8,8,16,0.9), rgba(40,28,72,0.88))">
+                                                    Arcane night
+                                                </option>
+                                                <option value="linear-gradient(135deg, rgba(255,242,224,0.85), rgba(218,170,110,0.82))">
+                                                    Sunlit vellum
+                                                </option>
+                                                <option value="linear-gradient(120deg, rgba(15,20,30,0.82), rgba(10,10,10,0.9))">
+                                                    Inked steel
+                                                </option>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </section>
+                            )}
+
+                            {settingsTab === "picture" && (
+                                <div className="profile-settings-section">
+                                    <h3>Profile Picture</h3>
+                                    <div className="profile-picture-grid">
+                                        <div className="profile-picture-preview">
+                                            <img src={toAbsUrl(profilePic)} alt="Profile" />
+                                            <span>Current avatar</span>
+                                        </div>
+                                        <div className="profile-picture-actions">
+                                            <label className="profile-action primary">
+                                                Upload image
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    style={{ display: "none" }}
+                                                    onChange={handleUploadProfilePicture}
+                                                />
+                                            </label>
+                                            <p className="profile-settings-hint">
+                                                Choose a default crest or upload your own.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="image-options d-flex flex-wrap gap-2">
+                                        {["profile1.jpg", "profile2.jpg", "profile3.jpg"].map(img => (
+                                            <img
+                                                key={img}
+                                                src={`/defaults/${img}`}
+                                                alt="Default Profile"
+                                                className="selectable-pic"
+                                                onClick={() => selectImage(img)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

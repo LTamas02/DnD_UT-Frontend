@@ -1,6 +1,6 @@
 import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getUser, getProfileTheme } from "./Api";
+import { getUser, getProfileTheme, completeTutorial } from "./Api";
 import { DEFAULT_THEME, THEME_KEY, applyTheme } from "./theme";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
@@ -30,6 +30,7 @@ import Background from './pages/wikiPages/Background'
 import DmtoolsNpcs from "./pages/DmtoolsNpcs";
 import VttLobby from "./pages/VttLobby";
 import VttSession from "./pages/VttSession";
+import TutorialOverlay from "./components/TutorialOverlay";
 
 import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
 import Alignment from "./pages/wikiPages/Alignments";
@@ -46,6 +47,7 @@ function App() {
   const [profilePicture, setProfilePicture] = useState("");
   const [loading, setLoading] = useState(true); // <-- Add loading state
   const [globalLoading, setGlobalLoading] = useState(false);
+  const [hasCompletedTutorial, setHasCompletedTutorial] = useState(true);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -78,6 +80,7 @@ function App() {
           if (res.data.id != null) {
             localStorage.setItem("userId", res.data.id);
           }
+          setHasCompletedTutorial(res.data.hasCompletedTutorial ?? true);
 
           getProfileTheme(token)
             .then(themeRes => {
@@ -93,6 +96,7 @@ function App() {
         })
         .catch(() => {
           setIsAuthenticated(false);
+          setHasCompletedTutorial(true);
           localStorage.removeItem("token");
         })
         .finally(() => setLoading(false)); // <-- Set loading to false after check
@@ -120,6 +124,14 @@ function App() {
         setIsAuthenticated={setIsAuthenticated}
         setUsername={setUsername}
         setProfilePicture={setProfilePicture}
+        hasCompletedTutorial={hasCompletedTutorial}
+        onTutorialComplete={() => {
+          setHasCompletedTutorial(true);
+          if (token) {
+            completeTutorial(token).catch(() => {});
+          }
+        }}
+        onTutorialStart={() => window.dispatchEvent(new CustomEvent("tutorial:start"))}
       />
       <LoadingOverlay active={globalLoading} />
     </BrowserRouter>
@@ -132,7 +144,10 @@ function AppWithRouter({
   profilePicture,
   setIsAuthenticated,
   setUsername,
-  setProfilePicture
+  setProfilePicture,
+  hasCompletedTutorial,
+  onTutorialComplete,
+  onTutorialStart
 }) {
   const location = useLocation();
 
@@ -144,11 +159,23 @@ function AppWithRouter({
         <Navbar username={username} profilePicture={profilePicture} />
       ) : null}
 
+      <TutorialOverlay
+        isAuthenticated={isAuthenticated}
+        username={username}
+        hasCompletedTutorial={hasCompletedTutorial}
+        onComplete={onTutorialComplete}
+      />
+
       <Routes>
         <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="*" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
-        <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/logreg" />} />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? <Profile onStartTutorial={onTutorialStart} /> : <Navigate to="/logreg" />
+          }
+        />
         <Route path="/friends" element={isAuthenticated ? <Friends /> : <Navigate to="/logreg" />} />
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
         <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />

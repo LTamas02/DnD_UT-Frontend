@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Source+Serif+4:wght@400;600&family=Uncial+Antiqua&display=swap");
+
 /*
  * 🏛️ Teljes oldal konténer: Háttér és alapbetűtípus 🏛️
  * A profil komponens (ID) határozza meg a teljes oldal textúráját.
@@ -327,5 +329,294 @@
 
     .profile-field.wide {
         grid-column: span 1;
+    }
+}
+
+/* === Profile Refresh === */
+#profile-comp {
+    font-family: "Source Serif 4", "IM Fell English SC", serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+#profile-comp::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("https://www.transparenttextures.com/patterns/old-wall.png");
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+#profile-comp::after {
+    content: "";
+    position: fixed;
+    inset: -10%;
+    background: radial-gradient(circle at 15% 20%, rgba(255, 204, 128, 0.18), transparent 55%);
+    opacity: 0.8;
+    pointer-events: none;
+    animation: profile-embers 16s ease-in-out infinite;
+}
+
+.profile-shell {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    padding: 36px 16px 60px;
+}
+
+.profile-box {
+    position: relative;
+    overflow: hidden;
+    animation: profile-fade 0.7s ease both;
+}
+
+.profile-box::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(255, 204, 128, 0.12), transparent 60%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.profile-pic {
+    animation: profile-float 6s ease-in-out infinite;
+}
+
+.profile-actions .btn {
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-weight: 600;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.profile-customizer,
+.allies-section {
+    animation: profile-fade 0.8s ease both;
+}
+
+.profile-customizer:not(.profile-customizer-modal) {
+    display: none;
+}
+
+.friends-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.friend {
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.friend span {
+    margin-left: 12px;
+}
+
+.profile-modal {
+    background: rgba(8, 6, 4, 0.8);
+    backdrop-filter: blur(6px);
+}
+
+.profile-modal-content {
+    background: rgba(22, 14, 10, 0.95);
+    color: var(--profile-text, #ffe0b2);
+    border: 1px solid rgba(255, 210, 150, 0.2);
+}
+
+.profile-settings-card {
+    max-width: 900px;
+    max-height: 85vh;
+    overflow: auto;
+}
+
+.profile-settings-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.profile-settings-status {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profile-settings-alert {
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 3px solid var(--profile-accent, #ffcc80);
+    font-size: 0.9rem;
+}
+
+.profile-settings-alert.is-error {
+    border-left-color: #ff6b6b;
+    color: #ffd3d3;
+}
+
+.profile-settings-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 0;
+}
+
+.profile-settings-tab {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--profile-text, #ffe7c2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.profile-settings-tab.is-active {
+    border-color: var(--profile-accent, #ffcc80);
+    box-shadow: 0 0 12px rgba(255, 204, 128, 0.35);
+}
+
+.profile-settings-body {
+    display: grid;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.profile-settings-section {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.profile-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.profile-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--profile-muted, #c9a980);
+    font-size: 0.9rem;
+}
+
+.profile-form-field input {
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--profile-text, #ffe7c2);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.profile-settings-hint {
+    color: var(--profile-muted, #c9a980);
+    font-size: 0.85rem;
+    margin-top: 10px;
+}
+
+.profile-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--profile-text, #ffe7c2);
+    cursor: pointer;
+}
+
+.profile-action.primary {
+    background: var(--profile-button-bg, #795548);
+    color: var(--profile-button-text, #fff8e1);
+    border-color: rgba(255, 204, 128, 0.35);
+}
+
+.profile-action.ghost {
+    background: transparent;
+    color: var(--profile-text, #ffe7c2);
+}
+
+.profile-picture-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.profile-picture-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--profile-muted, #c9a980);
+}
+
+.profile-picture-preview img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--profile-accent, #ffcc80);
+    object-fit: cover;
+    box-shadow: 0 0 15px rgba(255, 204, 128, 0.4);
+}
+
+@keyframes profile-fade {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes profile-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes profile-embers {
+    0% {
+        transform: translate3d(-2%, -2%, 0);
+    }
+    50% {
+        transform: translate3d(2%, 1%, 0);
+    }
+    100% {
+        transform: translate3d(-2%, -2%, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #profile-comp::after,
+    .profile-box,
+    .profile-customizer,
+    .allies-section,
+    .profile-pic {
+        animation: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-picture-grid {
+        grid-template-columns: 1fr;
     }
 }

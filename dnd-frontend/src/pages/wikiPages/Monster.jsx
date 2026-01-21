@@ -1,7 +1,25 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMonsterByIndex } from "../../Api";
+import { API_BASE, getMonsterByIndex } from "../../Api";
 import "../../assets/styles/WikiTheme.css";
+
+const resolveMonsterImageName = (name) => {
+  if (!name) return null;
+  const baseName = name.split("/")[0].split(",")[0].trim();
+  return baseName ? `${baseName}.png` : null;
+};
+
+const getMonsterImageSrc = (monster) => {
+  if (!monster) return null;
+  if (monster.image && /^https?:\/\//i.test(monster.image)) {
+    return monster.image;
+  }
+
+  const fileName = resolveMonsterImageName(monster.name);
+  if (!fileName) return null;
+
+  return `${API_BASE}/images/${encodeURIComponent(fileName)}`;
+};
 
 export default function Monster() {
   const { index } = useParams();
@@ -36,6 +54,7 @@ export default function Monster() {
     { label: "WIS", value: monster.wisdom },
     { label: "CHA", value: monster.charisma },
   ];
+  const imageSrc = getMonsterImageSrc(monster);
 
   return (
     <div id="monster-comp" className="monster-page-container">
@@ -47,8 +66,8 @@ export default function Monster() {
         <div className="monster-detail-card">
           <div className="monster-header">
             <h2>{monster.name}</h2>
-            {monster.image ? (
-              <img src={monster.image} alt={monster.name} className="monster-image" />
+            {imageSrc ? (
+              <img src={imageSrc} alt={monster.name} className="monster-image" />
             ) : (
               <div className="no-image">No Image Available</div>
             )}

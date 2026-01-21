@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../assets/styles/BooksLibrary.css";
-import { getMarkdownBooks, getMarkdownBookContentSilent } from "../Api";
+import { API_BASE, getMarkdownBooks, getMarkdownBookContentSilent } from "../Api";
 import { hasCachedBookContent, setCachedBookContent } from "../bookCache";
 
 const normalizeTitle = (title) =>
@@ -33,6 +33,12 @@ const getBucket = (title) => {
   if ("QRST".includes(first)) return "Q-T";
   if ("UVWXYZ".includes(first)) return "U-Z";
   return "Other";
+};
+
+const resolveBookCoverUrl = (coverPath = "") => {
+  if (!coverPath) return "";
+  const normalized = coverPath.startsWith("/") ? coverPath : `/${coverPath}`;
+  return `${API_BASE}${normalized}`;
 };
 
 const BooksLibrary = () => {
@@ -321,16 +327,29 @@ const BooksLibrary = () => {
                         const updated = book.lastModifiedUtc
                           ? new Date(book.lastModifiedUtc).toLocaleDateString()
                           : "";
+                        const coverUrl = resolveBookCoverUrl(book.coverImagePath);
+                        const displayTitle = book.displayTitle || book.title || book.fileName;
                         return (
                           <Link
                             key={book.fileName}
                             to={`/books/rules/${encodeURIComponent(book.fileName)}`}
                             className="books-library-book"
                           >
-                            <div>
-                              <div className="books-library-book-title">
-                                {book.displayTitle || book.title || book.fileName}
-                              </div>
+                            <div className="books-library-book-cover">
+                              {coverUrl ? (
+                                <img
+                                  src={coverUrl}
+                                  alt={`${displayTitle} cover`}
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="books-library-book-cover-placeholder">
+                                  No image
+                                </div>
+                              )}
+                            </div>
+                            <div className="books-library-book-body">
+                              <div className="books-library-book-title">{displayTitle}</div>
                               <div className="books-library-book-meta">
                                 {updated ? `Updated ${updated}` : "Update date unknown"}
                               </div>

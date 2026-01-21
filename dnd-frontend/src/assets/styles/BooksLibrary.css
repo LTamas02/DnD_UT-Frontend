@@ -238,6 +238,45 @@
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
+.books-library-book-cover {
+  width: 86px;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--books-panel);
+  border: 1px solid var(--books-border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.books-library-book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.books-library-book-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--books-ink-muted);
+  padding: 6px;
+  text-align: center;
+}
+
+.books-library-book-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .books-library-book:hover {
   border-color: var(--books-accent);
   background: var(--books-highlight);

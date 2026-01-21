@@ -354,4 +354,66 @@ body, html {
 .small-input {
     width: auto !important;
     min-width: 50px;
+}/* Skills table layout */
+.skills-grid {
+    display: grid;
+    gap: 6px;
+    margin-top: 10px;
+}
+.skills-grid-header,
+.skill-row {
+    display: grid;
+    grid-template-columns: 2fr 80px 90px 90px 80px;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    color: var(--app-text, #ffdd99);
+}
+.skills-grid-header {
+    background: rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--app-border, #6b4226);
+}
+.skill-row {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.skill-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.05);
+}
+.skill-name {
+    display:flex;
+    flex-direction:column;
+    gap: 2px;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+.skill-ability-abbrev {
+    font-size: 0.7em;
+    color: var(--app-accent, #d4af37);
+    letter-spacing: 0.08em;
+}
+.skill-ability-score,
+.skill-total {
+    text-align: center;
+    font-weight: bold;
+}
+.skill-checkbox {
+    display:flex;
+    align-items:center;
+    gap:4px;
+    font-size: 0.85em;
+    color: var(--app-text, #ffdd99);
+}
+.skill-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--app-accent, #d4af37);
+}
+@media (max-width: 900px) {
+    .skills-grid-header,
+    .skill-row {
+        grid-template-columns: 1.5fr 60px 80px 80px 60px;
+    }
 }

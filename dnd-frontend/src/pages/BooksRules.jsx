@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "../assets/styles/BooksRules.css";
-import { getMarkdownBooks, getMarkdownBookContent } from "../Api";
+import { API_BASE, getMarkdownBooks, getMarkdownBookContent } from "../Api";
 import { getCachedBookContent, setCachedBookContent } from "../bookCache";
 
 const createSlugger = () => {
@@ -29,9 +29,16 @@ const getNodeText = (node) => {
   return "";
 };
 
+const resolveMarkdownImageSrc = (src) => {
+  if (!src) return "";
+  if (/^https?:\/\//i.test(src) || /^data:/i.test(src)) return src;
+  const normalized = src.startsWith("/") ? src : `/${src}`;
+  return `${API_BASE}${normalized}`;
+};
+
 const MarkdownImage = ({ src = "", alt = "" }) => {
-  const isRemote = /^https?:\/\//i.test(src);
-  if (!isRemote) {
+  const resolvedSrc = resolveMarkdownImageSrc(src);
+  if (!resolvedSrc) {
     return (
       <figure className="books-rules-figure">
         <div className="books-rules-missing-image">Image unavailable</div>
@@ -42,7 +49,7 @@ const MarkdownImage = ({ src = "", alt = "" }) => {
 
   return (
     <figure className="books-rules-figure">
-      <img src={src} alt={alt || "Book illustration"} loading="lazy" />
+      <img src={resolvedSrc} alt={alt || "Book illustration"} loading="lazy" />
       {alt ? <figcaption>{alt}</figcaption> : null}
     </figure>
   );

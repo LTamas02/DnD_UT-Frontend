@@ -31,6 +31,13 @@ export default function VttSession() {
     const [meId, setMeId] = useState(storedUserId ? Number(storedUserId) : null);
     const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
     const [zoom, setZoom] = useState(1);
+    const [panMode, setPanMode] = useState(false);
+    const [showGrid, setShowGrid] = useState(true);
+    const [drawMode, setDrawMode] = useState(false);
+    const [eraseMode, setEraseMode] = useState(false);
+    const [pinMode, setPinMode] = useState(false);
+    const [drawings, setDrawings] = useState([]);
+    const [pins, setPins] = useState([]);
     const [isPanning, setIsPanning] = useState(false);
     const [spacePressed, setSpacePressed] = useState(false);
     const [pingMode, setPingMode] = useState(false);
@@ -62,8 +69,18 @@ export default function VttSession() {
     const panRef = useRef(null);
     const scrollRef = useRef(null);
     const rulerRef = useRef(null);
+    const drawRef = useRef(null);
 
     const isDm = role === "DM";
+    const panActive = panMode || spacePressed;
+    const isSelectMode = !(
+        panMode ||
+        pingMode ||
+        rulerMode ||
+        drawMode ||
+        eraseMode ||
+        pinMode
+    );
     const supportsPointer = typeof window !== "undefined" && "PointerEvent" in window;
 
     useEffect(() => {
@@ -94,8 +111,13 @@ export default function VttSession() {
             if (event.key === "Escape") {
                 setPingMode(false);
                 setRulerMode(false);
+                setPanMode(false);
+                setDrawMode(false);
+                setEraseMode(false);
+                setPinMode(false);
                 setRuler(null);
                 rulerRef.current = null;
+                drawRef.current = null;
             }
         };
 
@@ -124,6 +146,13 @@ export default function VttSession() {
             rulerRef.current = null;
             setPingMode(false);
             setRulerMode(false);
+            setPanMode(false);
+            setDrawMode(false);
+            setEraseMode(false);
+            setPinMode(false);
+            setDrawings([]);
+            setPins([]);
+            drawRef.current = null;
             try {
                 await VttApi.joinSession(sessionKey);
                 const state = await VttApi.getState(sessionKey);
@@ -315,6 +344,27 @@ export default function VttSession() {
         return { x: gridX, y: gridY };
     }, [displayGridSize]);
 
+    const getBoardPointFromEvent = useCallback((event) => {
+        if (!boardRef.current) return { x: 0, y: 0 };
+        const rect = boardRef.current.getBoundingClientRect();
+        const rawX = event.clientX - rect.left;
+        const rawY = event.clientY - rect.top;
+        const gridSize = displayGridSize || 50;
+        return {
+            x: Math.max(0, rawX / gridSize),
+            y: Math.max(0, rawY / gridSize)
+        };
+    }, [displayGridSize]);
+
+    const buildPath = (points) =>
+        points
+            .map((point, index) =>
+                `${index === 0 ? "M" : "L"}${point.x * displayGridSize} ${
+                    point.y * displayGridSize
+                }`
+            )
+            .join(" ");
+
     useEffect(() => {
         const onMove = (event) => {
             if (panRef.current && scrollRef.current) {
@@ -333,6 +383,25 @@ export default function VttSession() {
                 const nextRuler = { ...rulerRef.current, end: point };
                 rulerRef.current = nextRuler;
                 setRuler(nextRuler);
+                return;
+            }
+
+            if (drawRef.current && boardRef.current) {
+                if (supportsPointer && event.pointerId !== drawRef.current.pointerId) return;
+                const point = getBoardPointFromEvent(event);
+                const lastPoint = drawRef.current.points[drawRef.current.points.length - 1];
+                if (!lastPoint) return;
+                const distance = Math.hypot(point.x - lastPoint.x, point.y - lastPoint.y);
+                if (distance < 0.04) return;
+                const nextPoints = [...drawRef.current.points, point];
+                drawRef.current.points = nextPoints;
+                setDrawings((prev) =>
+                    prev.map((drawing) =>
+                        drawing.id === drawRef.current.id
+                            ? { ...drawing, points: nextPoints }
+                            : drawing
+                    )
+                );
                 return;
             }
 
@@ -363,6 +432,14 @@ export default function VttSession() {
                 if (!supportsPointer || event.pointerId === panRef.current.pointerId) {
                     panRef.current = null;
                     setIsPanning(false);
+                } else {
+                    return;
+                }
+            }
+
+            if (drawRef.current) {
+                if (!supportsPointer || event.pointerId === drawRef.current.pointerId) {
+                    drawRef.current = null;
                 } else {
                     return;
                 }
@@ -399,7 +476,14 @@ export default function VttSession() {
                 window.removeEventListener(cancelEvent, onUp);
             }
         };
-    }, [map, sessionKey, displayGridSize, getGridPointFromEvent, supportsPointer]);
+    }, [
+        map,
+        sessionKey,
+        displayGridSize,
+        getGridPointFromEvent,
+        getBoardPointFromEvent,
+        supportsPointer
+    ]);
 
     const handleSendChat = async () => {
         if (!chatInput.trim() || !connectionRef.current) return;
@@ -418,6 +502,51 @@ export default function VttSession() {
             setRollInput("");
         } catch (err) {
             console.error("Failed to roll dice:", err);
+        }
+    };
+
+    const toggleTool = (tool) => {
+        const isActive =
+            (tool === "pan" && panMode) ||
+            (tool === "ping" && pingMode) ||
+            (tool === "ruler" && rulerMode) ||
+            (tool === "draw" && drawMode) ||
+            (tool === "erase" && eraseMode) ||
+            (tool === "pin" && pinMode);
+
+        setPanMode(false);
+        setPingMode(false);
+        setRulerMode(false);
+        setDrawMode(false);
+        setEraseMode(false);
+        setPinMode(false);
+        setRuler(null);
+        rulerRef.current = null;
+        drawRef.current = null;
+
+        if (isActive || tool === "select") return;
+
+        switch (tool) {
+            case "pan":
+                setPanMode(true);
+                break;
+            case "ping":
+                setPingMode(true);
+                break;
+            case "ruler":
+                setRulerMode(true);
+                break;
+            case "draw":
+                setDrawMode(true);
+                break;
+            case "erase":
+                setEraseMode(true);
+                break;
+            case "pin":
+                setPinMode(true);
+                break;
+            default:
+                break;
         }
     };
 
@@ -486,6 +615,34 @@ export default function VttSession() {
         }
     };
 
+    const findClosestPinIndex = (list, point, threshold) => {
+        let closestIndex = -1;
+        let closestDistance = Infinity;
+        list.forEach((pin, index) => {
+            const distance = Math.hypot(pin.x - point.x, pin.y - point.y);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
+            }
+        });
+        return closestDistance <= threshold ? closestIndex : -1;
+    };
+
+    const findClosestDrawingIndex = (list, point, threshold) => {
+        let closestIndex = -1;
+        let closestDistance = Infinity;
+        list.forEach((drawing, index) => {
+            drawing.points.forEach((pt) => {
+                const distance = Math.hypot(pt.x - point.x, pt.y - point.y);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+        });
+        return closestDistance <= threshold ? closestIndex : -1;
+    };
+
     const canEditToken = (token) => {
         if (isDm) return true;
         if (token.isLocked) return false;
@@ -495,7 +652,7 @@ export default function VttSession() {
     const handleTokenMouseDown = (event, token) => {
         if (supportsPointer && event.isPrimary === false) return;
         if (!canEditToken(token)) return;
-        if (spacePressed) return;
+        if (panActive || !isSelectMode) return;
         if (!boardRef.current) return;
 
         event.preventDefault();
@@ -524,7 +681,9 @@ export default function VttSession() {
 
         const isTouchLike = supportsPointer && event.pointerType && event.pointerType !== "mouse";
         const shouldPan =
-            event.button === 1 || spacePressed || (isTouchLike && !pingMode && !rulerMode);
+            event.button === 1 ||
+            panActive ||
+            (isTouchLike && !pingMode && !rulerMode && !drawMode && !eraseMode && !pinMode);
 
         if (shouldPan) {
             panRef.current = {
@@ -579,6 +738,64 @@ export default function VttSession() {
                 };
                 rulerRef.current = nextRuler;
                 setRuler(nextRuler);
+            }
+            event.preventDefault();
+            return;
+        }
+
+        if (drawMode) {
+            const point = getBoardPointFromEvent(event);
+            const drawId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const drawing = {
+                id: drawId,
+                points: [point],
+                color: isDm ? "#ffcc80" : "#4bb9a8",
+                width: 2
+            };
+            if (supportsPointer && event.currentTarget?.setPointerCapture) {
+                event.currentTarget.setPointerCapture(event.pointerId);
+            }
+            drawRef.current = {
+                id: drawId,
+                points: [point],
+                pointerId: supportsPointer ? event.pointerId : null
+            };
+            setDrawings((prev) => [...prev, drawing]);
+            event.preventDefault();
+            return;
+        }
+
+        if (pinMode) {
+            const point = getGridPointFromEvent(event);
+            let customLabel = "";
+            if (event.shiftKey && typeof window !== "undefined") {
+                const response = window.prompt("Pin label", "");
+                if (response === null) {
+                    event.preventDefault();
+                    return;
+                }
+                customLabel = response.trim();
+            }
+            const pinId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            setPins((prev) => {
+                const label = customLabel || `Pin ${prev.length + 1}`;
+                return [...prev, { id: pinId, x: point.x, y: point.y, label }];
+            });
+            event.preventDefault();
+            return;
+        }
+
+        if (eraseMode) {
+            const point = getBoardPointFromEvent(event);
+            const pinIndex = findClosestPinIndex(pins, point, 0.45);
+            if (pinIndex >= 0) {
+                setPins((prev) => prev.filter((_, index) => index !== pinIndex));
+                event.preventDefault();
+                return;
+            }
+            const drawingIndex = findClosestDrawingIndex(drawings, point, 0.35);
+            if (drawingIndex >= 0) {
+                setDrawings((prev) => prev.filter((_, index) => index !== drawingIndex));
             }
             event.preventDefault();
             return;
@@ -704,14 +921,17 @@ export default function VttSession() {
                         <div className="vtt-tool-toggles">
                             <button
                                 className={`dmtools-action vtt-tool-button ${
+                                    panMode ? "is-active" : ""
+                                }`}
+                                onClick={() => toggleTool("pan")}
+                            >
+                                Pan
+                            </button>
+                            <button
+                                className={`dmtools-action vtt-tool-button ${
                                     pingMode ? "is-active" : ""
                                 }`}
-                                onClick={() => {
-                                    setPingMode((prev) => !prev);
-                                    setRulerMode(false);
-                                    setRuler(null);
-                                    rulerRef.current = null;
-                                }}
+                                onClick={() => toggleTool("ping")}
                             >
                                 Ping
                             </button>
@@ -719,14 +939,17 @@ export default function VttSession() {
                                 className={`dmtools-action vtt-tool-button ${
                                     rulerMode ? "is-active" : ""
                                 }`}
-                                onClick={() => {
-                                    setRulerMode((prev) => !prev);
-                                    setPingMode(false);
-                                    setRuler(null);
-                                    rulerRef.current = null;
-                                }}
+                                onClick={() => toggleTool("ruler")}
                             >
                                 Ruler
+                            </button>
+                            <button
+                                className={`dmtools-action vtt-tool-button ${
+                                    showGrid ? "is-active" : ""
+                                }`}
+                                onClick={() => setShowGrid((prev) => !prev)}
+                            >
+                                Grid
                             </button>
                         </div>
                         <div className="vtt-zoom-controls">
@@ -766,6 +989,113 @@ export default function VttSession() {
 
                 <div className={`vtt-layout ${toolbarCollapsed ? "toolbar-collapsed" : ""}`}>
                     <div className="vtt-board-wrap">
+                        <div className="vtt-tool-rail">
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${isSelectMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("select")}
+                                title="Select"
+                                aria-pressed={isSelectMode}
+                            >
+                                Select
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${panMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("pan")}
+                                title="Pan"
+                                aria-pressed={panMode}
+                            >
+                                Pan
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${drawMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("draw")}
+                                title="Draw"
+                                aria-pressed={drawMode}
+                            >
+                                Draw
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${eraseMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("erase")}
+                                title="Erase"
+                                aria-pressed={eraseMode}
+                            >
+                                Erase
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${pinMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("pin")}
+                                title="Pin"
+                                aria-pressed={pinMode}
+                            >
+                                Pin
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${pingMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("ping")}
+                                title="Ping"
+                                aria-pressed={pingMode}
+                            >
+                                Ping
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${rulerMode ? "is-active" : ""}`}
+                                onClick={() => toggleTool("ruler")}
+                                title="Ruler"
+                                aria-pressed={rulerMode}
+                            >
+                                Ruler
+                            </button>
+                            <button
+                                type="button"
+                                className={`vtt-rail-button ${showGrid ? "is-active" : ""}`}
+                                onClick={() => setShowGrid((prev) => !prev)}
+                                title="Toggle grid"
+                                aria-pressed={showGrid}
+                            >
+                                Grid
+                            </button>
+                        </div>
+
+                        <div className="vtt-zoom-rail">
+                            <button
+                                type="button"
+                                className="vtt-zoom-button"
+                                onClick={() => setZoom((prev) => clampZoom(prev + 0.1))}
+                                title="Zoom in"
+                            >
+                                +
+                            </button>
+                            <input
+                                className="vtt-zoom-slider"
+                                type="range"
+                                min={minZoom}
+                                max={maxZoom}
+                                step={0.05}
+                                value={zoom}
+                                onChange={(event) =>
+                                    setZoom(clampZoom(Number(event.target.value)))
+                                }
+                                aria-label="Zoom level"
+                            />
+                            <button
+                                type="button"
+                                className="vtt-zoom-button"
+                                onClick={() => setZoom((prev) => clampZoom(prev - 0.1))}
+                                title="Zoom out"
+                            >
+                                -
+                            </button>
+                            <div className="vtt-zoom-readout">{zoomLabel}</div>
+                        </div>
+
                         <div
                             className={`vtt-board-scroll ${isPanning ? "is-panning" : ""}`}
                             ref={scrollRef}
@@ -773,8 +1103,10 @@ export default function VttSession() {
                         >
                             <div
                                 className={`vtt-board ${
-                                    spacePressed ? "is-pan" : ""
-                                } ${pingMode ? "is-ping" : ""} ${rulerMode ? "is-ruler" : ""}`}
+                                    panActive ? "is-pan" : ""
+                                } ${pingMode ? "is-ping" : ""} ${rulerMode ? "is-ruler" : ""} ${
+                                    drawMode ? "is-draw" : ""
+                                } ${eraseMode ? "is-erase" : ""} ${pinMode ? "is-pin" : ""}`}
                                 ref={boardRef}
                                 onPointerDown={handleBoardMouseDown}
                                 style={{
@@ -785,15 +1117,36 @@ export default function VttSession() {
                                         : "none"
                                 }}
                             >
-                                <div
-                                    className="vtt-grid"
-                                    style={{
-                                        backgroundSize: `${displayGridSize}px ${displayGridSize}px`,
-                                        backgroundPosition: `${(map?.gridOffsetX || 0) * zoom}px ${
-                                            (map?.gridOffsetY || 0) * zoom
-                                        }px`
-                                    }}
-                                />
+                                {showGrid && (
+                                    <div
+                                        className="vtt-grid"
+                                        style={{
+                                            backgroundSize: `${displayGridSize}px ${displayGridSize}px`,
+                                            backgroundPosition: `${(map?.gridOffsetX || 0) * zoom}px ${
+                                                (map?.gridOffsetY || 0) * zoom
+                                            }px`
+                                        }}
+                                    />
+                                )}
+                                {drawings.length > 0 && (
+                                    <svg
+                                        className="vtt-draw-layer"
+                                        viewBox={`0 0 ${mapWidth} ${mapHeight}`}
+                                        preserveAspectRatio="none"
+                                    >
+                                        {drawings.map((drawing) => (
+                                            <path
+                                                key={drawing.id}
+                                                d={buildPath(drawing.points)}
+                                                stroke={drawing.color}
+                                                strokeWidth={drawing.width}
+                                                fill="none"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        ))}
+                                    </svg>
+                                )}
                                 {ruler?.start && ruler?.end && (
                                     <svg className="vtt-ruler">
                                         <line
@@ -814,6 +1167,20 @@ export default function VttSession() {
                                         </text>
                                     </svg>
                                 )}
+                                {pins.map((pin) => (
+                                    <div
+                                        key={pin.id}
+                                        className="vtt-pin"
+                                        style={{
+                                            left: pin.x * displayGridSize,
+                                            top: pin.y * displayGridSize
+                                        }}
+                                        title={pin.label}
+                                    >
+                                        <span className="vtt-pin-dot" />
+                                        <span className="vtt-pin-label">{pin.label}</span>
+                                    </div>
+                                ))}
                                 {pings.map((ping) => (
                                     <div
                                         key={ping.id}

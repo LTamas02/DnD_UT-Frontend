@@ -363,6 +363,100 @@
     url("https://www.transparenttextures.com/patterns/wood-pattern.png");
   box-shadow: 0 18px 40px rgba(7, 5, 3, 0.6);
   overflow: hidden;
+  position: relative;
+}
+
+.vtt-tool-rail {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--vtt-panel);
+  border: 1px solid var(--vtt-border);
+  box-shadow: 0 12px 24px var(--vtt-shadow);
+  backdrop-filter: blur(4px);
+  z-index: 6;
+  max-height: calc(100% - 36px);
+  overflow: auto;
+}
+
+.vtt-rail-button {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 216, 160, 0.4);
+  background: rgba(30, 18, 10, 0.85);
+  color: var(--vtt-ink);
+  font-weight: 700;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.vtt-rail-button:hover {
+  transform: translateY(-1px);
+}
+
+.vtt-rail-button.is-active {
+  border-color: var(--vtt-ember-strong);
+  box-shadow:
+    0 0 0 2px rgba(255, 204, 128, 0.5),
+    0 10px 18px rgba(7, 5, 3, 0.45);
+}
+
+.vtt-zoom-rail {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  border-radius: 18px;
+  background: var(--vtt-panel);
+  border: 1px solid var(--vtt-border);
+  box-shadow: 0 12px 24px var(--vtt-shadow);
+  backdrop-filter: blur(4px);
+  z-index: 6;
+  max-height: calc(100% - 36px);
+  overflow: auto;
+}
+
+.vtt-zoom-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 216, 160, 0.4);
+  background: rgba(30, 18, 10, 0.85);
+  color: var(--vtt-ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.vtt-zoom-slider {
+  height: clamp(90px, 24vh, 140px);
+  width: 8px;
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  background: linear-gradient(180deg, rgba(255, 224, 170, 0.4), rgba(0, 0, 0, 0.15));
+  border-radius: 999px;
+}
+
+.vtt-zoom-readout {
+  font-size: 0.78rem;
+  color: var(--vtt-ink-muted);
 }
 
 .vtt-board-scroll {
@@ -391,7 +485,10 @@
 }
 
 .vtt-board.is-ping,
-.vtt-board.is-ruler {
+.vtt-board.is-ruler,
+.vtt-board.is-draw,
+.vtt-board.is-erase,
+.vtt-board.is-pin {
   cursor: crosshair;
 }
 
@@ -403,6 +500,15 @@
     linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
   pointer-events: none;
   z-index: 1;
+}
+
+.vtt-draw-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .vtt-ruler {
@@ -429,6 +535,36 @@
   stroke-width: 3px;
 }
 
+.vtt-pin {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.vtt-pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffcc80;
+  border: 2px solid #5c2e14;
+  box-shadow: 0 0 12px rgba(255, 204, 128, 0.6);
+}
+
+.vtt-pin-label {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(31, 18, 10, 0.85);
+  border: 1px solid rgba(255, 204, 128, 0.45);
+  font-size: 0.7rem;
+  color: var(--vtt-ink);
+  white-space: nowrap;
+}
+
 .vtt-ping {
   position: absolute;
   width: 26px;
@@ -438,7 +574,7 @@
   box-shadow: 0 0 18px rgba(255, 204, 128, 0.8);
   transform: translate(-50%, -50%);
   animation: vtt-ping 0.9s ease-out infinite;
-  z-index: 4;
+  z-index: 5;
 }
 
 .vtt-token {
@@ -739,5 +875,25 @@
   .vtt-page {
     padding: 18px;
     background-attachment: scroll;
+  }
+}
+
+@media (max-width: 900px) {
+  .vtt-tool-rail {
+    top: auto;
+    bottom: 12px;
+    left: 12px;
+    flex-direction: row;
+  }
+
+  .vtt-zoom-rail {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    transform: none;
+  }
+
+  .vtt-zoom-slider {
+    height: 110px;
   }
 }

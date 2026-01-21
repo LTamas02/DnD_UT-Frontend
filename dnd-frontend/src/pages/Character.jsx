@@ -23,6 +23,22 @@ const SKILL_MAP = {
   performance: "cha", persuasion: "cha", religion: "int", sleightOfHand: "dex",
   stealth: "dex", survival: "wis"
 };
+const SKILL_KEYS = Object.keys(SKILL_MAP);
+
+const THEME_OPTIONS = [
+  { key: "parchment", label: "Parchment", description: "Classic parchment scroll with gilded highlights." },
+  { key: "shadowfell", label: "Shadowfell", description: "Violet mist, ghostly particles, and rune glows." },
+  { key: "elven", label: "Elven", description: "Verdant nebula with graceful leaf-like filigree." }
+];
+
+const buildSkillFlagMap = (source, prefix) => {
+  const flags = {};
+  SKILL_KEYS.forEach((skill) => {
+    const field = `${prefix}_${skill}`;
+    flags[skill] = !!source?.[field];
+  });
+  return flags;
+};
 
 const DEFAULT_PROFILE = {
   id: null, 
@@ -36,6 +52,7 @@ const DEFAULT_PROFILE = {
   str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10,
   saveProf: {}, 
   skillProf: {}, 
+  skillExpertise: {},
   passivePerception: 10,
 
   armor: 10, initiative: 0, speed: 30,
@@ -84,26 +101,14 @@ const mapFromApi = (charData) => ({
     wis: !!charData.saveProf_wis,
     cha: !!charData.saveProf_cha
   },
-  skillProf: {
-    acrobatics: !!charData.skillProf_acrobatics,
-    animalHandling: !!charData.skillProf_animalHandling,
-    arcana: !!charData.skillProf_arcana,
-    athletics: !!charData.skillProf_athletics,
-    deception: !!charData.skillProf_deception,
-    history: !!charData.skillProf_history,
-    insight: !!charData.skillProf_insight,
-    intimidation: !!charData.skillProf_intimidation,
-    investigation: !!charData.skillProf_investigation,
-    medicine: !!charData.skillProf_medicine,
-    nature: !!charData.skillProf_nature,
-    perception: !!charData.skillProf_perception,
-    performance: !!charData.skillProf_performance,
-    persuasion: !!charData.skillProf_persuasion,
-    religion: !!charData.skillProf_religion,
-    sleightOfHand: !!charData.skillProf_sleightOfHand,
-    stealth: !!charData.skillProf_stealth,
-    survival: !!charData.skillProf_survival
-  },
+  skillExpertise: buildSkillFlagMap(charData, "skillExp"),
+  skillProf: SKILL_KEYS.reduce((acc, skill) => {
+    const hasExpertise = !!charData[`skillExp_${skill}`];
+    return {
+      ...acc,
+      [skill]: hasExpertise || !!charData[`skillProf_${skill}`]
+    };
+  }, {}),
   attacks: parseJsonList(charData.attacks),
   selectedSpells: parseJsonList(charData.spellbook),
   generalEquipment: parseJsonList(charData.featuresFeats)
@@ -201,6 +206,24 @@ const buildSavePayload = (profile) => ({
   skillProf_sleightOfHand: !!profile.skillProf?.sleightOfHand,
   skillProf_stealth: !!profile.skillProf?.stealth,
   skillProf_survival: !!profile.skillProf?.survival,
+  skillExp_acrobatics: !!profile.skillExpertise?.acrobatics,
+  skillExp_animalHandling: !!profile.skillExpertise?.animalHandling,
+  skillExp_arcana: !!profile.skillExpertise?.arcana,
+  skillExp_athletics: !!profile.skillExpertise?.athletics,
+  skillExp_deception: !!profile.skillExpertise?.deception,
+  skillExp_history: !!profile.skillExpertise?.history,
+  skillExp_insight: !!profile.skillExpertise?.insight,
+  skillExp_intimidation: !!profile.skillExpertise?.intimidation,
+  skillExp_investigation: !!profile.skillExpertise?.investigation,
+  skillExp_medicine: !!profile.skillExpertise?.medicine,
+  skillExp_nature: !!profile.skillExpertise?.nature,
+  skillExp_perception: !!profile.skillExpertise?.perception,
+  skillExp_performance: !!profile.skillExpertise?.performance,
+  skillExp_persuasion: !!profile.skillExpertise?.persuasion,
+  skillExp_religion: !!profile.skillExpertise?.religion,
+  skillExp_sleightOfHand: !!profile.skillExpertise?.sleightOfHand,
+  skillExp_stealth: !!profile.skillExpertise?.stealth,
+  skillExp_survival: !!profile.skillExpertise?.survival,
   armor: toInt(profile.armor),
   initiative: toInt(profile.initiative),
   speed: toInt(profile.speed),
@@ -256,7 +279,13 @@ export default function Character() {
   const navigate = useNavigate(); 
   const [profile, setProfile] = useState(DEFAULT_PROFILE);
   const [activeTab, setActiveTab] = useState("identity");
-  
+  const [themeVariant, setThemeVariant] = useState(() => {
+    try {
+      return window.localStorage?.getItem("characterTheme") || "parchment";
+    } catch {
+      return "parchment";
+    }
+  });
   const [allClasses, setAllClasses] = useState([]);
   const [allSpells, setAllSpells] = useState([]);
   const [allWeapons, setAllWeapons] = useState([]);
@@ -279,17 +308,34 @@ export default function Character() {
     return (total >= 0 ? "+" : "") + total;
   }, [profile, getMod]);
 
-  const calcSkill = useCallback((key) => {
-    const ab = SKILL_MAP[key];
-    if (!ab) return "N/A";
+  const formatSigned = (value) => (value >= 0 ? `+${value}` : `${value}`);
 
-    const base = getMod(profile[ab] || 10);
-    const hasProf = !!(profile.skillProf && profile.skillProf[key]);
-    const total = base + (hasProf ? profile.profBonus : 0);
-    return (total >= 0 ? "+" : "") + total;
+  const getSkillData = useCallback((skill) => {
+    const ability = SKILL_MAP[skill];
+    const base = getMod(profile[ability] || 10);
+    const hasProf = !!(profile.skillProf && profile.skillProf[skill]);
+    const hasExpertise = !!(profile.skillExpertise && profile.skillExpertise[skill]);
+    const bonus = (hasProf ? profile.profBonus : 0) + (hasExpertise ? profile.profBonus : 0);
+    const total = base + bonus;
+    return {
+      ability,
+      base,
+      hasProf,
+      hasExpertise,
+      total,
+      bonus
+    };
   }, [profile, getMod]);
 
   const capitalizeWords = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+  useEffect(() => {
+    try {
+      window.localStorage?.setItem("characterTheme", themeVariant);
+    } catch {
+      // ignore
+    }
+  }, [themeVariant]);
 
 
   // --- STATE MODIFIER ---
@@ -301,11 +347,34 @@ export default function Character() {
   };
 
   const handleProficiencyChange = (type, key, checked) => {
+    setProfile(prev => {
+      const nextState = {
+        ...prev,
+        [type]: {
+          ...(prev[type] || {}),
+          [key]: checked
+        }
+      };
+      if (type === "skillProf" && !checked) {
+        nextState.skillExpertise = {
+          ...(prev.skillExpertise || {}),
+          [key]: false
+        };
+      }
+      return nextState;
+    });
+  };
+
+  const handleSkillExpertiseChange = (skill, checked) => {
     setProfile(prev => ({
       ...prev,
-      [type]: {
-        ...prev[type],
-        [key]: checked
+      skillExpertise: {
+        ...(prev.skillExpertise || {}),
+        [skill]: checked
+      },
+      skillProf: {
+        ...(prev.skillProf || {}),
+        [skill]: checked || !!prev.skillProf?.[skill]
       }
     }));
   };
@@ -621,7 +690,7 @@ export default function Character() {
   const navTabs = ["identity", "stats", "combat", "equipment", "story"];
 
   return (
-    <div className="character-app">
+    <div className={`character-app character-theme theme-${themeVariant}`}>
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-header">
@@ -809,20 +878,68 @@ export default function Character() {
                 {/* Column 3: Skills */}
                 <section className="card">
                     <h2 className="section-title">Skills</h2>
-                    <div className="skills-grid" style={{ columnCount: 2, columnGap: '10px' }}>
-                        {Object.entries(SKILL_MAP).map(([skill, ability]) => (
-                        <div key={skill} className="skill" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                            <label style={{ margin: 0, fontSize: '0.9em' }}>
-                            <input 
-                                type="checkbox" 
-                                checked={!!profile.skillProf?.[skill]}
-                                onChange={e => handleProficiencyChange("skillProf", skill, e.target.checked)}
-                            /> 
-                            {capitalizeWords(skill)} ({ability.toUpperCase()})
-                            </label>
-                            <input value={calcSkill(skill)} readOnly className="computed input-dark" style={{ width: '40px', textAlign: 'center' }} />
+                    <div className="skills-grid-wrapper">
+                        <div className="skills-grid-header">
+                            <span>Skill</span>
+                            <span>Ability</span>
+                            <span>Prof.</span>
+                            <span>Expert.</span>
+                            <span>Bonus</span>
                         </div>
-                        ))}
+                        <div className="skills-columns">
+                            {(() => {
+                                const half = Math.ceil(SKILL_KEYS.length / 2);
+                                const left = SKILL_KEYS.slice(0, half);
+                                const right = SKILL_KEYS.slice(half);
+
+                                const renderColumn = (skills) => (
+                                    <div className="skills-column">
+                                        {skills.map((skill) => {
+                                            const skillData = getSkillData(skill);
+                                            return (
+                                                <div key={skill} className="skill-row">
+                                                    <div className="skill-name">
+                                                        <strong>{capitalizeWords(skill)}</strong>
+                                                        {skillData.ability && (
+                                                            <span className="skill-ability-abbrev">{skillData.ability.toUpperCase()}</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="skill-ability-score">
+                                                        <span>{formatSigned(skillData.base)}</span>
+                                                    </div>
+                                                    <label className="skill-checkbox">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={skillData.hasProf}
+                                                            onChange={(e) => handleProficiencyChange("skillProf", skill, e.target.checked)}
+                                                        />
+                                                        <span>Prof</span>
+                                                    </label>
+                                                    <label className="skill-checkbox">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={skillData.hasExpertise}
+                                                            onChange={(e) => handleSkillExpertiseChange(skill, e.target.checked)}
+                                                        />
+                                                        <span>Exp</span>
+                                                    </label>
+                                                    <div className="skill-total">
+                                                        <span>{formatSigned(skillData.total)}</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+
+                                return (
+                                    <>
+                                        {renderColumn(left)}
+                                        {renderColumn(right)}
+                                    </>
+                                );
+                            })()}
+                        </div>
                     </div>
                 </section>
 

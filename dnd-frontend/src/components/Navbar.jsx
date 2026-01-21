@@ -24,6 +24,7 @@ const Navbar = ({ username, profilePicture }) => {
                 <Link
                     to="/"
                     className="navbar-brand"
+                    data-tutorial="nav-home"
                     style={{
                         color: "rgb(255, 0, 0)",
                         backgroundColor: "black",
@@ -50,22 +51,22 @@ const Navbar = ({ username, profilePicture }) => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <Link to="/characters" className="nav-link active">
+                            <Link to="/characters" className="nav-link active" data-tutorial="nav-characters">
                                 Characters
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/wiki" className="nav-link active">
+                            <Link to="/wiki" className="nav-link active" data-tutorial="nav-wiki">
                                 Wiki
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/books" className="nav-link active">
+                            <Link to="/books" className="nav-link active" data-tutorial="nav-books">
                                 Books
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/dmtools" className="nav-link active">
+                            <Link to="/dmtools" className="nav-link active" data-tutorial="nav-dmtools">
                                 DM Tools
                             </Link>
                         </li>
@@ -73,7 +74,7 @@ const Navbar = ({ username, profilePicture }) => {
                         </li>
                     </ul>
                     <form className="d-flex">
-                        <Link to="/profile" className="btn btn-outline-warning me-2">
+                        <Link to="/profile" className="btn btn-outline-warning me-2" data-tutorial="nav-profile">
                             <img
                                 className="profKep"
                                 id="profkep"
@@ -97,6 +98,7 @@ const NavbarProfile = ({ username, profilePicture }) => {
                 <Link
                     to="/"
                     className="navbar-brand"
+                    data-tutorial="nav-home"
                     style={{
                         color: "rgb(255, 0, 0)",
                         backgroundColor: "black",
@@ -123,17 +125,17 @@ const NavbarProfile = ({ username, profilePicture }) => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <Link to="/characters" className="nav-link active">
+                            <Link to="/characters" className="nav-link active" data-tutorial="nav-characters">
                                 Characters
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/wiki" className="nav-link active">
+                            <Link to="/wiki" className="nav-link active" data-tutorial="nav-wiki">
                                 Wiki
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/dmtools" className="nav-link active">
+                            <Link to="/dmtools" className="nav-link active" data-tutorial="nav-dmtools">
                                 DM Tools
                             </Link>
                         </li>                        

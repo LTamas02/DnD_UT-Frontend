@@ -1,8 +1,8 @@
 import axios from "axios";
 import { startLoading, stopLoading } from "./loadingStore";
 
-export const API_BASE = "https://api.dnd-tool.com";
-
+//export const API_BASE = "https://api.dnd-tool.com";
+export const API_BASE = "http://localhost:5188";
 const api = axios.create({
     baseURL: `${API_BASE}/api`,
     headers: {
@@ -85,6 +85,11 @@ export const getUser = (token) =>
         headers: { "Authorization": `Bearer ${token}` }
     });
 
+export const updateProfile = (token, payload) =>
+    api.put("Auth/me", payload, {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
 export const updateProfilePicture = (token, profilePicture) =>
     api.put(
         "Auth/me/profile-picture",
@@ -114,6 +119,15 @@ export const updateProfileTheme = (token, theme) =>
     api.put(
         "Auth/me/theme",
         { theme },
+        {
+            headers: { "Authorization": `Bearer ${token}` }
+        }
+    );
+
+export const completeTutorial = (token) =>
+    api.put(
+        "Auth/me/tutorial",
+        { completed: true },
         {
             headers: { "Authorization": `Bearer ${token}` }
         }
