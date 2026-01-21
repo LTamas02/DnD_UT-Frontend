@@ -718,12 +718,27 @@ export default function Character() {
       <main className="page-container">
         
         {/* --- ACTION BAR / FUNCTION BUTTONS --- */}
-        <header className="action-bar card">
-          <h1>{profile.characterName || (id === 'new' ? "Create New Character" : "Edit Character")}</h1>
-          <div className="action-buttons">
-            <button className="btn-save btn-aura" onClick={handleSave}>
-              Save
-            </button>
+          <header className="action-bar card">
+            <div>
+              <h1>{profile.characterName || (id === 'new' ? "Create New Character" : "Edit Character")}</h1>
+              <div className="theme-selector">
+                {THEME_OPTIONS.map((theme) => (
+                  <button
+                    key={theme.key}
+                    type="button"
+                    className={`theme-option ${themeVariant === theme.key ? "active" : ""}`}
+                    onClick={() => setThemeVariant(theme.key)}
+                    title={theme.description}
+                  >
+                    {theme.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="action-buttons">
+              <button className="btn-save btn-aura" onClick={handleSave}>
+                Save
+              </button>
             <button 
                 className="btn-delete btn-aura" 
                 onClick={handleDelete}
