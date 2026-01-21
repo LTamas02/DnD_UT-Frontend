@@ -1,4 +1,5 @@
 import axios from "axios";
+import { startLoading, stopLoading } from "./loadingStore";
 
 export const API_BASE = "https://api.dnd-tool.com";
 
@@ -8,6 +9,50 @@ const api = axios.create({
         "Content-Type": "application/json"
     }
 });
+
+const apiSilent = axios.create({
+    baseURL: `${API_BASE}/api`,
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
+
+api.interceptors.request.use(
+    (config) => {
+        startLoading();
+        return config;
+    },
+    (error) => {
+        stopLoading();
+        return Promise.reject(error);
+    }
+);
+
+api.interceptors.response.use(
+    (response) => {
+        stopLoading();
+        return response;
+    },
+    (error) => {
+        stopLoading();
+        return Promise.reject(error);
+    }
+);
+
+// Books (markdown) endpoints
+export const getMarkdownBooks = () =>
+    api.get("/books/markdown");
+
+export const getMarkdownBookContent = (fileName) =>
+    api.get(`/books/markdown/${encodeURIComponent(fileName)}`, {
+        responseType: "text"
+    });
+
+export const getMarkdownBookContentSilent = (fileName, config = {}) =>
+    apiSilent.get(`/books/markdown/${encodeURIComponent(fileName)}`, {
+        responseType: "text",
+        ...config
+    });
 
 
 
@@ -669,6 +714,62 @@ export const CharacterApi = {
     const res = await api.delete(`/characters/${id}`, withAuth());
     return res.data;
   },
+};
+
+// =========================
+// === VTT Endpoints
+// =========================
+
+export const VttApi = {
+  async listSessions() {
+    const res = await api.get("/vtt/sessions", withAuth());
+    return res.data;
+  },
+
+  async createSession(name) {
+    const res = await api.post("/vtt/sessions", { name }, withAuth());
+    return res.data;
+  },
+
+  async joinSession(id) {
+    const res = await api.post(`/vtt/sessions/${id}/join`, null, withAuth());
+    return res.data;
+  },
+
+  async getState(id) {
+    const res = await api.get(`/vtt/sessions/${id}/state`, withAuth());
+    return res.data;
+  },
+
+  async updateMap(id, payload) {
+    const res = await api.put(`/vtt/sessions/${id}/map`, payload, withAuth());
+    return res.data;
+  },
+
+  async uploadMapImage(id, file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    const config = withAuth();
+    config.headers = {
+      ...(config.headers || {}),
+      "Content-Type": "multipart/form-data"
+    };
+    const res = await api.post(`/vtt/sessions/${id}/map/image`, formData, config);
+    return res.data;
+  },
+
+  async uploadAsset(id, file, kind = "misc") {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("kind", kind);
+    const config = withAuth();
+    config.headers = {
+      ...(config.headers || {}),
+      "Content-Type": "multipart/form-data"
+    };
+    const res = await api.post(`/vtt/sessions/${id}/assets`, formData, config);
+    return res.data;
+  }
 };
 
 

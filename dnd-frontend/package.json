@@ -17,9 +17,11 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
+    "react-markdown": "^8.0.7",
     "react-lottie": "^1.2.10",
     "react-router-dom": "^7.4.1",
     "react-scripts": "5.0.1",
+    "remark-gfm": "^3.0.1",
     "reactflow": "^11.11.4",
     "tailwindcss": "^4.1.13",
     "web-vitals": "^2.1.4"

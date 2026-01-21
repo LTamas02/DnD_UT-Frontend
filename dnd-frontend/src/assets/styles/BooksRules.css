@@ -1,0 +1,831 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=IM+Fell+English+SC&display=swap");
+
+.books-rules-page {
+  --books-ink: var(--app-text, #2b1b12);
+  --books-ink-muted: var(--app-muted, #6b5848);
+  --books-accent: var(--app-accent, #b0532b);
+  --books-accent-strong: var(--app-accent, #8a3b1e);
+  --books-border: var(--app-border, #d9c9b8);
+  --books-panel: var(--app-card, rgba(255, 251, 244, 0.95));
+  --books-panel-soft: var(--app-panel, rgba(255, 255, 255, 0.12));
+  --books-highlight: var(--app-accent-soft, rgba(176, 83, 43, 0.14));
+  --books-shadow: rgba(0, 0, 0, 0.25);
+  --books-page: var(--app-card, #fffcf6);
+
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  padding: 12px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--books-ink);
+  font-family: "Cormorant Garamond", serif;
+  background-color: var(--app-bg, #f6efe5);
+  background-image: var(--app-bg-gradient, none), var(--app-bg-image, none);
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+}
+
+.books-rules-page::before,
+.books-rules-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.books-rules-page::before {
+  background:
+    repeating-linear-gradient(
+      105deg,
+      rgba(0, 0, 0, 0.08) 0,
+      rgba(0, 0, 0, 0.08) 1px,
+      transparent 1px,
+      transparent 7px
+    );
+  opacity: 0.2;
+}
+
+.books-rules-page::after {
+  background: radial-gradient(500px 300px at 50% 120%, rgba(0, 0, 0, 0.25), transparent 70%);
+  opacity: 0.25;
+}
+
+.books-rules-layout {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  min-height: 0;
+  height: 100%;
+  flex: 1;
+}
+
+.books-rules-page.is-focus .books-rules-layout {
+  grid-template-columns: 1fr;
+}
+
+.books-rules-page.is-focus .books-rules-toc-panel {
+  display: none;
+}
+
+.books-rules-reader {
+  min-height: 0;
+}
+
+.books-rules-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--books-panel);
+  border: 1px solid var(--books-border);
+  box-shadow: 0 12px 20px var(--books-shadow);
+}
+
+.books-rules-back {
+  text-decoration: none;
+  color: var(--books-ink-muted);
+  font-size: 0.95rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--books-border);
+  background: var(--books-panel-soft);
+  transition: color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.books-rules-back:hover {
+  color: var(--books-accent-strong);
+  border-color: var(--books-accent);
+}
+
+.books-rules-topbar-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.books-rules-topbar-title {
+  font-family: "IM Fell English SC", serif;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--books-accent-strong);
+}
+
+.books-rules-topbar-subtitle {
+  font-size: 0.95rem;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-panel {
+  background: var(--books-panel);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--books-border);
+  box-shadow: 0 12px 20px var(--books-shadow);
+  animation: books-fade 0.6s ease forwards;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.books-rules-toc-panel {
+  min-height: 0;
+  gap: 12px;
+}
+
+.books-rules-toc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.books-rules-toc-count {
+  font-size: 0.85rem;
+  color: var(--books-ink-muted);
+  border: 1px solid var(--books-border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: var(--books-panel-soft);
+}
+
+.books-rules-toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 6px;
+  flex: 1;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+.books-rules-toc-panel .books-rules-empty {
+  padding: 24px 12px;
+}
+
+.books-rules-panel--library {
+  flex: 1;
+  min-height: 0;
+}
+
+.books-rules-panel + .books-rules-panel {
+  margin-top: 0;
+}
+
+.books-rules-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.books-rules-panel-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.books-rules-panel-title {
+  font-family: "IM Fell English SC", serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.books-rules-panel-subtitle {
+  font-size: 0.9rem;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-search {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--books-border);
+  background: var(--books-panel-soft);
+  color: var(--books-ink);
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.books-rules-search:focus {
+  outline: none;
+  border-color: var(--books-accent);
+  box-shadow: 0 0 0 2px var(--books-highlight);
+}
+
+.books-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 0 2px;
+}
+
+.books-rules-library {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 6px;
+  border-top: 1px solid var(--books-border);
+  padding-top: 12px;
+  scrollbar-gutter: stable;
+}
+
+.books-rules-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.books-rules-group-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 2px;
+  border: none;
+  border-bottom: 1px solid var(--books-border);
+  background: transparent;
+  color: var(--books-ink);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "IM Fell English SC", serif;
+  letter-spacing: 0.05em;
+}
+
+.books-rules-group-toggle:hover {
+  color: var(--books-accent-strong);
+}
+
+.books-rules-group-count {
+  font-size: 0.85rem;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-group-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.books-rules-group-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--books-border);
+  background: var(--books-panel-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--books-ink-muted);
+  font-size: 0.95rem;
+}
+
+.books-rules-book-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.books-rules-book {
+  display: block;
+  text-align: left;
+  padding: 6px 4px;
+  border-radius: 8px;
+  background: transparent;
+  border-left: 3px solid transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  animation: books-stagger 0.6s ease forwards;
+}
+
+.books-rules-book:hover {
+  background: var(--books-highlight);
+}
+
+.books-rules-book.is-active {
+  border-left-color: var(--books-accent);
+  background: var(--books-highlight);
+}
+
+.books-rules-book-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.books-rules-book-meta {
+  font-size: 0.8rem;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-book-entry.is-active .books-rules-book-title {
+  color: var(--books-accent-strong);
+}
+
+.books-rules-book-toc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid var(--books-border);
+}
+
+.books-rules-toc-item {
+  font-size: 0.9rem;
+  color: var(--books-ink-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  display: block;
+  width: 100%;
+}
+
+.books-rules-toc-item:hover {
+  color: var(--books-accent-strong);
+}
+
+.books-rules-toc-item.is-active {
+  color: var(--books-accent-strong);
+  font-weight: 600;
+}
+
+.books-rules-toc-item.level-1 {
+  color: var(--books-ink);
+  font-weight: 600;
+}
+
+.books-rules-toc-item.level-2 {
+  margin-left: 10px;
+}
+
+.books-rules-toc-item.level-3 {
+  margin-left: 18px;
+  font-size: 0.85rem;
+}
+
+.books-rules-reader-card {
+  background: var(--books-panel);
+  border-radius: 16px;
+  border: 1px solid var(--books-border);
+  box-shadow: 0 18px 32px var(--books-shadow);
+  padding: 18px 18px 22px;
+  animation: books-rise 0.7s ease forwards;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.books-rules-reader-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--books-border);
+}
+
+.books-rules-reader-title {
+  max-width: 60ch;
+}
+
+.books-rules-reader-title h2 {
+  margin: 2px 0 4px;
+  font-family: "IM Fell English SC", serif;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  color: var(--books-accent-strong);
+}
+
+.books-rules-reader-title p {
+  margin: 0;
+  color: var(--books-ink-muted);
+  font-size: 0.95rem;
+}
+
+.books-rules-reader-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.books-rules-reader-mobile {
+  display: none;
+  width: 100%;
+  flex: 1 1 100%;
+  margin-top: 6px;
+}
+
+.books-rules-select-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--books-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.books-rules-select {
+  border-radius: 10px;
+  border: 1px solid var(--books-border);
+  background: var(--books-panel-soft);
+  color: var(--books-ink);
+  padding: 10px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.books-rules-select:focus {
+  outline: none;
+  border-color: var(--books-accent);
+  box-shadow: 0 0 0 2px var(--books-highlight);
+}
+
+.books-rules-control-group {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--books-panel-soft);
+  border: 1px solid var(--books-border);
+}
+
+.books-rules-button {
+  border: none;
+  background: transparent;
+  color: var(--books-ink-muted);
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.books-rules-button:hover {
+  color: var(--books-accent-strong);
+}
+
+.books-rules-button.is-active {
+  background: var(--books-highlight);
+  color: var(--books-ink);
+}
+
+.books-rules-progress {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  margin: 14px 0 18px;
+  background: var(--books-panel-soft);
+  overflow: hidden;
+}
+
+.books-rules-progress-bar {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--app-accent-soft, rgba(176, 83, 43, 0.2)), var(--books-accent));
+  transition: none;
+  will-change: transform;
+}
+
+.books-rules-content {
+  color: var(--books-ink);
+  line-height: 1.7;
+  max-width: 86ch;
+  margin: 0 auto;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 30px;
+  background: var(--books-page);
+  border-radius: 14px;
+  border: 1px solid var(--books-border);
+  box-shadow: 0 8px 18px var(--books-shadow);
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.books-rules-content.size-sm {
+  font-size: 1rem;
+}
+
+.books-rules-content.size-md {
+  font-size: 1.12rem;
+}
+
+.books-rules-content.size-lg {
+  font-size: 1.25rem;
+}
+
+.books-rules-content.width-wide {
+  max-width: 95ch;
+}
+
+.books-rules-content h1,
+.books-rules-content h2,
+.books-rules-content h3,
+.books-rules-content h4 {
+  font-family: "IM Fell English SC", serif;
+  color: var(--books-accent-strong);
+  margin: 28px 0 12px;
+}
+
+.books-rules-content h1 {
+  font-size: 2.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.books-rules-content h2 {
+  font-size: 1.6rem;
+}
+
+.books-rules-content h3 {
+  font-size: 1.3rem;
+}
+
+.books-rules-content p {
+  margin: 12px 0;
+}
+
+.books-rules-content strong {
+  color: var(--books-accent-strong);
+}
+
+.books-rules-content a {
+  color: var(--books-accent);
+}
+
+.books-rules-content ul,
+.books-rules-content ol {
+  padding-left: 24px;
+}
+
+.books-rules-content li {
+  margin: 6px 0;
+}
+
+.books-rules-content blockquote {
+  margin: 18px 0;
+  padding: 16px 20px;
+  background: var(--books-panel-soft);
+  border-left: 3px solid var(--books-accent);
+  border-radius: 12px;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-content blockquote blockquote {
+  background: var(--books-panel-soft);
+  border-left-color: var(--books-accent);
+}
+
+.books-rules-content hr {
+  border: none;
+  border-top: 1px solid var(--books-border);
+  margin: 28px 0;
+}
+
+.books-rules-content code {
+  font-family: "Courier New", monospace;
+  background: var(--books-panel-soft);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--books-accent-strong);
+}
+
+.books-rules-content pre {
+  background: var(--books-panel-soft);
+  padding: 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+
+.books-rules-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  background: var(--books-panel-soft);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.books-rules-content th,
+.books-rules-content td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--books-border);
+  text-align: left;
+}
+
+.books-rules-content th {
+  background: var(--books-panel-soft);
+  color: var(--books-accent-strong);
+}
+
+.books-rules-figure {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.books-rules-media-block {
+  margin: 20px 0;
+}
+
+.books-rules-figure img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--books-border);
+}
+
+.books-rules-figure figcaption {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: var(--books-ink-muted);
+}
+
+.books-rules-missing-image {
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px dashed var(--books-border);
+  color: var(--books-ink-muted);
+  background: var(--books-panel-soft);
+}
+
+.books-rules-empty,
+.books-rules-loading,
+.books-rules-error {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--books-ink-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.books-rules-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 4px;
+}
+
+.books-rules-skeleton-title,
+.books-rules-skeleton-subtitle,
+.books-rules-skeleton-line {
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--books-panel-soft),
+    var(--app-accent-soft, rgba(176, 83, 43, 0.25)),
+    var(--books-panel-soft)
+  );
+  background-size: 200% 100%;
+  animation: books-shimmer 1.2s ease-in-out infinite;
+}
+
+.books-rules-skeleton-title {
+  height: 28px;
+  width: 60%;
+}
+
+.books-rules-skeleton-subtitle {
+  height: 18px;
+  width: 40%;
+}
+
+.books-rules-skeleton-line {
+  height: 14px;
+  width: 100%;
+}
+
+.books-rules-skeleton-line.is-mid {
+  width: 75%;
+}
+
+.books-rules-skeleton-line.is-short {
+  width: 55%;
+}
+
+.books-rules-empty-link {
+  text-decoration: none;
+  color: var(--books-accent-strong);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.books-rules-empty-link:hover {
+  color: var(--books-accent);
+}
+
+@keyframes books-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes books-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes books-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes books-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@media (max-width: 980px) {
+  .books-rules-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .books-rules-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .books-rules-toc-panel {
+    max-height: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .books-rules-page {
+    padding: 10px 12px 12px;
+    gap: 12px;
+  }
+
+  .books-rules-reader-card {
+    padding: 16px 14px 18px;
+  }
+
+  .books-rules-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .books-rules-content {
+    max-width: 100%;
+    padding: 20px 18px;
+  }
+}

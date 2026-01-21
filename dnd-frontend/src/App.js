@@ -12,6 +12,8 @@ import DmtoolsLoot from "./pages/DmtoolsLoot";
 import DmtoolsMaps from "./pages/DmtoolsMaps";
 import Wiki from "./pages/Wiki";
 import Friends from "./pages/Friends";
+import BooksLibrary from "./pages/BooksLibrary";
+import BooksRules from "./pages/BooksRules";
 import { Navbar, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
 import Spells from "./pages/wikiPages/Spells";
@@ -26,6 +28,8 @@ import Equipments from './pages/wikiPages/Equipments'
 import Backgrounds from './pages/wikiPages/Backgrounds'
 import Background from './pages/wikiPages/Background'
 import DmtoolsNpcs from "./pages/DmtoolsNpcs";
+import VttLobby from "./pages/VttLobby";
+import VttSession from "./pages/VttSession";
 
 import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
 import Alignment from "./pages/wikiPages/Alignments";
@@ -33,12 +37,15 @@ import Conditions from "./pages/wikiPages/Conditions";
 import DamageTypes from "./pages/wikiPages/DamageTypes";
 import Languages from "./pages/wikiPages/Languages";
 import Language from "./pages/wikiPages/Language";
+import LoadingOverlay from "./components/LoadingOverlay";
+import { getLoadingCount, subscribeLoading } from "./loadingStore";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
   const [loading, setLoading] = useState(true); // <-- Add loading state
+  const [globalLoading, setGlobalLoading] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -68,6 +75,9 @@ function App() {
           setProfilePicture(nextProfilePicture);
           localStorage.setItem("profilePicture", nextProfilePicture);
           localStorage.setItem("username", res.data.username || "Guest");
+          if (res.data.id != null) {
+            localStorage.setItem("userId", res.data.id);
+          }
 
           getProfileTheme(token)
             .then(themeRes => {
@@ -91,7 +101,15 @@ function App() {
     }
   }, [token]);
 
-  if (loading) return null; // or a loading spinner
+  useEffect(() => {
+    const update = (count) => setGlobalLoading(count > 0);
+    update(getLoadingCount());
+    return subscribeLoading(update);
+  }, []);
+
+  if (loading) {
+    return <LoadingOverlay active label="Loading profile..." />;
+  }
 
   return (
     <BrowserRouter>
@@ -103,6 +121,7 @@ function App() {
         setUsername={setUsername}
         setProfilePicture={setProfilePicture}
       />
+      <LoadingOverlay active={globalLoading} />
     </BrowserRouter>
   );
 }
@@ -138,7 +157,12 @@ function AppWithRouter({
         <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
+        <Route path="/vtt" element={isAuthenticated ? <VttLobby /> : <Navigate to="/logreg" />} />
+        <Route path="/vtt/:sessionId" element={isAuthenticated ? <VttSession /> : <Navigate to="/logreg" />} />
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
+        <Route path="/books" element={isAuthenticated ? <BooksLibrary /> : <Navigate to="/logreg" />} />
+        <Route path="/books/rules" element={isAuthenticated ? <BooksRules /> : <Navigate to="/logreg" />} />
+        <Route path="/books/rules/:fileName" element={isAuthenticated ? <BooksRules /> : <Navigate to="/logreg" />} />
 
 
         <Route path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />

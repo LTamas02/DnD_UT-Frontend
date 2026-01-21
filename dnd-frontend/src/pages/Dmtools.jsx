@@ -32,6 +32,12 @@ export default function Dmtools() {
       description: 'Sketch locations and keep notes organized.',
       path: '/dmtools/maps',
       image: mapImage
+    },
+    {
+      name: 'Virtual Tabletop',
+      description: 'Run battles with maps, tokens, chat, and dice.',
+      path: '/vtt',
+      image: mapImage
     }
   ]
 

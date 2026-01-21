@@ -60,6 +60,11 @@ const Navbar = ({ username, profilePicture }) => {
                             </Link>
                         </li>
                         <li className="nav-item">
+                            <Link to="/books" className="nav-link active">
+                                Books
+                            </Link>
+                        </li>
+                        <li className="nav-item">
                             <Link to="/dmtools" className="nav-link active">
                                 DM Tools
                             </Link>
