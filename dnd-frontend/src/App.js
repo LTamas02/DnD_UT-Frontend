@@ -16,28 +16,47 @@ import BooksLibrary from "./pages/BooksLibrary";
 import BooksRules from "./pages/BooksRules";
 import { Navbar, NavbarProfile } from "./components/Navbar";
 import Character from "./pages/Character";
+
+
+// Wiki Pages
 import Spells from "./pages/wikiPages/Spells";
 import Spell from "./pages/wikiPages/Spell";
 import Classes from "./pages/wikiPages/Classes";
 import Class from "./pages/wikiPages/Class";
+import SubClass from "./pages/wikiPages/SubClass";
 import Races from './pages/wikiPages/Races'
 import Race from "./pages/wikiPages/Race";
+import SubRace from "./pages/wikiPages/SubRace";
 import Monsters from './pages/wikiPages/Monsters'
 import Monster from "./pages/wikiPages/Monster";
 import Equipments from './pages/wikiPages/Equipments'
 import Backgrounds from './pages/wikiPages/Backgrounds'
 import Background from './pages/wikiPages/Background'
-import DmtoolsNpcs from "./pages/DmtoolsNpcs";
-import VttLobby from "./pages/VttLobby";
-import VttSession from "./pages/VttSession";
-
+import MagicItems from "./pages/wikiPages/MagicItems";
+import MagicItem from "./pages/wikiPages/MagicItem";
+import MagicSchools from "./pages/wikiPages/MagicSchools";
+import MagicSchool from "./pages/wikiPages/MagicSchool";
 import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
 import Alignment from "./pages/wikiPages/Alignments";
 import Conditions from "./pages/wikiPages/Conditions";
 import DamageTypes from "./pages/wikiPages/DamageTypes";
 import Languages from "./pages/wikiPages/Languages";
 import Language from "./pages/wikiPages/Language";
+import Proficiencies from "./pages/wikiPages/Proficiencies";
+import Skills from "./pages/wikiPages/Skills";
+
+
+
+import DmtoolsNpcs from "./pages/DmtoolsNpcs";
+import VttLobby from "./pages/VttLobby";
+import VttSession from "./pages/VttSession";
 import LoadingOverlay from "./components/LoadingOverlay";
+
+
+
+
+
+
 import { getLoadingCount, subscribeLoading } from "./loadingStore";
 
 function App() {
@@ -170,9 +189,12 @@ function AppWithRouter({
 
         <Route path="/wiki/classes" element={isAuthenticated ? <Classes /> : <Navigate to="/logreg" />} />
         <Route path="/class/:index" element={isAuthenticated ? <Class /> : <Navigate to="/logreg" />} />
+        <Route path="/subclass/:index" element={isAuthenticated ? <SubClass /> : <Navigate to="/logreg" />} />
 
         <Route path="/wiki/races" element={isAuthenticated ? <Races /> : <Navigate to="/logreg" />} />
         <Route path="/race/:index" element={isAuthenticated ? <Race /> : <Navigate to="/logreg" />} />
+        <Route path="/race/:raceIndex/subrace/:subraceIndex" element={isAuthenticated ? <SubRace /> : <Navigate to="/logreg" />} />
+
 
         <Route path="/wiki/monsters" element={isAuthenticated ? <Monsters /> : <Navigate to="/logreg" />} />
         <Route path="/monster/:index" element={isAuthenticated ? <Monster /> : <Navigate to="/logreg" />} />
@@ -180,8 +202,17 @@ function AppWithRouter({
         <Route path="/wiki/backgrounds" element={isAuthenticated ? <Backgrounds /> : <Navigate to="/logreg" />} />
         <Route path="/background/:index" element={isAuthenticated ? <Background /> : <Navigate to="/logreg" />} />
 
-
         <Route path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/magic-items" element={isAuthenticated ? <MagicItems /> : <Navigate to="/logreg" />} />
+        <Route path="/magic-item/:index" element={isAuthenticated ? <MagicItem /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/magic-schools" element={isAuthenticated ? <MagicSchools /> : <Navigate to="/logreg" />} />
+        <Route path="/magic-school/:index" element={isAuthenticated ? <MagicSchool /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/proficiencies" element={isAuthenticated ? <Proficiencies /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/skills" element={isAuthenticated ? <Skills /> : <Navigate to="/logreg" />} />
 
         <Route path="/wiki/ability-scores" element={isAuthenticated ? <AbilityScoresWiki /> : <Navigate to="/logreg" />} />
         <Route path="/wiki/alignments" element={isAuthenticated ? <Alignment /> : <Navigate to="/logreg" />} />
