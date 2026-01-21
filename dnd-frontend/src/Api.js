@@ -1019,3 +1019,227 @@ export const searchLanguages = async (query) => {
     }
 };
 
+
+
+
+
+
+
+// =========================
+// === Magic Items Endpoints
+// =========================
+
+// Get all magic items
+export const getAllMagicItems = () =>
+  api.get("/MagicItems");
+
+// Get magic item by index
+export const getMagicItemByIndex = (index) =>
+  api.get(`/MagicItems/${encodeURIComponent(index)}`);
+
+// Get magic items by category
+export const getMagicItemsByCategory = (category) =>
+  api.get(`/MagicItems/category/${encodeURIComponent(category)}`);
+
+// Get magic items by rarity
+export const getMagicItemsByRarity = (rarity) =>
+  api.get(`/MagicItems/rarity/${encodeURIComponent(rarity)}`);
+
+// Search magic items by name (querystring)
+export const searchMagicItemsByName = (name) =>
+  api.get("/MagicItems/search", { params: { name } });
+
+// Get variants for an item
+export const getMagicItemVariants = (index) =>
+  api.get(`/MagicItems/${encodeURIComponent(index)}/variants`);
+
+// Items requiring attunement
+export const getMagicItemsAttunementRequired = () =>
+  api.get("/MagicItems/attunement/required");
+
+// Cursed items
+export const getCursedMagicItems = () =>
+  api.get("/MagicItems/cursed");
+
+// All available equipment category names
+export const getMagicItemCategories = () =>
+  api.get("/MagicItems/categories");
+
+// All available rarity names
+export const getMagicItemRarities = () =>
+  api.get("/MagicItems/rarities");
+
+// Paginated list
+export const getPaginatedMagicItems = (page = 1, pageSize = 20) =>
+  api.get("/MagicItems/paginated", { params: { page, pageSize } });
+
+
+
+
+
+
+
+
+
+
+
+// =========================
+// === Magic Schools Endpoints
+// =========================
+
+// Get all magic schools
+export const getAllMagicSchools = () =>
+  api.get("/MagicSchools");
+
+// Get magic school by index
+export const getMagicSchoolByIndex = (index) =>
+  api.get(`/MagicSchools/${encodeURIComponent(index)}`);
+
+
+
+
+
+
+
+// =========================
+// === Proficiencies Endpoints
+// =========================
+
+// Get all proficiencies
+export const getAllProficiencies = () =>
+  api.get("/Proficiencies");
+
+// Get proficiency by index
+export const getProficiencyByIndex = (index) =>
+  api.get(`/Proficiencies/${encodeURIComponent(index)}`);
+
+// Get proficiencies by type
+export const getProficienciesByType = (type) =>
+  api.get(`/Proficiencies/type/${encodeURIComponent(type)}`);
+
+// Get proficiencies by class index
+export const getProficienciesByClass = (classIndex) =>
+  api.get(`/Proficiencies/class/${encodeURIComponent(classIndex)}`);
+
+// Get proficiencies by race index
+export const getProficienciesByRace = (raceIndex) =>
+  api.get(`/Proficiencies/race/${encodeURIComponent(raceIndex)}`);
+
+// Search proficiencies by name
+export const searchProficienciesByName = (name) =>
+  api.get("/Proficiencies/search", { params: { name } });
+
+// Get proficiency categories (distinct types)
+export const getProficiencyCategories = () =>
+  api.get("/Proficiencies/categories");
+
+
+
+
+
+// =========================
+// === Skills Endpoints
+// =========================
+
+// Get all skills
+export const getAllSkills = () =>
+  api.get("/Skills");
+
+// Get skill by index
+export const getSkillByIndex = (index) =>
+  api.get(`/Skills/${encodeURIComponent(index)}`);
+
+// Get skills by ability index (e.g., str, dex, con, int, wis, cha)
+export const getSkillsByAbility = (abilityIndex) =>
+  api.get(`/Skills/ability/${encodeURIComponent(abilityIndex)}`);
+
+// Search skills by name
+export const searchSkillsByName = (name) =>
+  api.get("/Skills/search", { params: { name } });
+
+// Search skills by description keyword
+export const searchSkillsByDescription = (keyword) =>
+  api.get("/Skills/search/description", { params: { keyword } });
+
+// Get distinct ability score names (e.g., STR, DEX, ...)
+export const getSkillAbilityScores = () =>
+  api.get("/Skills/ability-scores");
+
+// Grouped by ability name
+export const getSkillsGroupedByAbility = () =>
+  api.get("/Skills/grouped-by-ability");
+
+// Convenience buckets
+export const getPhysicalSkills = () =>
+  api.get("/Skills/physical");
+
+export const getMentalSkills = () =>
+  api.get("/Skills/mental");
+
+export const getSocialSkills = () =>
+  api.get("/Skills/social");
+
+// Per-skill helpers
+export const getSkillExamples = (index) =>
+  api.get(`/Skills/${encodeURIComponent(index)}/examples`);
+
+export const getSkillFullDescription = (index) =>
+  api.get(`/Skills/${encodeURIComponent(index)}/full-description`);
+
+// Summary endpoints
+export const getSkillsCount = () =>
+  api.get("/Skills/count");
+
+export const getSkillsSummary = () =>
+  api.get("/Skills/summary");
+
+
+
+
+
+
+// =========================
+// === Subclasses Endpoints
+// =========================
+
+// Get all subclasses
+export const getAllSubclasses = () =>
+  api.get("/Subclasses");
+
+// Get subclass by index
+export const getSubclassByIndex = (index) =>
+  api.get(`/Subclasses/${encodeURIComponent(index)}`);
+
+// Get subclasses by class name (e.g., "Bard", "Cleric")
+export const getSubclassesByClassName = (className) =>
+  api.get(`/Subclasses/class/${encodeURIComponent(className)}`);
+
+
+
+
+// =========================
+// === Subraces Endpoints
+// =========================
+
+// Get all subraces
+export const getAllSubraces = () =>
+  api.get("/Subraces");
+
+// Get subrace by index
+export const getSubraceByIndex = (index) =>
+  api.get(`/Subraces/${encodeURIComponent(index)}`);
+
+// Get subraces by race name (e.g., "Elf", "Dwarf")
+export const getSubracesByRaceName = (raceName) =>
+  api.get(`/Subraces/race/${encodeURIComponent(raceName)}`);
+
+// Search subraces by name
+export const searchSubraces = (name) =>
+  api.get(`/Subraces/search/${encodeURIComponent(name)}`);
+
+// Helper endpoints
+export const getSubraceTotalBonuses = (index) =>
+  api.get(`/Subraces/${encodeURIComponent(index)}/total-bonuses`);
+
+export const getSubraceTraits = (index) =>
+  api.get(`/Subraces/${encodeURIComponent(index)}/traits`);

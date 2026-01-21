@@ -4,27 +4,25 @@ import '../assets/styles/Navbar.css';
 import '../assets/styles/WikiTheme.css'; // unified theme
 
 const wikiSections = [
-  { name: 'Spells', path: '/wiki/spells' },
-  { name: 'Races', path: '/wiki/races' },
   { name: 'Backgrounds', path: '/wiki/backgrounds' },
-  { name: 'Heroic Chronicle', path: '/wiki/heroic-chronicle' },
   { name: 'Classes', path: '/wiki/classes' },
-  { name: 'Items', path: '/wiki/items' },
   { name: 'Equipments', path: '/wiki/equipments' },
-  { name: 'Feats', path: '/wiki/feats' },
-  { name: 'Racial Feats', path: '/wiki/racial-feats' },
-  { name: 'Miscellaneous', path: '/wiki/miscellaneous' },
+  { name: 'Magic Items', path: '/wiki/magic-items' },
+  { name: 'Magic Schools', path: '/wiki/magic-schools' },
   { name: 'Monsters', path: '/wiki/monsters' },
-  { name: 'Homebrew', path: '/wiki/homebrew' },
-  { name: 'UA', path: '/wiki/ua' }
+  { name: 'Proficiencies', path: '/wiki/proficiencies' },
+  { name: 'Races', path: '/wiki/races' },
+  { name: 'Spells', path: '/wiki/spells' }
 ];
+
 
 const baseInfoSection = [
   { name: 'Ability Scores', path: '/wiki/ability-scores' },
   { name: 'Alignments', path: '/wiki/alignments' },
   { name: 'Conditions', path: '/wiki/conditions' },
   { name: 'Damage Types', path: '/wiki/damage-types' },
-  { name: 'Languages', path: '/wiki/languages' }
+  { name: 'Languages', path: '/wiki/languages' },
+  { name: 'Skills', path: '/wiki/skills' }
 ];
 
 const Wiki = () => {

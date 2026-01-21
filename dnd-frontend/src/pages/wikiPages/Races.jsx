@@ -1,50 +1,66 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getAllRaces, getRaceSizes } from "../../Api";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/WikiTheme.css";
 
+const norm = (v) => (v ?? "").toString().trim().toLowerCase();
+
 export default function Races() {
-  const [races, setRaces] = useState([]);
+  const [allRaces, setAllRaces] = useState([]);
+  const [sizes, setSizes] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [sizes, setSizes] = useState([]);
-  const [filters, setFilters] = useState({ size: "", speed: "" });
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({ size: "", speed: "" }); // speed is min speed number as string
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError("");
+
       try {
         const data = await getAllRaces();
-        setRaces(data);
+        setAllRaces(Array.isArray(data) ? data : []);
+
         const sizeOptions = await getRaceSizes();
-        setSizes(sizeOptions);
+        setSizes(Array.isArray(sizeOptions) ? sizeOptions : []);
       } catch {
         setError("Error loading races.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
-  const handleSearch = async () => {
-    let filtered = await getAllRaces();
-    if (searchTerm) {
-      filtered = filtered.filter((r) =>
-        r.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const filteredRaces = useMemo(() => {
+    let list = allRaces;
+
+    const q = norm(searchTerm);
+    if (q) {
+      list = list.filter((r) => norm(r?.name).includes(q));
     }
-    if (filters.size) filtered = filtered.filter(r => r.size === filters.size);
-    if (filters.speed) filtered = filtered.filter(r => r.speed >= parseInt(filters.speed));
-    setRaces(filtered);
-  };
+
+    if (filters.size) {
+      list = list.filter((r) => r?.size === filters.size);
+    }
+
+    if (filters.speed) {
+      const minSpeed = Number(filters.speed);
+      list = list.filter((r) => Number(r?.speed ?? 0) >= minSpeed);
+    }
+
+    return list;
+  }, [allRaces, searchTerm, filters.size, filters.speed]);
 
   const resetFilters = () => {
     setFilters({ size: "", speed: "" });
     setSearchTerm("");
-    handleSearch();
   };
 
   if (loading) return <div className="loading">Loading races...</div>;
@@ -52,10 +68,11 @@ export default function Races() {
 
   return (
     <div id="races-comp">
-      <div id="races-page">
+      <div id="races-page" className="page-content" style={{ maxWidth: 1100, margin: "0 auto" }}>
         <button className="back-button" onClick={() => navigate("/wiki")}>
           ← Back to Main Page
         </button>
+
         <header>
           <h1>D&D Races</h1>
           <p className="subtitle">Explore the Dungeons & Dragons races</p>
@@ -66,37 +83,47 @@ export default function Races() {
             type="text"
             placeholder="Search by race name..."
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              handleSearch();
-            }}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <select value={filters.size} onChange={e => {
-            setFilters(f => ({ ...f, size: e.target.value }));
-            handleSearch();
-          }}>
+
+          <select
+            value={filters.size}
+            onChange={(e) => setFilters((f) => ({ ...f, size: e.target.value }))}
+          >
             <option value="">All Sizes</option>
-            {sizes.map(size => <option key={size} value={size}>{size}</option>)}
+            {sizes.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
           </select>
-          <select value={filters.speed} onChange={e => {
-            setFilters(f => ({ ...f, speed: e.target.value }));
-            handleSearch();
-          }}>
+
+          {/* speed = MIN speed filter */}
+          <select
+            value={filters.speed}
+            onChange={(e) => setFilters((f) => ({ ...f, speed: e.target.value }))}
+          >
             <option value="">All Speeds</option>
-            <option value="20">≤ 20 ft</option>
-            <option value="25">25 ft</option>
-            <option value="30">30 ft</option>
-            <option value="35">≥ 35 ft</option>
+            <option value="20">20+ ft</option>
+            <option value="25">25+ ft</option>
+            <option value="30">30+ ft</option>
+            <option value="35">35+ ft</option>
           </select>
+
           <button onClick={resetFilters}>Reset</button>
         </div>
 
         <div className="races-grid">
-          {races.length === 0 ? (
+          {filteredRaces.length === 0 ? (
             <div className="error">No races found.</div>
           ) : (
-            races.map(race => (
-              <div key={race.index} className="race-card" onClick={() => navigate(`/race/${race.index}`)}>
+            filteredRaces.map((race) => (
+              <div
+                key={race.index}
+                className="race-card"
+                onClick={() => navigate(`/race/${race.index}`)}
+                style={{ cursor: "pointer" }}
+              >
                 <div className="race-header" style={{ backgroundColor: "var(--app-border, #878787)" }}>
                   <h3 className="race-name">{race.name}</h3>
                   <div className="race-size">{race.size}</div>

@@ -1,46 +1,69 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllItems, getItemCategories } from "../../Api"; // adjust path
+import { getAllItems, getItemCategories } from "../../Api";
 import "../../assets/styles/WikiTheme.css";
 
 export default function Equipments() {
   const [items, setItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [rawCategories, setRawCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(""); // will store value
+
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       const allItems = await getAllItems();
-      setItems(allItems);
-      setFilteredItems(allItems);
+      setItems(allItems || []);
       const cats = await getItemCategories();
-      setCategories(cats);
+      setRawCategories(cats || []);
       setLoading(false);
     }
     fetchData();
   }, []);
 
-  // Live filtering
-  useEffect(() => {
-    let results = items;
+  // Normalize categories to { value, label }
+  const categories = useMemo(() => {
+    return (rawCategories || [])
+      .map((c) => {
+        // Some APIs return: [{ index, name }], others return: ["Armor", "Weapon"], etc.
+        if (typeof c === "string") return { value: c, label: c };
+        if (c && typeof c === "object") {
+          const value = c.index ?? c.name ?? "";
+          const label = c.name ?? c.index ?? "";
+          return value ? { value, label } : null;
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }, [rawCategories]);
+
+  const filteredItems = useMemo(() => {
+    let results = items || [];
+
     if (searchTerm) {
-      results = results.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      const q = searchTerm.toLowerCase();
+      results = results.filter((item) => item?.name?.toLowerCase().includes(q));
     }
+
     if (selectedCategory) {
-      results = results.filter(
-        (item) =>
-          item.equipment_category && item.equipment_category.index === selectedCategory
-      );
+      results = results.filter((item) => {
+        const ec = item?.equipment_category; // equipment endpoint often uses snake_case
+        const idx = ec?.index ?? ec?.name ?? "";
+        const name = ec?.name ?? "";
+        // Allow matching by either index or name (covers both dropdown data types)
+        return (
+          idx?.toLowerCase() === selectedCategory.toLowerCase() ||
+          name?.toLowerCase() === selectedCategory.toLowerCase()
+        );
+      });
     }
-    setFilteredItems(results);
-  }, [searchTerm, selectedCategory, items]);
+
+    return results;
+  }, [items, searchTerm, selectedCategory]);
 
   return (
     <div id="equipments-comp" className="page-comp">
@@ -61,14 +84,12 @@ export default function Equipments() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
+
+          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
             <option value="">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat.index} value={cat.index}>
-                {cat.name}
+              <option key={cat.value} value={cat.value}>
+                {cat.label}
               </option>
             ))}
           </select>
@@ -91,9 +112,7 @@ export default function Equipments() {
                   {item.armor_class && (
                     <p>
                       Armor Class:{" "}
-                      {typeof item.armor_class === "object"
-                        ? item.armor_class.base
-                        : item.armor_class}
+                      {typeof item.armor_class === "object" ? item.armor_class.base : item.armor_class}
                     </p>
                   )}
                   {item.weight !== undefined && <p>Weight: {item.weight}</p>}
