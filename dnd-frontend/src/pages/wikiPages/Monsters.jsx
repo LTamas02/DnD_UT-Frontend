@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllMonsters } from "../../Api";
+import { getAllMonsters } from "../../assets/api/wikiapi";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/WikiTheme.css";
 
@@ -191,3 +191,5 @@ export default function Monsters() {
     </div>
   );
 }
+
+

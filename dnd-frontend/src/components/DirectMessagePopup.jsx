@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import { API_BASE, getDmHistory } from "../Api";
+import { API_BASE, getDmHistory } from "../assets/api/dndtoolapi";
 import "../assets/styles/ChatPopUp.css";
 
 export default function DirectMessagePopup({ token, meId, friend, onClose }) {
@@ -131,3 +131,4 @@ export default function DirectMessagePopup({ token, meId, friend, onClose }) {
         </div>
     );
 }
+

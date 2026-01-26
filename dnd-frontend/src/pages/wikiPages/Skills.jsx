@@ -1,7 +1,7 @@
 // Skills.jsx (FIXED: ability_score field + working filters)
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllSkills, getSkillAbilityScores } from "../../Api"; // adjust path
+import { getAllSkills, getSkillAbilityScores } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
@@ -317,3 +317,5 @@ export default function Skills() {
     </div>
   );
 }
+
+

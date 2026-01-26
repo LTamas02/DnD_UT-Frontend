@@ -6,7 +6,7 @@ import {
   getRaceLanguages,
   getRaceAbilityBonuses,
   getSubracesByRaceName,
-} from "../../Api";
+} from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 const Race = () => {
@@ -180,3 +180,5 @@ const Race = () => {
 };
 
 export default Race;
+
+

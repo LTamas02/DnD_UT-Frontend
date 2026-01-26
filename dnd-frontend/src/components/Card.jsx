@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPdf } from '../Api';
+import { getPdf } from '../assets/api/dndtoolapi';
 
 export default function Card({ character }) {
     const navigate = useNavigate();
@@ -53,3 +53,4 @@ export default function Card({ character }) {
         </div>
     );
 }
+

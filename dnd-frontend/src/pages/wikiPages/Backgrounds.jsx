@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getAllBackgrounds } from '../../Api';
+import { getAllBackgrounds } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 
 export default function Backgrounds() {
@@ -85,3 +85,5 @@ export default function Backgrounds() {
     </div>
   );
 }
+
+

@@ -28,3 +28,4 @@ const LoadingOverlay = ({ active, label = "Loading..." }) => {
 };
 
 export default LoadingOverlay;
+

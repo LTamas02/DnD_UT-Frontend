@@ -448,8 +448,10 @@
 .vtt-zoom-slider {
   height: clamp(90px, 24vh, 140px);
   width: 8px;
-  writing-mode: bt-lr;
-  -webkit-appearance: slider-vertical;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: none;
+  appearance: none;
   background: linear-gradient(180deg, rgba(255, 224, 170, 0.4), rgba(0, 0, 0, 0.15));
   border-radius: 999px;
 }

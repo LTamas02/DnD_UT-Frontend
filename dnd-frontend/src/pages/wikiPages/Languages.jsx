@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllLanguages } from '../../Api';
+import { getAllLanguages } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 
 export default function LanguagesWiki() {
@@ -64,3 +64,5 @@ export default function LanguagesWiki() {
     </div>
   );
 }
+
+

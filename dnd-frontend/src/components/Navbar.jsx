@@ -2,13 +2,24 @@
 import React from "react";
 import "../assets/styles/Navbar.css"; // Import your CSS file for styling
 import { Link } from "react-router-dom";
-import ppic from "../assets/img/profile_picture.jpg"; // Default profile picture
+const profileImages = require.context("../assets/img/profile", false, /\.(png|jpe?g|gif|svg)$/);
+const PROFILE_IMAGE_OPTIONS = profileImages.keys().map((key) => ({
+    name: key.replace("./", ""),
+    src: profileImages(key)
+}));
+const profileImageMap = PROFILE_IMAGE_OPTIONS.reduce((acc, image) => {
+    acc[image.name] = image.src;
+    return acc;
+}, {});
+const DEFAULT_PROFILE_IMAGE = profileImageMap["profile_picture.jpg"] || PROFILE_IMAGE_OPTIONS[0]?.src || "";
 
 const API_BASE = "https://api.dnd-tool.com";
 
 const toAbsUrl = (url) => {
     if (!url || typeof url !== "string") return "";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    const localKey = url.replace(/^\/defaults\//, "");
+    if (profileImageMap[localKey]) return profileImageMap[localKey];
     if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
     return url;
 };
@@ -16,7 +27,7 @@ const toAbsUrl = (url) => {
 const Navbar = ({ username, profilePicture }) => {
     const displayName = username || localStorage.getItem("username") || "Profile";
     const storedPicture = localStorage.getItem("profilePicture");
-    const displayPicture = profilePicture || storedPicture || ppic;
+    const displayPicture = profilePicture || storedPicture || DEFAULT_PROFILE_IMAGE;
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark">
@@ -135,6 +146,11 @@ const NavbarProfile = ({ username, profilePicture }) => {
                             </Link>
                         </li>
                         <li className="nav-item">
+                            <Link to="/books" className="nav-link active" data-tutorial="nav-books">
+                                Books
+                            </Link>
+                        </li>
+                        <li className="nav-item">
                             <Link to="/dmtools" className="nav-link active" data-tutorial="nav-dmtools">
                                 DM Tools
                             </Link>
@@ -170,4 +186,5 @@ const NavbarLogin= () => {
 };
 
 export {Navbar, NavbarLogin, NavbarProfile};
+
 

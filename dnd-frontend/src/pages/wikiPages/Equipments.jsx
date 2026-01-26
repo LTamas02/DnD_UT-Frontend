@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllItems, getItemCategories } from "../../Api";
+import { getAllItems, getItemCategories } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 export default function Equipments() {
@@ -126,3 +126,5 @@ export default function Equipments() {
     </div>
   );
 }
+
+

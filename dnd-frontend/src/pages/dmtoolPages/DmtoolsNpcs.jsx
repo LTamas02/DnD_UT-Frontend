@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import '../assets/styles/WikiTheme.css'
-import '../assets/styles/Dmtools.css'
-import '../assets/styles/DmtoolsNpcs.css'
+import '../../assets/styles/WikiTheme.css'
+import '../../assets/styles/Dmtools.css'
+import '../../assets/styles/DmtoolsNpcs.css'
 
 const randomPick = (list) => list[Math.floor(Math.random() * list.length)]
 
@@ -310,3 +310,5 @@ export default function DmtoolsNpcs() {
     </div>
   )
 }
+
+

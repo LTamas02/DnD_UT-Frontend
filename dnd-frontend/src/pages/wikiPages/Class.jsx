@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getClassByIndex, getSubclassesByClassName } from "../../Api";
+import { getClassByIndex, getSubclassesByClassName } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 const Class = () => {
@@ -173,3 +173,5 @@ const Class = () => {
 };
 
 export default Class;
+
+

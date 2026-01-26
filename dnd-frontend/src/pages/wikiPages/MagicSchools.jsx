@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllMagicSchools } from "../../Api"; // adjust path
+import { getAllMagicSchools } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
@@ -139,3 +139,5 @@ export default function MagicSchools() {
     </div>
   );
 }
+
+

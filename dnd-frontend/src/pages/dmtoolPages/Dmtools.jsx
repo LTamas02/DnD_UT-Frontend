@@ -1,11 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import '../assets/styles/WikiTheme.css'
-import '../assets/styles/Dmtools.css'
-import encounterImage from '../assets/img/BG/classes/fighter.jpg'
-import npcImage from '../assets/img/BG/classes/bard.jpg'
-import lootImage from '../assets/img/BG/classes/cleric.jpg'
-import mapImage from '../assets/img/BG/classes/wizard.jpg'
+import '../../assets/styles/WikiTheme.css'
+import '../../assets/styles/Dmtools.css'
+import encounterImage from '../../assets/img/BG/classes/fighter.jpg'
+import npcImage from '../../assets/img/BG/classes/bard.jpg'
+import lootImage from '../../assets/img/BG/classes/cleric.jpg'
+import mapImage from '../../assets/img/BG/classes/wizard.jpg'
+import vttImage from '../../assets/img/BG/classes/warlock.jpg'
 
 export default function Dmtools() {
   const dmTools = [
@@ -37,7 +38,7 @@ export default function Dmtools() {
       name: 'Virtual Tabletop',
       description: 'Run battles with maps, tokens, chat, and dice.',
       path: '/vtt',
-      image: mapImage
+      image: vttImage
     }
   ]
 
@@ -64,3 +65,5 @@ export default function Dmtools() {
     </div>
   )
 }
+
+

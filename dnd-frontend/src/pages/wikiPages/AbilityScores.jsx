@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getAllAbilityScores } from "../../Api";
+import { getAllAbilityScores } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 import { useNavigate } from "react-router-dom";
 
@@ -198,3 +198,5 @@ export default function AbilityScoresWiki() {
     </div>
   );
 }
+
+

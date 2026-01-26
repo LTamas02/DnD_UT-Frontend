@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getSubclassByIndex } from "../../Api";
+import { getSubclassByIndex } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 const toLabel = (x) => {
@@ -103,3 +103,5 @@ export default function SubClass() {
     </div>
   );
 }
+
+

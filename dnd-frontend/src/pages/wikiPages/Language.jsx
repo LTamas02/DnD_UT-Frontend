@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getLanguageByIndex } from '../../Api';
+import { getLanguageByIndex } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 
 export default function Language() {
@@ -71,3 +71,5 @@ export default function Language() {
         </div>
     );
 }
+
+

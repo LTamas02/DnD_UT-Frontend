@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/WikiTheme.css';
-import { getSpellsByLevel } from '../../Api';
+import { getSpellsByLevel } from '../../assets/api/wikiapi';
 
 const levels = [
   { label: 'Cantrip', value: 0 },
@@ -120,3 +120,5 @@ const Spells = () => {
 };
 
 export default Spells;
+
+

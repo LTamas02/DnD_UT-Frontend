@@ -5,7 +5,7 @@ import {
     getBackgroundFeature,
     getBackgroundStartingEquipment,
     getBackgroundProficiencies
-} from '../../Api';
+} from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 
 // Segédfüggvény a felszerelés listájának formázásához (változatlan)
@@ -198,3 +198,5 @@ export default function Background() {
         </div>
     );
 }
+
+

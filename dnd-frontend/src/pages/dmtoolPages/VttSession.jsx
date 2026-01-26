@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import { API_BASE, CharacterApi, VttApi, getUser } from "../Api";
-import "../assets/styles/Vtt.css";
-import "../assets/styles/DmtoolsMaps.css";
+import { API_BASE, CharacterApi, VttApi, getUser } from "../../assets/api/dndtoolapi";
+import "../../assets/styles/Vtt.css";
+import "../../assets/styles/DmtoolsMaps.css";
 
 const resolveAssetUrl = (url) => {
     if (!url) return "";
@@ -1543,3 +1543,5 @@ export default function VttSession() {
         </div>
     );
 }
+
+

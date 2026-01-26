@@ -1,7 +1,7 @@
 // Proficiencies.jsx (single-page, list shows 2 cards per row on desktop)
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllProficiencies, getProficiencyCategories } from "../../Api"; // adjust path
+import { getAllProficiencies, getProficiencyCategories } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
@@ -274,3 +274,5 @@ export default function Proficiencies() {
     </div>
   );
 }
+
+

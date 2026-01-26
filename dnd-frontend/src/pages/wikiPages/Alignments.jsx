@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllAlignments } from '../../Api';
+import { getAllAlignments } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -63,3 +63,5 @@ export default function AlignmentsWiki() {
     </div>
   );
 }
+
+

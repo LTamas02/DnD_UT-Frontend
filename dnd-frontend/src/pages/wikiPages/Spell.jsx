@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
-import { getSpellByIndex } from '../../Api';
+import { getSpellByIndex } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 
 const Spell = () => {
@@ -106,3 +106,5 @@ const Spell = () => {
 };
 
 export default Spell;
+
+

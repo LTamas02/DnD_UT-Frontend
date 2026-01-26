@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { getAllRaces, getRaceSizes } from "../../Api";
+import { getAllRaces, getRaceSizes } from "../../assets/api/wikiapi";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/WikiTheme.css";
 
@@ -142,3 +142,5 @@ export default function Races() {
     </div>
   );
 }
+
+

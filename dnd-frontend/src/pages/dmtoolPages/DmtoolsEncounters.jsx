@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import '../assets/styles/WikiTheme.css'
-import '../assets/styles/Dmtools.css'
-import '../assets/styles/DmtoolsEncounters.css'
+import '../../assets/styles/WikiTheme.css'
+import '../../assets/styles/Dmtools.css'
+import '../../assets/styles/DmtoolsEncounters.css'
 
 const XP_THRESHOLDS = {
   1: { easy: 25, medium: 50, hard: 75, deadly: 100 },
@@ -332,3 +332,5 @@ export default function DmtoolsEncounters() {
     </div>
   )
 }
+
+

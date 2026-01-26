@@ -5,7 +5,7 @@ import {
   getAllMagicItems,
   getMagicItemCategories,
   getMagicItemRarities,
-} from "../../Api"; // adjust path
+} from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
@@ -232,3 +232,5 @@ export default function MagicItems() {
     </div>
   );
 }
+
+

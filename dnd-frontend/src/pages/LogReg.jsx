@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "../assets/styles/Login.css";
 import React, { useState, useEffect, useRef } from "react";
 import { sha256 } from "js-sha256";
-import { register, login, getSalt, saltSend } from "../Api";
+import { register, login, getSalt, saltSend } from "../assets/api/dndtoolapi";
 import Footer from "../components/Footer";
 import { NavbarLogin } from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
@@ -385,3 +385,4 @@ const LogReg = ({ setIsAuthenticated }) => {
 };
 
 export default LogReg;
+

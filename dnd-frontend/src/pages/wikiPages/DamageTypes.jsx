@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllDamageTypes } from '../../Api';
+import { getAllDamageTypes } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
 
 export default function DamageTypesWiki() {
@@ -64,3 +64,5 @@ export default function DamageTypesWiki() {
     </div>
   );
 }
+
+

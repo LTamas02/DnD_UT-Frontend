@@ -69,12 +69,12 @@
  */
 .allies-section {
     /* Szín: Nagyon világos kávé, vagy krémfehér, enyhe áttetszőséggel */
-    background: var(--profile-panel-bg, rgba(255, 255, 255, 0.1)); 
+    background: var(--profile-card-bg, rgba(30, 20, 14, 0.72));
     backdrop-filter: blur(5px); /* Enyhe elmosás a háttérkép miatt */
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--profile-card-border, rgba(255, 255, 255, 0.1));
     margin-top: 40px;
     color: var(--app-accent, #ffcc80); /* Szöveg alapértelmezett színe */
 }
@@ -141,6 +141,19 @@
     background-color: var(--profile-card-border, #6d4c41);
 }
 
+.allies-section .btn {
+    background: var(--profile-button-bg, var(--app-button-bg, #795548));
+    color: var(--profile-button-text, var(--app-button-text, #fff8e1));
+    border: 1px solid var(--profile-card-border, rgba(255, 255, 255, 0.12));
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+}
+
+.allies-section .btn:hover {
+    background: var(--profile-accent, #ffcc80);
+    color: #2b1a12;
+}
 .no-allies {
     font-style: italic;
     color: var(--app-border, #a1887f); /* Lágy barna szín */
@@ -363,6 +376,7 @@
     z-index: 1;
     max-width: 1100px;
     padding: 36px 16px 60px;
+    margin: 0 auto;
 }
 
 .profile-box {
@@ -406,14 +420,55 @@
     gap: 16px;
 }
 
-.friend {
+.friends-list .friend {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
+    gap: 16px;
     margin: 0;
 }
 
-.friend span {
-    margin-left: 12px;
+.friend-name {
+    font-weight: 600;
+    color: var(--profile-text, #ffe0b2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.friend-action {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    background: var(--profile-button-bg, var(--app-button-bg, #795548));
+    color: var(--profile-button-text, var(--app-button-text, #fff8e1));
+    border: 1px solid var(--profile-card-border, rgba(255, 255, 255, 0.12));
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.friend-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    background: var(--profile-accent, #ffcc80);
+    color: #2b1a12;
+}
+
+.friend-action.danger {
+    background: rgba(150, 60, 46, 0.85);
+    border-color: rgba(200, 120, 100, 0.4);
+    color: #ffe8e2;
+}
+
+.friend-action.danger:hover {
+    background: rgba(200, 90, 70, 0.95);
+    color: #1f120d;
 }
 
 .profile-modal {

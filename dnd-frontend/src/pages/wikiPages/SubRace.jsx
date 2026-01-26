@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getSubraceByIndex } from "../../Api";
+import { getSubraceByIndex } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 const toLabel = (x) => {
@@ -97,3 +97,5 @@ export default function SubRace() {
     </div>
   );
 }
+
+

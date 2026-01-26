@@ -9,9 +9,9 @@ import ReactFlow, {
   useNodesState
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import '../assets/styles/WikiTheme.css'
-import '../assets/styles/Dmtools.css'
-import '../assets/styles/DmtoolsMaps.css'
+import '../../assets/styles/WikiTheme.css'
+import '../../assets/styles/Dmtools.css'
+import '../../assets/styles/DmtoolsMaps.css'
 
 // ===== Backend config =====
 const API_BASE = 'https://api.dnd-tool.com' // <-- backend base url
@@ -1718,3 +1718,5 @@ export default function DmtoolsMaps() {
     </div>
   )
 }
+
+

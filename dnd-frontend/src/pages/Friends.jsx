@@ -13,7 +13,7 @@ import {
     unblockFriend,
     getMutualFriends,
     inviteMultipleFriends
-} from "../Api";
+} from "../assets/api/dndtoolapi";
 import Footer from "../components/Footer";
 import DirectMessagePopup from "../components/DirectMessagePopup";
 
@@ -230,3 +230,4 @@ const Friends = () => {
 };
 
 export default Friends;
+

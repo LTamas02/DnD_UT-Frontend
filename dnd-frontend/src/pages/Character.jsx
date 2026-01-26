@@ -7,9 +7,9 @@ import {
   getClassByIndex,
   getWeapons,
   getAllRaces,
-  getRaceByIndex,
-  CharacterApi
-} from "../Api";
+  getRaceByIndex
+} from "../assets/api/wikiapi";
+import { CharacterApi } from "../assets/api/dndtoolapi";
 
 // ==========================================================
 // === DEFAULT PROFILE & Helper Data ===
@@ -1339,6 +1339,7 @@ export default function Character() {
     </div>
   );
 }
+
 
 
 

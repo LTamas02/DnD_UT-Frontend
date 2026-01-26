@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "../assets/styles/BooksRules.css";
-import { API_BASE, getMarkdownBooks, getMarkdownBookContent } from "../Api";
+import { API_BASE, getMarkdownBooks, getMarkdownBookContent } from "../assets/api/dndtoolapi";
 import { getCachedBookContent, setCachedBookContent } from "../bookCache";
 
 const createSlugger = () => {
@@ -480,3 +480,4 @@ const BooksRules = () => {
 };
 
 export default BooksRules;
+

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import '../assets/styles/WikiTheme.css'
-import '../assets/styles/Dmtools.css'
+import '../../assets/styles/WikiTheme.css'
+import '../../assets/styles/Dmtools.css'
 
 export default function DmtoolsLoot() {
   return (
@@ -23,3 +23,5 @@ export default function DmtoolsLoot() {
     </div>
   )
 }
+
+

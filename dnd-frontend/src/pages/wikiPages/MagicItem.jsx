@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMagicItemByIndex, getMagicItemVariants } from "../../Api"; // adjust path
+import { getMagicItemByIndex, getMagicItemVariants } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
@@ -126,3 +126,5 @@ export default function MagicItem() {
     </div>
   );
 }
+
+

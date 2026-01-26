@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getMagicSchoolByIndex } from "../../Api"; // adjust path
+import { getMagicSchoolByIndex } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
 
 export default function MagicSchool() {
@@ -85,3 +85,5 @@ export default function MagicSchool() {
     </div>
   );
 }
+
+

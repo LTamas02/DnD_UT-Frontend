@@ -21,74 +21,112 @@ import {
     updateProfilePictureFile,
     getProfileTheme,
     updateProfileTheme
-} from "../Api";
+} from "../assets/api/profileapi";
 import { DEFAULT_THEME, THEME_KEY, applyTheme } from "../theme";
 
 const API_BASE = "https://api.dnd-tool.com";
-
 const THEME_PRESETS = [
     {
         id: "ember",
         name: "Ember Hearth",
         theme: {
-            bgGradient: "linear-gradient(135deg, rgba(14,8,6,0.85), rgba(64,20,12,0.92))",
-            pageBg: "#281813",
+            bgGradient: "linear-gradient(135deg, rgba(18,10,8,0.88), rgba(72,26,14,0.94))",
+            pageBg: "#2b1611",
+            overlay: "rgba(6,4,3,0.45)",
             accent: "#ffb36b",
-            text: "#ffe3c4",
-            muted: "#d0a578",
-            panelBg: "rgba(255,190,120,0.08)",
-            buttonBg: "#6b3b2a"
+            text: "#ffe8d3",
+            muted: "#d8a97a",
+            cardBg: "linear-gradient(180deg, rgba(38,20,16,0.92), rgba(34,16,12,0.8))",
+            cardBorder: "rgba(255,179,107,0.12)",
+            panelBg: "rgba(30,12,8,0.65)",
+            panelText: "#ffe8d3",
+            buttonBg: "#8a4f39",
+            buttonText: "#fff7ef",
+            buttonBorder: "rgba(0,0,0,0.15)",
+            buttonHover: "#a05a42",
+            friendBg: "rgba(88,39,24,0.18)"
         }
     },
     {
         id: "forest",
         name: "Wyrdwood",
         theme: {
-            bgGradient: "linear-gradient(140deg, rgba(6,12,10,0.9), rgba(18,60,48,0.85))",
-            pageBg: "#0f1a15",
+            bgGradient: "linear-gradient(140deg, rgba(6,12,10,0.92), rgba(16,54,42,0.9))",
+            pageBg: "#081611",
+            overlay: "rgba(4,10,8,0.5)",
             accent: "#7ce0b4",
-            text: "#d7fff0",
-            muted: "#98c7b4",
-            cardBg: "#1d2f29",
-            friendBg: "#223a32",
-            buttonBg: "#2f4d41"
+            text: "#dffbf0",
+            muted: "#9fd1bf",
+            cardBg: "#122a24",
+            cardBorder: "rgba(124,224,180,0.06)",
+            panelBg: "linear-gradient(180deg, rgba(20,40,34,0.7), rgba(14,28,24,0.6))",
+            panelText: "#dffbf0",
+            buttonBg: "#2f6a56",
+            buttonText: "#eefbf6",
+            buttonBorder: "rgba(0,0,0,0.12)",
+            buttonHover: "#3f7d68",
+            friendBg: "#16382f"
         }
     },
     {
         id: "midnight",
         name: "Night Ledger",
         theme: {
-            bgGradient: "linear-gradient(140deg, rgba(8,8,16,0.9), rgba(40,28,72,0.88))",
-            pageBg: "#141123",
+            bgGradient: "linear-gradient(140deg, rgba(10,8,18,0.9), rgba(44,30,80,0.92))",
+            pageBg: "#0e0b16",
+            overlay: "rgba(6,6,12,0.56)",
             accent: "#f0b9ff",
-            text: "#f8e9ff",
-            muted: "#cab4e6",
-            cardBg: "#2a223d",
-            buttonBg: "#3d2f5c"
+            text: "#fbecff",
+            muted: "#d9c2e8",
+            cardBg: "#271f34",
+            cardBorder: "rgba(240,185,255,0.06)",
+            panelBg: "rgba(28,20,44,0.78)",
+            panelText: "#f3e8ff",
+            buttonBg: "#4a3370",
+            buttonText: "#fff6ff",
+            buttonBorder: "rgba(0,0,0,0.14)",
+            buttonHover: "#5a4286",
+            friendBg: "#2b2340"
         }
     },
     {
         id: "sunlit",
         name: "Sunlit Archive",
         theme: {
-            bgGradient: "linear-gradient(135deg, rgba(255,242,224,0.85), rgba(218,170,110,0.82))",
-            pageBg: "#f6e1c8",
+            bgGradient: "linear-gradient(135deg, rgba(255,245,230,0.9), rgba(220,180,120,0.9))",
+            pageBg: "#f7e9d7",
+            overlay: "rgba(255,246,236,0.45)",
             accent: "#7c2f1c",
             text: "#3b1f14",
-            muted: "#7c5841",
-            cardBg: "#fdf6eb",
-            cardBorder: "#d6b087",
-            panelBg: "rgba(60,30,15,0.08)",
+            muted: "#8f6f57",
+            cardBg: "#fff8f1",
+            cardBorder: "#e6c9a4",
+            panelBg: "rgba(250,240,230,0.6)",
             panelText: "#3b1f14",
-            buttonBg: "#7c2f1c",
-            buttonText: "#fff0d6",
-            friendBg: "#f2dbc0"
+            buttonBg: "#8b4a33",
+            buttonText: "#fff1df",
+            buttonBorder: "rgba(0,0,0,0.06)",
+            buttonHover: "#a15b41",
+            friendBg: "#f3dfc8"
         }
     }
 ];
 
+const profileImages = require.context("../assets/img/profile", false, /\.(png|jpe?g|gif|svg)$/);
+const PROFILE_IMAGE_OPTIONS = profileImages.keys().map((key) => ({
+    name: key.replace("./", ""),
+    src: profileImages(key)
+}));
+const profileImageMap = PROFILE_IMAGE_OPTIONS.reduce((acc, image) => {
+    acc[image.name] = image.src;
+    return acc;
+}, {});
+const DEFAULT_PROFILE_IMAGE = profileImageMap["profile_picture.jpg"] || PROFILE_IMAGE_OPTIONS[0]?.src || "";
+
 const toAbsUrl = (url) => {
-    if (!url || typeof url !== "string") return "";
+    if (!url || typeof url !== "string") return DEFAULT_PROFILE_IMAGE;
+    const localKey = url.replace(/^\/defaults\//, "");
+    if (profileImageMap[localKey]) return profileImageMap[localKey];
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
     if (url.startsWith("/uploads/")) return `${API_BASE}${url}`;
     return url;
@@ -96,11 +134,12 @@ const toAbsUrl = (url) => {
 
 const Profile = ({ onStartTutorial }) => {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
+    const rawToken = localStorage.getItem("token");
+    const token = rawToken && rawToken !== "undefined" && rawToken !== "null" ? rawToken : null;
 
     const [user, setUser] = useState(null);
     const [friends, setFriends] = useState([]);
-    const [profilePic, setProfilePic] = useState("/defaults/profile_picture.jpg");
+    const [profilePic, setProfilePic] = useState(DEFAULT_PROFILE_IMAGE);
     const [activeChat, setActiveChat] = useState(null);
 
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -138,10 +177,16 @@ const Profile = ({ onStartTutorial }) => {
                 setProfilePic(
                     res.data.profilePictureUrl ||
                     res.data.profilePicture ||
-                    "/defaults/profile_picture.jpg"
+                    DEFAULT_PROFILE_IMAGE
                 );
             })
-            .catch(err => console.error("Error loading user:", err));
+            .catch(err => {
+                if (err?.response?.status === 401) {
+                    logout();
+                    return;
+                }
+                console.error("Error loading user:", err);
+            });
 
         getFriends(token)
             .then(res => setFriends(res.data || []))
@@ -448,7 +493,7 @@ const Profile = ({ onStartTutorial }) => {
 
             <div className="container profile-shell">
                 <div className="row justify-content-center">
-                    <div className="col-md-6">
+                    <div className="col-md-12">
                         <div className="profile-box text-center">
                             <img
                                 src={toAbsUrl(profilePic)}
@@ -624,7 +669,7 @@ const Profile = ({ onStartTutorial }) => {
                                         {friends.map(friend => (
                                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
                                                 <img
-                                                    src={toAbsUrl(friend.profilePictureUrl || friend.profilePicture || friend.profile_picture || "/defaults/profile_picture.jpg")}
+                                                    src={toAbsUrl(friend.profilePictureUrl || friend.profilePicture || friend.profile_picture || DEFAULT_PROFILE_IMAGE)}
                                                     alt="Friend"
                                                     className="friend-pic rounded-circle"
                                                 />
@@ -993,13 +1038,13 @@ const Profile = ({ onStartTutorial }) => {
                                         </div>
                                     </div>
                                     <div className="image-options d-flex flex-wrap gap-2">
-                                        {["profile1.jpg", "profile2.jpg", "profile3.jpg"].map(img => (
+                                        {PROFILE_IMAGE_OPTIONS.map((img) => (
                                             <img
-                                                key={img}
-                                                src={`/defaults/${img}`}
+                                                key={img.name}
+                                                src={img.src}
                                                 alt="Default Profile"
                                                 className="selectable-pic"
-                                                onClick={() => selectImage(img)}
+                                                onClick={() => selectImage(img.name)}
                                             />
                                         ))}
                                     </div>
@@ -1052,7 +1097,7 @@ const Profile = ({ onStartTutorial }) => {
                             {friendRequests.map(req => (
                                 <li key={req.id} className="d-flex align-items-center mb-2 request-item">
                                     <img
-                                        src={toAbsUrl(req.requesterProfilePicture || "/defaults/profile_picture.jpg")}
+                                        src={toAbsUrl(req.requesterProfilePicture || DEFAULT_PROFILE_IMAGE)}
                                         alt="Sender"
                                         className="friend-request-pic"
                                     />
@@ -1089,3 +1134,4 @@ const Profile = ({ onStartTutorial }) => {
 };
 
 export default Profile;
+

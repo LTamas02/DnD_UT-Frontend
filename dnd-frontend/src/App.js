@@ -1,15 +1,15 @@
 import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getUser, getProfileTheme, completeTutorial } from "./Api";
+import { getUser, getProfileTheme, completeTutorial } from "./assets/api/dndtoolapi";
 import { DEFAULT_THEME, THEME_KEY, applyTheme } from "./theme";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import LogReg from "./pages/LogReg";
 import Characters from "./pages/Characters";
-import Dmtools from "./pages/Dmtools";
-import DmtoolsEncounters from "./pages/DmtoolsEncounters";
-import DmtoolsLoot from "./pages/DmtoolsLoot";
-import DmtoolsMaps from "./pages/DmtoolsMaps";
+import Dmtools from "./pages/dmtoolPages/Dmtools";
+import DmtoolsEncounters from "./pages/dmtoolPages/DmtoolsEncounters";
+import DmtoolsLoot from "./pages/dmtoolPages/DmtoolsLoot";
+import DmtoolsMaps from "./pages/dmtoolPages/DmtoolsMaps";
 import Wiki from "./pages/Wiki";
 import Friends from "./pages/Friends";
 import BooksLibrary from "./pages/BooksLibrary";
@@ -27,9 +27,9 @@ import Monster from "./pages/wikiPages/Monster";
 import Equipments from './pages/wikiPages/Equipments'
 import Backgrounds from './pages/wikiPages/Backgrounds'
 import Background from './pages/wikiPages/Background'
-import DmtoolsNpcs from "./pages/DmtoolsNpcs";
-import VttLobby from "./pages/VttLobby";
-import VttSession from "./pages/VttSession";
+import DmtoolsNpcs from "./pages/dmtoolPages/DmtoolsNpcs";
+import VttLobby from "./pages/dmtoolPages/VttLobby";
+import VttSession from "./pages/dmtoolPages/VttSession";
 import TutorialOverlay from "./components/TutorialOverlay";
 
 import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
@@ -48,7 +48,14 @@ function App() {
   const [loading, setLoading] = useState(true); // <-- Add loading state
   const [globalLoading, setGlobalLoading] = useState(false);
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(true);
-  const token = localStorage.getItem("token");
+  const rawToken = localStorage.getItem("token");
+  const token = rawToken && rawToken !== "undefined" && rawToken !== "null" ? rawToken : null;
+
+  useEffect(() => {
+    if (rawToken === "undefined" || rawToken === "null") {
+      localStorage.removeItem("token");
+    }
+  }, [rawToken]);
 
   useEffect(() => {
     const raw = localStorage.getItem(THEME_KEY);

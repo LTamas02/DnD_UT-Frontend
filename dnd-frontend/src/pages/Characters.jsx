@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
-import { CharacterApi } from '../Api';
+import { CharacterApi } from '../assets/api/dndtoolapi';
 import '../assets/styles/Characters.css';
 import '../assets/styles/Navbar.css';
 import '../assets/styles/Card.css';
@@ -75,3 +75,4 @@ export default function Characters() {
         </div>
     );
 }
+

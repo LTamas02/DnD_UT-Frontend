@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getAllClasses } from "../../Api";
+import { getAllClasses } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 export default function Classes() {
@@ -63,3 +63,5 @@ export default function Classes() {
     </div>
   );
 }
+
+

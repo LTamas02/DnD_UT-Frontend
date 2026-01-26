@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { API_BASE, getMonsterByIndex } from "../../Api";
+import { API_BASE, getMonsterByIndex } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
 
 const resolveMonsterImageName = (name) => {
@@ -126,3 +126,5 @@ export default function Monster() {
     </div>
   );
 }
+
+

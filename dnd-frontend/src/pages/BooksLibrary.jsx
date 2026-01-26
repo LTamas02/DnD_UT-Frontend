@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "../assets/styles/BooksLibrary.css";
-import { API_BASE, getMarkdownBooks, getMarkdownBookContentSilent } from "../Api";
+import { API_BASE, getMarkdownBooks, getMarkdownBookContentSilent } from "../assets/api/dndtoolapi";
 import { hasCachedBookContent, setCachedBookContent } from "../bookCache";
 
 const normalizeTitle = (title) =>
@@ -398,3 +398,4 @@ const BooksLibrary = () => {
 };
 
 export default BooksLibrary;
+

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { VttApi } from "../Api";
-import "../assets/styles/Vtt.css";
-import "../assets/styles/DmtoolsMaps.css";
+import { VttApi } from "../../assets/api/dndtoolapi";
+import "../../assets/styles/Vtt.css";
+import "../../assets/styles/DmtoolsMaps.css";
 
 export default function VttLobby() {
     const [sessions, setSessions] = useState([]);
@@ -148,3 +148,5 @@ export default function VttLobby() {
         </div>
     );
 }
+
+
