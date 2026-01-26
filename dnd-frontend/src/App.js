@@ -2,43 +2,74 @@ import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-route
 import { useEffect, useState } from "react";
 import { getUser, getProfileTheme, completeTutorial } from "./assets/api/dndtoolapi";
 import { DEFAULT_THEME, THEME_KEY, applyTheme } from "./theme";
+import { Navbar, NavbarProfile } from "./components/Navbar";
+
+
+// _____ Main pages _____
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import LogReg from "./pages/LogReg";
-import Characters from "./pages/Characters";
-import Dmtools from "./pages/dmtoolPages/Dmtools";
-import DmtoolsEncounters from "./pages/dmtoolPages/DmtoolsEncounters";
-import DmtoolsLoot from "./pages/dmtoolPages/DmtoolsLoot";
-import DmtoolsMaps from "./pages/dmtoolPages/DmtoolsMaps";
-import Wiki from "./pages/Wiki";
 import Friends from "./pages/Friends";
+
+
+// _____Character pages_____
+import Characters from "./pages/Characters";
+import Character from "./pages/Character";
+
+
+// _____ Books pages _____
 import BooksLibrary from "./pages/BooksLibrary";
 import BooksRules from "./pages/BooksRules";
-import { Navbar, NavbarProfile } from "./components/Navbar";
-import Character from "./pages/Character";
-import Spells from "./pages/wikiPages/Spells";
-import Spell from "./pages/wikiPages/Spell";
-import Classes from "./pages/wikiPages/Classes";
-import Class from "./pages/wikiPages/Class";
-import Races from './pages/wikiPages/Races'
-import Race from "./pages/wikiPages/Race";
-import Monsters from './pages/wikiPages/Monsters'
-import Monster from "./pages/wikiPages/Monster";
-import Equipments from './pages/wikiPages/Equipments'
-import Backgrounds from './pages/wikiPages/Backgrounds'
-import Background from './pages/wikiPages/Background'
+
+
+// _____ Dmtools page _____
+import Dmtools from "./pages/dmtoolPages/Dmtools";
+// Dmtools detailed pages
+import DmtoolsEncounters from "./pages/dmtoolPages/DmtoolsEncounters";
 import DmtoolsNpcs from "./pages/dmtoolPages/DmtoolsNpcs";
+import DmtoolsLoot from "./pages/dmtoolPages/DmtoolsLoot";
+import DmtoolsMaps from "./pages/dmtoolPages/DmtoolsMaps";
+// VTT pages
 import VttLobby from "./pages/dmtoolPages/VttLobby";
 import VttSession from "./pages/dmtoolPages/VttSession";
-import TutorialOverlay from "./components/TutorialOverlay";
 
+// _____ Wiki page _____
+import Wiki from "./pages/Wiki";
+// Wiki main pages
+import Backgrounds from './pages/wikiPages/Backgrounds'
+import Background from './pages/wikiPages/Background'
+import Classes from "./pages/wikiPages/Classes";
+import Class from "./pages/wikiPages/Class";
+import SubClass from "./pages/wikiPages/SubClass";
+import Equipments from './pages/wikiPages/Equipments'
+import MagicItems from "./pages/wikiPages/MagicItems";
+import MagicSchools from "./pages/wikiPages/MagicSchools";
+import MagicSchool from "./pages/wikiPages/MagicSchool";
+import Monsters from './pages/wikiPages/Monsters'
+import Monster from "./pages/wikiPages/Monster";
+import Proficiencies from "./pages/wikiPages/Proficiencies";
+import Races from './pages/wikiPages/Races'
+import Race from "./pages/wikiPages/Race";
+import SubRace from "./pages/wikiPages/SubRace";
+import Spells from "./pages/wikiPages/Spells";
+import Spell from "./pages/wikiPages/Spell";
+
+// Wiki detailed pages
 import AbilityScoresWiki from "./pages/wikiPages/AbilityScores";
 import Alignment from "./pages/wikiPages/Alignments";
 import Conditions from "./pages/wikiPages/Conditions";
 import DamageTypes from "./pages/wikiPages/DamageTypes";
 import Languages from "./pages/wikiPages/Languages";
 import Language from "./pages/wikiPages/Language";
+
+
+
+// _____Overlays_____
 import LoadingOverlay from "./components/LoadingOverlay";
+import TutorialOverlay from "./components/TutorialOverlay";
+
+
+
 import { getLoadingCount, subscribeLoading } from "./loadingStore";
 
 function App() {
@@ -174,54 +205,75 @@ function AppWithRouter({
       />
 
       <Routes>
+        {/*_______________MAIN ROUTES_______________ */}
         <Route path="/logreg" element={<LogReg setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="*" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
-        <Route
-          path="/profile"
-          element={
-            isAuthenticated ? <Profile onStartTutorial={onTutorialStart} /> : <Navigate to="/logreg" />
-          }
-        />
+        <Route path="/profile" element={isAuthenticated ? <Profile onStartTutorial={onTutorialStart} /> : <Navigate to="/logreg" />} />
         <Route path="/friends" element={isAuthenticated ? <Friends /> : <Navigate to="/logreg" />} />
+
+        {/*__________Character Routes__________*/}
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
         <Route path="/character/:id" element={isAuthenticated ? <Character /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools/encounters" element={isAuthenticated ? <DmtoolsEncounters /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
-        <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
-        <Route path="/vtt" element={isAuthenticated ? <VttLobby /> : <Navigate to="/logreg" />} />
-        <Route path="/vtt/:sessionId" element={isAuthenticated ? <VttSession /> : <Navigate to="/logreg" />} />
-        <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
+
+        {/*__________Books Routes__________ */}
         <Route path="/books" element={isAuthenticated ? <BooksLibrary /> : <Navigate to="/logreg" />} />
         <Route path="/books/rules" element={isAuthenticated ? <BooksRules /> : <Navigate to="/logreg" />} />
         <Route path="/books/rules/:fileName" element={isAuthenticated ? <BooksRules /> : <Navigate to="/logreg" />} />
 
 
-        <Route path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />
-        <Route path="/spell/:index" element={isAuthenticated ? <Spell /> : <Navigate to="/logreg" />} />
+        {/* __________Dmtools Routes__________ */}
+        <Route path="/dmtools" element={isAuthenticated ? <Dmtools /> : <Navigate to="/logreg" />} />
+
+        {/* _____Main Dmtools Routes_____ */}
+        <Route path="/dmtools/encounters" element={isAuthenticated ? <DmtoolsEncounters /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
+        <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
+
+        {/* _____VTT Routes_____ */}
+        <Route path="/vtt" element={isAuthenticated ? <VttLobby /> : <Navigate to="/logreg" />} />
+        <Route path="/vtt/:sessionId" element={isAuthenticated ? <VttSession /> : <Navigate to="/logreg" />} />
+
+
+
+        {/*__________Wiki Routes__________ */}
+        <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />
+        
+        {/* _____Main Wiki Routes_____ */}
+        <Route path="/wiki/backgrounds" element={isAuthenticated ? <Backgrounds /> : <Navigate to="/logreg" />} />
+        <Route path="/background/:index" element={isAuthenticated ? <Background /> : <Navigate to="/logreg" />} />
 
         <Route path="/wiki/classes" element={isAuthenticated ? <Classes /> : <Navigate to="/logreg" />} />
         <Route path="/class/:index" element={isAuthenticated ? <Class /> : <Navigate to="/logreg" />} />
+        <Route path="/subclass/:index" element={isAuthenticated ? <SubClass /> : <Navigate to="/logreg" />} />
 
-        <Route path="/wiki/races" element={isAuthenticated ? <Races /> : <Navigate to="/logreg" />} />
-        <Route path="/race/:index" element={isAuthenticated ? <Race /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/magic-items" element={isAuthenticated ? <MagicItems /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/magic-schools" element={isAuthenticated ? <MagicSchools /> : <Navigate to="/logreg" />} />
+        <Route path="/magic-school/:index" element={isAuthenticated ? <MagicSchool /> : <Navigate to="/logreg" />} />
 
         <Route path="/wiki/monsters" element={isAuthenticated ? <Monsters /> : <Navigate to="/logreg" />} />
         <Route path="/monster/:index" element={isAuthenticated ? <Monster /> : <Navigate to="/logreg" />} />
 
-        <Route path="/wiki/backgrounds" element={isAuthenticated ? <Backgrounds /> : <Navigate to="/logreg" />} />
-        <Route path="/background/:index" element={isAuthenticated ? <Background /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/proficiencies" element={isAuthenticated ? <Proficiencies /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/races" element={isAuthenticated ? <Races /> : <Navigate to="/logreg" />} />
+        <Route path="/race/:index" element={isAuthenticated ? <Race /> : <Navigate to="/logreg" />} />
+        <Route path="/subrace/:index" element={isAuthenticated ? <SubRace /> : <Navigate to="/logreg" />} />
+
+        <Route path="/wiki/spells" element={isAuthenticated ? <Spells /> : <Navigate to="/logreg" />} />
+        <Route path="/spell/:index" element={isAuthenticated ? <Spell /> : <Navigate to="/logreg" />} />
 
 
-        <Route path="/wiki/equipments" element={isAuthenticated ? <Equipments /> : <Navigate to="/logreg" />} />
 
+        {/* _____Detailed Wiki Routes_____ */}
         <Route path="/wiki/ability-scores" element={isAuthenticated ? <AbilityScoresWiki /> : <Navigate to="/logreg" />} />
         <Route path="/wiki/alignments" element={isAuthenticated ? <Alignment /> : <Navigate to="/logreg" />} />
         <Route path="/wiki/conditions" element={isAuthenticated ? <Conditions /> : <Navigate to="/logreg" />} />
         <Route path="/wiki/damage-types" element={isAuthenticated ? <DamageTypes /> : <Navigate to="/logreg" />} />
-
         <Route path="/wiki/languages" element={isAuthenticated ? <Languages /> : <Navigate to="/logreg" />} />
         <Route path="/language/:index" element={isAuthenticated ? <Language /> : <Navigate to="/logreg" />} />
 

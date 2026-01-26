@@ -34,6 +34,17 @@ a {
   color: var(--app-accent);
 }
 
+@media (hover: hover) {
+  * {
+    transition-property: color, background-color, border-color, opacity;
+  }
+
+  *:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
