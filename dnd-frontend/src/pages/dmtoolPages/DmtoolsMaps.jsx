@@ -92,7 +92,7 @@ async function apiUpload(path, file) {
         }
       })()
     : null
-
+//
   if (!res.ok) {
     if (res.status === 401) {
       throw new Error('Unauthorized (401). Jelentkezz be ujra, vagy hianyzik a token.')
