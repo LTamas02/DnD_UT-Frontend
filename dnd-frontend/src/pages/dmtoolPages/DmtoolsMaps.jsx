@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import ReactFlow, {
   Background,
@@ -152,6 +153,9 @@ export default function DmtoolsMaps() {
   const lastSavedHashRef = useRef('')
   const contextImageInputRef = useRef(null)
   const contextImageNodeIdRef = useRef(null)
+  const reactFlowInstanceRef = useRef(null)
+  const initialFitDoneRef = useRef(false)
+  const lastTreePositionsRef = useRef(new Map())
 
   const pushToast = useCallback((type, message) => {
     const now = Date.now()
@@ -247,6 +251,7 @@ export default function DmtoolsMaps() {
         setIsDirty(false)
         setSaveQueued(false)
         hydratedRef.current = true
+        initialFitDoneRef.current = false
       } catch (e) {
         if (!cancelled) setErrorMsg(e.message || 'Failed to load campaign')
       } finally {
@@ -358,6 +363,23 @@ export default function DmtoolsMaps() {
     }))
   }, [edges, visibleNodes])
 
+  const matchedNodes = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    if (!query) return []
+    return nodes.filter((node) => {
+      const label = String(node.data?.label || '').toLowerCase()
+      const type = String(node.data?.type || '').toLowerCase()
+      const tags = (node.data?.tags || []).map((tag) => String(tag).toLowerCase())
+      const notes = String(node.data?.notes || '').toLowerCase()
+      return (
+        label.includes(query) ||
+        type.includes(query) ||
+        notes.includes(query) ||
+        tags.some((tag) => tag.includes(query))
+      )
+    })
+  }, [nodes, search])
+
   const handleCreateCampaign = useCallback(async () => {
     const trimmed = createName.trim()
     if (!trimmed) return
@@ -432,6 +454,13 @@ export default function DmtoolsMaps() {
   const handleConnect = useCallback((params) => {
     setEdges((prev) => addEdge({ ...params, type: 'smoothstep' }, prev))
   }, [setEdges])
+
+  const handleNodesChange = useCallback(
+    (changes) => {
+      onNodesChange(changes)
+    },
+    [onNodesChange]
+  )
 
   const updateNodeData = useCallback((nodeId, updates) => {
     setNodes((prev) =>
@@ -816,6 +845,16 @@ export default function DmtoolsMaps() {
   }, [drawerOpen, selectedNodeId])
 
   useEffect(() => {
+    if (!reactFlowInstanceRef.current) return
+    if (!nodes.length) return
+    if (initialFitDoneRef.current) return
+    reactFlowInstanceRef.current.fitView({ padding: 0.2, duration: 400 })
+    initialFitDoneRef.current = true
+  }, [nodes])
+
+  // Ball layout removed
+
+  useEffect(() => {
     if (!drawerOpen) return
     const onKey = (event) => {
       if (event.key === 'Escape') {
@@ -893,6 +932,11 @@ export default function DmtoolsMaps() {
     document.addEventListener('fullscreenchange', handleChange)
     return () => document.removeEventListener('fullscreenchange', handleChange)
   }, [])
+
+  const fullscreenTarget = isFullscreen
+    ? document.fullscreenElement || mapLayoutRef.current
+    : null
+  const portalTarget = fullscreenTarget || document.body
 
   return (
     <div className="page-comp dmtools-page">
@@ -1213,7 +1257,7 @@ export default function DmtoolsMaps() {
             >
               {leftPanelOpen && (
                 <aside className="dmtools-panel">
-                <h2>Filters</h2>
+                  <h2>Filters</h2>
 
                 <label className="dmtools-label" htmlFor="dmtools-search">
                   Search
@@ -1228,6 +1272,32 @@ export default function DmtoolsMaps() {
                   disabled={loading}
                   ref={searchInputRef}
                 />
+
+                {search.trim() && (
+                  <div className="dmtools-search-results">
+                    <div className="dmtools-label">Matches</div>
+                    {matchedNodes.length === 0 && (
+                      <div className="dmtools-muted">No nodes found.</div>
+                    )}
+                    {matchedNodes.map((node) => (
+                      <button
+                        key={node.id}
+                        type="button"
+                        className="dmtools-search-item"
+                        onClick={() => {
+                          setSelectedNodeId(node.id)
+                          setDrawerOpen(true)
+                        }}
+                        disabled={loading}
+                      >
+                        <div className="dmtools-search-item-title">{node.data?.label || 'Node'}</div>
+                        <div className="dmtools-search-item-meta">
+                          {node.data?.type || 'Location'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <label className="dmtools-label" htmlFor="dmtools-type">
                   Type
@@ -1310,9 +1380,16 @@ export default function DmtoolsMaps() {
                   <ReactFlow
                     nodes={visibleNodes}
                     edges={visibleEdges}
-                    onNodesChange={onNodesChange}
+                    onNodesChange={handleNodesChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={handleConnect}
+                    onInit={(instance) => {
+                      reactFlowInstanceRef.current = instance
+                      if (nodes.length) {
+                        instance.fitView({ padding: 0.2, duration: 0 })
+                        initialFitDoneRef.current = true
+                      }
+                    }}
                     onNodeClick={(_, node) => {
                       setSelectedNodeId(node.id)
                       setDrawerOpen(true)
@@ -1483,213 +1560,216 @@ export default function DmtoolsMaps() {
           </div>
         )}
 
-        {drawerOpen && selectedNode && (
-          <div
-            className="dmtools-modal-overlay"
-            onClick={() => {
-              setSelectedNodeId(null)
-              setDrawerOpen(false)
-            }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 70,
-              background: 'var(--app-overlay, rgba(0,0,0,0.55))',
-              display: 'grid',
-              placeItems: 'center'
-            }}
-          >
+
+        {drawerOpen && selectedNode &&
+          createPortal(
             <div
-              onClick={(event) => event.stopPropagation()}
-              className="dmtools-modal-panel"
+              className="dmtools-modal-overlay"
+              onClick={() => {
+                setSelectedNodeId(null)
+                setDrawerOpen(false)
+              }}
               style={{
-                width: 'min(900px, 92vw)',
-                maxHeight: '86vh',
-                overflow: 'auto',
-                background: 'var(--app-panel, rgba(16,16,16,0.98))',
-                border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
-                borderRadius: 18,
-                boxShadow: '0 24px 60px rgba(0,0,0,0.45)',
-                padding: 20
+                position: 'fixed',
+                inset: 0,
+                zIndex: 200,
+                background: 'var(--app-overlay, rgba(0,0,0,0.55))',
+                display: 'grid',
+                placeItems: 'center'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <h2 style={{ margin: 0 }}>Node Details</h2>
-                <button className="dmtools-action" onClick={() => setDrawerOpen(false)}>
-                  Close
-                </button>
-              </div>
-
-              <div className="dmtools-modal-body">
-                <div style={{ marginBottom: 14 }}>
-                {selectedNode.data?.imageUrl ? (
-                  <img
-                    src={toAbsUrl(selectedNode.data.imageUrl)}
-                    alt="node"
-                    style={{
-                      width: '100%',
-                      height: 260,
-                      objectFit: 'contain',
-                      background: 'var(--app-overlay, rgba(0,0,0,0.35))',
-                      borderRadius: 16,
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => setLightboxUrl(toAbsUrl(selectedNode.data.imageUrl))}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: '100%',
-                      height: 260,
-                      borderRadius: 16,
-                      border: '1px solid var(--app-border, rgba(255,255,255,0.15))',
-                      opacity: 0.35
-                    }}
-                  />
-                )}
+              <div
+                onClick={(event) => event.stopPropagation()}
+                className="dmtools-modal-panel"
+                style={{
+                  width: 'min(1100px, 92vw)',
+                  maxHeight: '90vh',
+                  overflow: 'auto',
+                  background: 'var(--app-panel, rgba(16,16,16,0.98))',
+                  border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
+                  borderRadius: 18,
+                  boxShadow: '0 24px 60px rgba(0,0,0,0.45)',
+                  padding: 20
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <h2 style={{ margin: 0 }}>Node Details</h2>
+                  <button className="dmtools-action" onClick={() => setDrawerOpen(false)}>
+                    Close
+                  </button>
                 </div>
 
-              <label className="dmtools-label" htmlFor="dmtools-node-label">
-                Label
-              </label>
-              <input
-                id="dmtools-node-label"
-                className="dmtools-input"
-                type="text"
-                value={selectedNode.data?.label || ''}
-                onChange={(event) => updateNodeData(selectedNode.id, { label: event.target.value })}
-                disabled={loading}
-              />
-
-              <label className="dmtools-label" htmlFor="dmtools-node-type">
-                Type
-              </label>
-              <select
-                id="dmtools-node-type"
-                className="dmtools-input"
-                value={selectedNode.data?.type || 'Location'}
-                onChange={(event) => {
-                  const newType = event.target.value
-                  // ha Monsterre valtasz, adunk egy default statblockot (ures object)
-                  if (newType === 'Monster' && !selectedNode.data?.statblock) {
-                    updateNodeData(selectedNode.id, { type: newType, statblock: {} })
-                  } else {
-                    updateNodeData(selectedNode.id, { type: newType })
-                  }
-                }}
-                disabled={loading}
-              >
-                {NODE_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-
-              <label className="dmtools-label">Image</label>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
-                <label className="dmtools-action" style={{ cursor: 'pointer' }}>
-                  Upload
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) handleUploadNodeImage(file)
-                      e.target.value = ''
-                    }}
-                    disabled={loading}
-                  />
-                </label>
-
-                {selectedNode.data?.imageUrl && (
-                  <button
-                    className="dmtools-action dmtools-danger"
-                    onClick={handleRemoveNodeImage}
-                    disabled={loading}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-
-              <label className="dmtools-label" htmlFor="dmtools-node-tags">
-                Tags (comma separated)
-              </label>
-              <input
-                id="dmtools-node-tags"
-                className="dmtools-input"
-                type="text"
-                value={(selectedNode.data?.tags || []).join(', ')}
-                onChange={(event) =>
-                  updateNodeData(selectedNode.id, {
-                    tags: event.target.value
-                      .split(',')
-                      .map((tag) => tag.trim())
-                      .filter(Boolean)
-                  })
-                }
-                disabled={loading}
-              />
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <label className="dmtools-label" htmlFor="dmtools-node-notes">
-                  Notes
-                </label>
-                <button className="dmtools-action" onClick={handleInsertNpcDraft} disabled={loading}>
-                  Insert NPC draft
-                </button>
-              </div>
-              <textarea
-                id="dmtools-node-notes"
-                className="dmtools-textarea"
-                value={selectedNode.data?.notes || ''}
-                onChange={(event) => updateNodeData(selectedNode.id, { notes: event.target.value })}
-                rows={6}
-                disabled={loading}
-              />
-
-              {(selectedNode.data?.type || '') === 'Monster' && (
-                <>
-                  <label className="dmtools-label" htmlFor="dmtools-node-statblock">
-                    Statblock (JSON)
-                  </label>
-                  <textarea
-                    id="dmtools-node-statblock"
-                    className="dmtools-textarea"
-                    rows={10}
-                    value={JSON.stringify(selectedNode.data?.statblock || {}, null, 2)}
-                    onChange={(event) => {
-                      const raw = event.target.value
-                      try {
-                        const parsed = raw.trim() ? JSON.parse(raw) : {}
-                        updateNodeData(selectedNode.id, { statblock: parsed })
-                        setErrorMsg('')
-                      } catch {
-                        setErrorMsg('Statblock JSON invalid.')
-                      }
-                    }}
-                    disabled={loading}
-                  />
-                  <div style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
-                    Tipp: ide barmilyen JSON-t irhatsz (AC, HP, actions, stb.). Autosave menti a kampanyba.
+                <div className="dmtools-modal-body">
+                  <div style={{ marginBottom: 14 }}>
+                  {selectedNode.data?.imageUrl ? (
+                    <img
+                      src={toAbsUrl(selectedNode.data.imageUrl)}
+                      alt="node"
+                      style={{
+                        width: '100%',
+                        height: 260,
+                        objectFit: 'contain',
+                        background: 'var(--app-overlay, rgba(0,0,0,0.35))',
+                        borderRadius: 16,
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => setLightboxUrl(toAbsUrl(selectedNode.data.imageUrl))}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: 260,
+                        borderRadius: 16,
+                        border: '1px solid var(--app-border, rgba(255,255,255,0.15))',
+                        opacity: 0.35
+                      }}
+                    />
+                  )}
                   </div>
-                </>
-              )}
 
-              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                <button className="dmtools-action" onClick={handleDuplicateNode} disabled={loading}>
-                  Duplicate
-                </button>
-                <button className="dmtools-action dmtools-danger" onClick={handleDeleteNode} disabled={loading}>
-                  Delete Node
-                </button>
+                <label className="dmtools-label" htmlFor="dmtools-node-label">
+                  Label
+                </label>
+                <input
+                  id="dmtools-node-label"
+                  className="dmtools-input"
+                  type="text"
+                  value={selectedNode.data?.label || ''}
+                  onChange={(event) => updateNodeData(selectedNode.id, { label: event.target.value })}
+                  disabled={loading}
+                />
+
+                <label className="dmtools-label" htmlFor="dmtools-node-type">
+                  Type
+                </label>
+                <select
+                  id="dmtools-node-type"
+                  className="dmtools-input"
+                  value={selectedNode.data?.type || 'Location'}
+                  onChange={(event) => {
+                    const newType = event.target.value
+                    if (newType === 'Monster' && !selectedNode.data?.statblock) {
+                      updateNodeData(selectedNode.id, { type: newType, statblock: {} })
+                    } else {
+                      updateNodeData(selectedNode.id, { type: newType })
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  {NODE_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+
+                <label className="dmtools-label">Image</label>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 10 }}>
+                  <label className="dmtools-action" style={{ cursor: 'pointer' }}>
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) handleUploadNodeImage(file)
+                        e.target.value = ''
+                      }}
+                      disabled={loading}
+                    />
+                  </label>
+
+                  {selectedNode.data?.imageUrl && (
+                    <button
+                      className="dmtools-action dmtools-danger"
+                      onClick={handleRemoveNodeImage}
+                      disabled={loading}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <label className="dmtools-label" htmlFor="dmtools-node-tags">
+                  Tags (comma separated)
+                </label>
+                <input
+                  id="dmtools-node-tags"
+                  className="dmtools-input"
+                  type="text"
+                  value={(selectedNode.data?.tags || []).join(', ')}
+                  onChange={(event) =>
+                    updateNodeData(selectedNode.id, {
+                      tags: event.target.value
+                        .split(',')
+                        .map((tag) => tag.trim())
+                        .filter(Boolean)
+                    })
+                  }
+                  disabled={loading}
+                />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <label className="dmtools-label" htmlFor="dmtools-node-notes">
+                    Notes
+                  </label>
+                  <button className="dmtools-action" onClick={handleInsertNpcDraft} disabled={loading}>
+                    Insert NPC draft
+                  </button>
+                </div>
+                <textarea
+                  id="dmtools-node-notes"
+                  className="dmtools-textarea"
+                  value={selectedNode.data?.notes || ''}
+                  onChange={(event) => updateNodeData(selectedNode.id, { notes: event.target.value })}
+                  rows={6}
+                  disabled={loading}
+                />
+
+                {(selectedNode.data?.type || '') === 'Monster' && (
+                  <>
+                    <label className="dmtools-label" htmlFor="dmtools-node-statblock">
+                      Statblock (JSON)
+                    </label>
+                    <textarea
+                      id="dmtools-node-statblock"
+                      className="dmtools-textarea"
+                      rows={10}
+                      value={JSON.stringify(selectedNode.data?.statblock || {}, null, 2)}
+                      onChange={(event) => {
+                        const raw = event.target.value
+                        try {
+                          const parsed = raw.trim() ? JSON.parse(raw) : {}
+                          updateNodeData(selectedNode.id, { statblock: parsed })
+                          setErrorMsg('')
+                        } catch {
+                          setErrorMsg('Statblock JSON invalid.')
+                        }
+                      }}
+                      disabled={loading}
+                    />
+                    <div style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
+                      Tipp: ide barmilyen JSON-t irhatsz (AC, HP, actions, stb.). Autosave menti a kampanyba.
+                    </div>
+                  </>
+                )}
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+                  <button className="dmtools-action" onClick={handleDuplicateNode} disabled={loading}>
+                    Duplicate
+                  </button>
+                  <button className="dmtools-action dmtools-danger" onClick={handleDeleteNode} disabled={loading}>
+                    Delete Node
+                  </button>
+                </div>
+                </div>
               </div>
-              </div>
-            </div>
-          </div>
-        )}
+            </div>,
+            portalTarget
+          )}
+
 
         <input
           ref={contextImageInputRef}
@@ -1706,25 +1786,27 @@ export default function DmtoolsMaps() {
           disabled={loading}
         />
 
-        {lightboxUrl && (
-          <div
-            onClick={() => setLightboxUrl('')}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 80,
-              background: 'var(--app-overlay, rgba(0,0,0,0.8))',
-              display: 'grid',
-              placeItems: 'center'
-            }}
-          >
-            <img
-              src={lightboxUrl}
-              alt="lightbox"
-              style={{ maxWidth: '90vw', maxHeight: '86vh', borderRadius: 16 }}
-            />
-          </div>
-        )}
+        {lightboxUrl &&
+          createPortal(
+            <div
+              onClick={() => setLightboxUrl('')}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 220,
+                background: 'var(--app-overlay, rgba(0,0,0,0.8))',
+                display: 'grid',
+                placeItems: 'center'
+              }}
+            >
+              <img
+                src={lightboxUrl}
+                alt="lightbox"
+                style={{ maxWidth: '90vw', maxHeight: '86vh', borderRadius: 16 }}
+              />
+            </div>,
+            portalTarget
+          )}
 
         {toasts.length > 0 && (
           <div
