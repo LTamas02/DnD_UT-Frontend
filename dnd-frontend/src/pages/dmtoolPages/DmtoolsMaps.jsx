@@ -9,7 +9,6 @@ import ReactFlow, {
   useNodesState
 } from 'reactflow'
 import 'reactflow/dist/style.css'
-import '../../assets/styles/WikiTheme.css'
 import '../../assets/styles/Dmtools.css'
 import '../../assets/styles/DmtoolsMaps.css'
 
@@ -92,7 +91,7 @@ async function apiUpload(path, file) {
         }
       })()
     : null
-//
+
   if (!res.ok) {
     if (res.status === 401) {
       throw new Error('Unauthorized (401). Jelentkezz be ujra, vagy hianyzik a token.')
@@ -141,6 +140,8 @@ export default function DmtoolsMaps() {
   const [gridSize, setGridSize] = useState(20)
   const [contextMenu, setContextMenu] = useState(null)
   const [layoutMode, setLayoutMode] = useState('tree-vertical')
+  const [leftPanelOpen, setLeftPanelOpen] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // Debounce autosave
   const saveTimerRef = useRef(null)
@@ -874,6 +875,25 @@ export default function DmtoolsMaps() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [handleAddNode, handleDeleteNode, handleDuplicateNode, selectedNodeId])
 
+  const handleToggleFullscreen = useCallback(() => {
+    const target = mapLayoutRef.current
+    if (!target) return
+
+    if (!document.fullscreenElement) {
+      target.requestFullscreen?.()
+    } else {
+      document.exitFullscreen?.()
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement))
+    }
+    document.addEventListener('fullscreenchange', handleChange)
+    return () => document.removeEventListener('fullscreenchange', handleChange)
+  }, [])
+
   return (
     <div className="page-comp dmtools-page">
       <div className="page-overlay dmtools-overlay">
@@ -959,7 +979,9 @@ export default function DmtoolsMaps() {
             }
           }
           @media (max-width: 720px) {
-            .dmtools-map-layout {
+            .dmtools-map-layout,
+            .dmtools-map-layout.dmtools-left-open,
+            .dmtools-map-layout.dmtools-left-closed {
               grid-template-columns: 1fr;
             }
             .dmtools-panel {
@@ -1047,7 +1069,10 @@ export default function DmtoolsMaps() {
         )}
 
         {activeCampaign && (
-          <div className="dmtools-map-shell">
+          <div
+            className={`dmtools-map-shell${isFullscreen ? ' dmtools-fullscreen' : ''}`}
+            ref={mapLayoutRef}
+          >
             <header className="dmtools-map-header">
               <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                 <div
@@ -1145,6 +1170,21 @@ export default function DmtoolsMaps() {
               </div>
 
               <div className="dmtools-map-actions">
+                <button
+                  className={`dmtools-action dmtools-ghost${leftPanelOpen ? ' is-active' : ''}`}
+                  onClick={() => setLeftPanelOpen((prev) => !prev)}
+                  disabled={loading}
+                  type="button"
+                >
+                  Tools
+                </button>
+                <button
+                  className="dmtools-action dmtools-ghost"
+                  onClick={handleToggleFullscreen}
+                  type="button"
+                >
+                  {isFullscreen ? 'Exit full screen' : 'Full screen'}
+                </button>
                 <button className="dmtools-action" onClick={handleAddNode} disabled={loading}>
                   Add Node
                 </button>
@@ -1168,8 +1208,11 @@ export default function DmtoolsMaps() {
               </div>
             </header>
 
-            <div className="dmtools-map-layout" ref={mapLayoutRef}>
-              <aside className="dmtools-panel">
+            <div
+              className={`dmtools-map-layout ${leftPanelOpen ? 'dmtools-left-open' : 'dmtools-left-closed'}`}
+            >
+              {leftPanelOpen && (
+                <aside className="dmtools-panel">
                 <h2>Filters</h2>
 
                 <label className="dmtools-label" htmlFor="dmtools-search">
@@ -1244,7 +1287,8 @@ export default function DmtoolsMaps() {
                     style={{ width: '100%' }}
                   />
                 </div>
-              </aside>
+                </aside>
+              )}
 
               <section
                 className="dmtools-map-canvas"
@@ -1718,5 +1762,4 @@ export default function DmtoolsMaps() {
     </div>
   )
 }
-
 
