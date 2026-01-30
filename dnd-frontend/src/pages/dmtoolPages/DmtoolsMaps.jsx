@@ -143,6 +143,12 @@ export default function DmtoolsMaps() {
   const [layoutMode, setLayoutMode] = useState('tree-vertical')
   const [leftPanelOpen, setLeftPanelOpen] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [shareUsername, setShareUsername] = useState('')
+  const [shareRole, setShareRole] = useState('viewer')
+  const [shareList, setShareList] = useState([])
+  const [shareLoading, setShareLoading] = useState(false)
+  const [shareError, setShareError] = useState('')
 
   // Debounce autosave
   const saveTimerRef = useRef(null)
@@ -186,7 +192,15 @@ export default function DmtoolsMaps() {
   // ===== Load campaign list =====
   const refreshCampaigns = useCallback(async () => {
     const list = await api('/api/mapforge/campaigns')
-    setCampaigns(Array.isArray(list) ? list : [])
+    setCampaigns(
+      Array.isArray(list)
+        ? list.map((campaign) => ({
+            ...campaign,
+            accessRole: campaign?.accessRole || 'owner',
+            isOwner: campaign?.isOwner ?? true
+          }))
+        : []
+    )
   }, [])
 
   useEffect(() => {
@@ -195,7 +209,17 @@ export default function DmtoolsMaps() {
       try {
         setErrorMsg('')
         const list = await api('/api/mapforge/campaigns')
-        if (!cancelled) setCampaigns(Array.isArray(list) ? list : [])
+        if (!cancelled) {
+          setCampaigns(
+            Array.isArray(list)
+              ? list.map((campaign) => ({
+                  ...campaign,
+                  accessRole: campaign?.accessRole || 'owner',
+                  isOwner: campaign?.isOwner ?? true
+                }))
+              : []
+          )
+        }
       } catch (e) {
         if (!cancelled) setErrorMsg(e.message || 'Failed to load campaigns')
       }
@@ -221,6 +245,15 @@ export default function DmtoolsMaps() {
         if (cancelled) return
 
         setCampaignName(campaign?.name || '')
+        if (campaign?.accessRole) {
+          setCampaigns((prev) =>
+            prev.map((c) =>
+              c.id === campaign.id
+                ? { ...c, accessRole: campaign.accessRole, isOwner: campaign.isOwner ?? c.isOwner }
+                : c
+            )
+          )
+        }
 
         // ensure data shape for backend (imageUrl/statblock exist)
         const normalizedNodes = (campaign?.nodes || []).map((n) => ({
@@ -293,7 +326,14 @@ export default function DmtoolsMaps() {
         setCampaigns((prev) =>
           prev.map((c) =>
             c.id === updated.id
-              ? { ...c, name: updated.name, updatedAt: updated.updatedAt, coverImageUrl: updated.coverImageUrl ?? c.coverImageUrl }
+              ? {
+                  ...c,
+                  name: updated.name,
+                  updatedAt: updated.updatedAt,
+                  coverImageUrl: updated.coverImageUrl ?? c.coverImageUrl,
+                  accessRole: updated.accessRole ?? c.accessRole,
+                  isOwner: updated.isOwner ?? c.isOwner
+                }
               : c
           )
         )
@@ -327,6 +367,20 @@ export default function DmtoolsMaps() {
     () => campaigns.find((item) => item.id === activeCampaignId) || null,
     [campaigns, activeCampaignId]
   )
+  const accessRole = activeCampaign?.accessRole || 'owner'
+  const isOwner = accessRole === 'owner'
+  const canEdit = accessRole === 'owner' || accessRole === 'editor'
+  const canDeleteNodes = accessRole === 'owner'
+  const ensureCanEdit = useCallback(() => {
+    if (canEdit) return true
+    pushToast('error', 'Read-only access')
+    return false
+  }, [canEdit, pushToast])
+  const ensureCanDeleteNodes = useCallback(() => {
+    if (canDeleteNodes) return true
+    pushToast('error', 'Only the owner can delete nodes')
+    return false
+  }, [canDeleteNodes, pushToast])
 
   const selectedNode = useMemo(
     () => nodes.find((node) => node.id === selectedNodeId) || null,
@@ -425,6 +479,12 @@ export default function DmtoolsMaps() {
     setSearch('')
     setTypeFilter('all')
     setTagFilter('')
+    setShareOpen(false)
+    setShareUsername('')
+    setShareRole('viewer')
+    setShareList([])
+    setShareError('')
+    setShareLoading(false)
 
     try {
       await refreshCampaigns()
@@ -433,7 +493,106 @@ export default function DmtoolsMaps() {
     }
   }, [refreshCampaigns, setEdges, setNodes])
 
+  const loadShares = useCallback(async () => {
+    if (!activeCampaignId || !isOwner) return
+    try {
+      setShareLoading(true)
+      setShareError('')
+      const list = await api(
+        `/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/shares`
+      )
+      setShareList(Array.isArray(list) ? list : [])
+    } catch (e) {
+      setShareError(e.message || 'Failed to load shares')
+      pushToast('error', e.message || 'Failed to load shares')
+    } finally {
+      setShareLoading(false)
+    }
+  }, [activeCampaignId, isOwner, pushToast])
+
+  const handleShareInvite = useCallback(async () => {
+    if (!activeCampaignId || !isOwner) return
+    const username = shareUsername.trim()
+    if (!username) return
+
+    try {
+      setShareLoading(true)
+      setShareError('')
+      const created = await api(`/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/shares`, {
+        method: 'POST',
+        body: JSON.stringify({ username, role: shareRole })
+      })
+      setShareList((prev) => {
+        const next = Array.isArray(prev) ? [...prev] : []
+        const index = next.findIndex((item) => item.userId === created.userId)
+        if (index >= 0) {
+          next[index] = created
+        } else {
+          next.push(created)
+        }
+        return next.sort((a, b) => String(a.username).localeCompare(String(b.username)))
+      })
+      setShareUsername('')
+      pushToast('success', 'Share updated')
+    } catch (e) {
+      setShareError(e.message || 'Share failed')
+      pushToast('error', e.message || 'Share failed')
+    } finally {
+      setShareLoading(false)
+    }
+  }, [activeCampaignId, isOwner, pushToast, shareRole, shareUsername])
+
+  const handleUpdateShareRole = useCallback(
+    async (userId, role) => {
+      if (!activeCampaignId || !isOwner) return
+      try {
+        setShareLoading(true)
+        setShareError('')
+        const updated = await api(
+          `/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/shares/${userId}`,
+          {
+            method: 'PUT',
+            body: JSON.stringify({ role })
+          }
+        )
+        setShareList((prev) =>
+          prev.map((item) => (item.userId === updated.userId ? updated : item))
+        )
+        pushToast('success', 'Role updated')
+      } catch (e) {
+        setShareError(e.message || 'Update failed')
+        pushToast('error', e.message || 'Update failed')
+      } finally {
+        setShareLoading(false)
+      }
+    },
+    [activeCampaignId, isOwner, pushToast]
+  )
+
+  const handleRemoveShare = useCallback(
+    async (userId) => {
+      if (!activeCampaignId || !isOwner) return
+      try {
+        setShareLoading(true)
+        setShareError('')
+        await api(
+          `/api/mapforge/campaigns/${encodeURIComponent(activeCampaignId)}/shares/${userId}`,
+          { method: 'DELETE' }
+        )
+        setShareList((prev) => prev.filter((item) => item.userId !== userId))
+        pushToast('success', 'Share removed')
+      } catch (e) {
+        setShareError(e.message || 'Remove failed')
+        pushToast('error', e.message || 'Remove failed')
+      } finally {
+        setShareLoading(false)
+      }
+    },
+    [activeCampaignId, isOwner, pushToast]
+  )
+
   const handleAddNode = useCallback(() => {
+    if (!ensureCanEdit()) return
     const newNode = {
       id: createId(),
       position: { x: Math.random() * 400 - 200, y: Math.random() * 300 - 150 },
@@ -449,28 +608,40 @@ export default function DmtoolsMaps() {
     setNodes((prev) => [...prev, newNode])
     setSelectedNodeId(newNode.id)
     setDrawerOpen(true)
-  }, [setNodes])
+  }, [ensureCanEdit, setNodes])
 
   const handleConnect = useCallback((params) => {
+    if (!ensureCanEdit()) return
     setEdges((prev) => addEdge({ ...params, type: 'smoothstep' }, prev))
-  }, [setEdges])
+  }, [ensureCanEdit, setEdges])
 
   const handleNodesChange = useCallback(
     (changes) => {
+      if (!canEdit) return
       onNodesChange(changes)
     },
-    [onNodesChange]
+    [canEdit, onNodesChange]
+  )
+
+  const handleEdgesChange = useCallback(
+    (changes) => {
+      if (!canEdit) return
+      onEdgesChange(changes)
+    },
+    [canEdit, onEdgesChange]
   )
 
   const updateNodeData = useCallback((nodeId, updates) => {
+    if (!ensureCanEdit()) return
     setNodes((prev) =>
       prev.map((node) =>
         node.id === nodeId ? { ...node, data: { ...node.data, ...updates } } : node
       )
     )
-  }, [setNodes])
+  }, [ensureCanEdit, setNodes])
 
   const handleDeleteNode = useCallback(() => {
+    if (!ensureCanDeleteNodes()) return
     if (!selectedNodeId) return
     setNodes((prev) => prev.filter((node) => node.id !== selectedNodeId))
     setEdges((prev) =>
@@ -478,9 +649,10 @@ export default function DmtoolsMaps() {
     )
     setSelectedNodeId(null)
     setDrawerOpen(false)
-  }, [selectedNodeId, setEdges, setNodes])
+  }, [ensureCanDeleteNodes, selectedNodeId, setEdges, setNodes])
 
   const handleDuplicateNode = useCallback(() => {
+    if (!ensureCanEdit()) return
     if (!selectedNode) return
     const clonedId = createId()
     const clonedNode = {
@@ -498,9 +670,10 @@ export default function DmtoolsMaps() {
     setNodes((prev) => [...prev, clonedNode])
     setSelectedNodeId(clonedId)
     setDrawerOpen(true)
-  }, [selectedNode, setNodes])
+  }, [ensureCanEdit, selectedNode, setNodes])
 
   const handleAutoLayout = useCallback(() => {
+    if (!ensureCanEdit()) return
     if (!nodes.length) return
 
     const idToNode = new Map(nodes.map((node) => [node.id, node]))
@@ -668,10 +841,14 @@ export default function DmtoolsMaps() {
         ? 'Tree layout (compact)'
         : 'Tree layout (top down)'
     pushToast('success', `${label} from ${rootLabel}`)
-  }, [edges, layoutMode, nodes, pushToast, selectedNodeId, setNodes])
+  }, [edges, ensureCanEdit, layoutMode, nodes, pushToast, selectedNodeId, setNodes])
 
   // ===== Campaign cover upload =====
   const handleUploadCover = useCallback(async (file) => {
+    if (!canEdit) {
+      pushToast('error', 'Read-only access')
+      return
+    }
     if (!file || !activeCampaignId) return
 
     try {
@@ -696,11 +873,15 @@ export default function DmtoolsMaps() {
     } finally {
       setLoading(false)
     }
-  }, [activeCampaignId, pushToast])
+  }, [activeCampaignId, canEdit, pushToast])
 
   // ===== Node image upload/remove =====
   const uploadNodeImage = useCallback(
     async (nodeId, file) => {
+      if (!canEdit) {
+        pushToast('error', 'Read-only access')
+        return
+      }
       if (!file || !activeCampaignId || !nodeId) return
 
       try {
@@ -726,7 +907,7 @@ export default function DmtoolsMaps() {
         setLoading(false)
       }
     },
-    [activeCampaignId, updateNodeData, pushToast]
+    [activeCampaignId, canEdit, updateNodeData, pushToast]
   )
 
   const handleUploadNodeImage = useCallback(
@@ -738,6 +919,10 @@ export default function DmtoolsMaps() {
   )
 
   const handleRemoveNodeImage = useCallback(async () => {
+    if (!canEdit) {
+      pushToast('error', 'Read-only access')
+      return
+    }
     if (!activeCampaignId || !selectedNode) return
 
     try {
@@ -759,9 +944,10 @@ export default function DmtoolsMaps() {
     } finally {
       setLoading(false)
     }
-  }, [activeCampaignId, selectedNode, updateNodeData, pushToast])
+  }, [activeCampaignId, canEdit, selectedNode, updateNodeData, pushToast])
 
   const handleInsertNpcDraft = useCallback(() => {
+    if (!ensureCanEdit()) return
     if (!selectedNode) return
     const draft = localStorage.getItem('npcNotesDraft') || ''
     if (!draft.trim()) {
@@ -772,9 +958,10 @@ export default function DmtoolsMaps() {
     const combined = existing ? `${existing}\n\n${draft}` : draft
     updateNodeData(selectedNode.id, { notes: combined })
     pushToast('success', 'NPC draft inserted')
-  }, [selectedNode, updateNodeData, pushToast])
+  }, [ensureCanEdit, selectedNode, updateNodeData, pushToast])
 
   const handleEdgeLabelCommit = useCallback(() => {
+    if (!ensureCanEdit()) return
     if (!selectedEdgeId) return
     const nextLabel = edgeLabelDraft.trim()
     setEdges((prev) =>
@@ -790,7 +977,7 @@ export default function DmtoolsMaps() {
           : edge
       )
     )
-  }, [edgeLabelDraft, selectedEdgeId, setEdges])
+  }, [edgeLabelDraft, ensureCanEdit, selectedEdgeId, setEdges])
 
   const handleContextMenuAction = useCallback(
     (action) => {
@@ -801,6 +988,7 @@ export default function DmtoolsMaps() {
         setDrawerOpen(true)
       }
       if (action === 'duplicate') {
+        if (!ensureCanEdit()) return
         const targetNode = nodes.find((node) => node.id === nodeId)
         if (!targetNode) return
         const clonedId = createId()
@@ -821,6 +1009,7 @@ export default function DmtoolsMaps() {
         setDrawerOpen(true)
       }
       if (action === 'delete') {
+        if (!ensureCanDeleteNodes()) return
         if (window.confirm('Delete this node?')) {
           setNodes((prev) => prev.filter((node) => node.id !== nodeId))
           setEdges((prev) => prev.filter((edge) => edge.source !== nodeId && edge.target !== nodeId))
@@ -831,18 +1020,24 @@ export default function DmtoolsMaps() {
         }
       }
       if (action === 'set-image') {
+        if (!ensureCanEdit()) return
         contextImageNodeIdRef.current = nodeId
         contextImageInputRef.current?.click()
       }
       setContextMenu(null)
     },
-    [contextMenu, nodes, setEdges, setNodes, selectedNodeId]
+    [contextMenu, ensureCanDeleteNodes, ensureCanEdit, nodes, setEdges, setNodes, selectedNodeId]
   )
 
   useEffect(() => {
     if (!drawerOpen) return
     if (!selectedNodeId) setDrawerOpen(false)
   }, [drawerOpen, selectedNodeId])
+
+  useEffect(() => {
+    if (!shareOpen) return
+    loadShares()
+  }, [shareOpen, loadShares])
 
   useEffect(() => {
     if (!reactFlowInstanceRef.current) return
@@ -891,12 +1086,12 @@ export default function DmtoolsMaps() {
 
       if (event.key.toLowerCase() === 'n') {
         event.preventDefault()
-        handleAddNode()
+        if (canEdit) handleAddNode()
       }
 
       if (event.key === 'Delete' && selectedNodeId) {
         event.preventDefault()
-        if (window.confirm('Delete this node?')) handleDeleteNode()
+        if (canDeleteNodes && window.confirm('Delete this node?')) handleDeleteNode()
       }
 
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'f') {
@@ -906,13 +1101,13 @@ export default function DmtoolsMaps() {
 
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'd') {
         event.preventDefault()
-        handleDuplicateNode()
+        if (canEdit) handleDuplicateNode()
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [handleAddNode, handleDeleteNode, handleDuplicateNode, selectedNodeId])
+  }, [canDeleteNodes, canEdit, handleAddNode, handleDeleteNode, handleDuplicateNode, selectedNodeId])
 
   const handleToggleFullscreen = useCallback(() => {
     const target = mapLayoutRef.current
@@ -1096,6 +1291,7 @@ export default function DmtoolsMaps() {
                   {campaigns.map((campaign) => (
                     <option key={campaign.id} value={campaign.id}>
                       {campaign.name}
+                      {!campaign.isOwner ? ` (shared: ${campaign.accessRole})` : ''}
                     </option>
                   ))}
                 </select>
@@ -1121,6 +1317,7 @@ export default function DmtoolsMaps() {
               <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                 <div
                   onDragOver={(event) => {
+                    if (!canEdit) return
                     event.preventDefault()
                     setCoverDragging(true)
                   }}
@@ -1128,6 +1325,7 @@ export default function DmtoolsMaps() {
                   onDrop={(event) => {
                     event.preventDefault()
                     setCoverDragging(false)
+                    if (!canEdit) return
                     const file = event.dataTransfer.files?.[0]
                     if (file) handleUploadCover(file)
                   }}
@@ -1188,13 +1386,18 @@ export default function DmtoolsMaps() {
                         if (file) handleUploadCover(file)
                         e.target.value = ''
                       }}
-                      disabled={loading}
+                      disabled={loading || !canEdit}
                     />
                   </label>
                 </div>
 
                 <div>
                   <h1>{campaignName || activeCampaign?.name || 'Campaign'}</h1>
+                  {!isOwner && (
+                    <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>
+                      Shared as {accessRole}
+                    </div>
+                  )}
                   <p>
                     Drag nodes, connect ideas, and filter the web.
                     {saving && <span style={{ marginLeft: 10, opacity: 0.8 }}>Saving...</span>}
@@ -1229,21 +1432,32 @@ export default function DmtoolsMaps() {
                 >
                   {isFullscreen ? 'Exit full screen' : 'Full screen'}
                 </button>
-                <button className="dmtools-action" onClick={handleAddNode} disabled={loading}>
+                {isOwner && (
+                  <button
+                    className="dmtools-action"
+                    onClick={() => {
+                      setShareOpen(true)
+                    }}
+                    disabled={loading || shareLoading}
+                  >
+                    Share
+                  </button>
+                )}
+                <button className="dmtools-action" onClick={handleAddNode} disabled={loading || !canEdit}>
                   Add Node
                 </button>
                 <select
                   className="dmtools-input"
                   value={layoutMode}
                   onChange={(event) => setLayoutMode(event.target.value)}
-                  disabled={loading}
+                  disabled={loading || !canEdit}
                   style={{ minWidth: 190 }}
                 >
                   <option value="tree-vertical">Tree (top down)</option>
                   <option value="tree-horizontal">Tree (left to right)</option>
                   <option value="tree-compact">Tree (compact)</option>
                 </select>
-                <button className="dmtools-action" onClick={handleAutoLayout} disabled={loading}>
+                <button className="dmtools-action" onClick={handleAutoLayout} disabled={loading || !canEdit}>
                   Auto-layout
                 </button>
                 <button className="dmtools-action" onClick={handleBackToChooser} disabled={loading}>
@@ -1377,8 +1591,11 @@ export default function DmtoolsMaps() {
                     nodes={visibleNodes}
                     edges={visibleEdges}
                     onNodesChange={handleNodesChange}
-                    onEdgesChange={onEdgesChange}
+                    onEdgesChange={handleEdgesChange}
                     onConnect={handleConnect}
+                    nodesDraggable={canEdit}
+                    nodesConnectable={canEdit}
+                    edgesUpdatable={canEdit}
                     onInit={(instance) => {
                       reactFlowInstanceRef.current = instance
                       if (nodes.length) {
@@ -1398,6 +1615,7 @@ export default function DmtoolsMaps() {
                       setSelectedNodeId(node.id)
                     }}
                     onEdgeClick={(event, edge) => {
+                      if (!canEdit) return
                       event.stopPropagation()
                       setSelectedEdgeId(edge.id)
                       setEdgeLabelDraft(edge.label || '')
@@ -1504,13 +1722,25 @@ export default function DmtoolsMaps() {
                     <button className="dmtools-action" onClick={() => handleContextMenuAction('open')}>
                       Open details
                     </button>
-                    <button className="dmtools-action" onClick={() => handleContextMenuAction('set-image')}>
+                    <button
+                      className="dmtools-action"
+                      onClick={() => handleContextMenuAction('set-image')}
+                      disabled={loading || !canEdit}
+                    >
                       Set image
                     </button>
-                    <button className="dmtools-action" onClick={() => handleContextMenuAction('duplicate')}>
+                    <button
+                      className="dmtools-action"
+                      onClick={() => handleContextMenuAction('duplicate')}
+                      disabled={loading || !canEdit}
+                    >
                       Duplicate
                     </button>
-                    <button className="dmtools-action dmtools-danger" onClick={() => handleContextMenuAction('delete')}>
+                    <button
+                      className="dmtools-action dmtools-danger"
+                      onClick={() => handleContextMenuAction('delete')}
+                      disabled={loading || !canDeleteNodes}
+                    >
                       Delete
                     </button>
                   </div>
@@ -1547,6 +1777,7 @@ export default function DmtoolsMaps() {
                           setSelectedEdgeId(null)
                         }
                       }}
+                      disabled={loading || !canEdit}
                     />
                   </div>
                 )}
@@ -1556,6 +1787,119 @@ export default function DmtoolsMaps() {
           </div>
         )}
 
+
+        {shareOpen && isOwner &&
+          createPortal(
+            <div
+              className="dmtools-modal-overlay"
+              onClick={() => setShareOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 210,
+                background: 'var(--app-overlay, rgba(0,0,0,0.55))',
+                display: 'grid',
+                placeItems: 'center'
+              }}
+            >
+              <div
+                onClick={(event) => event.stopPropagation()}
+                className="dmtools-modal-panel"
+                style={{
+                  width: 'min(900px, 92vw)',
+                  maxHeight: '86vh',
+                  overflow: 'auto',
+                  background: 'var(--app-panel, rgba(16,16,16,0.98))',
+                  border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
+                  borderRadius: 18,
+                  boxShadow: '0 24px 60px rgba(0,0,0,0.45)',
+                  padding: 20
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <h2 style={{ margin: 0 }}>Share Campaign</h2>
+                  <button className="dmtools-action" onClick={() => setShareOpen(false)}>
+                    Close
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
+                  <label className="dmtools-label" htmlFor="share-username">Username</label>
+                  <input
+                    id="share-username"
+                    className="dmtools-input"
+                    type="text"
+                    placeholder="Invite by username"
+                    value={shareUsername}
+                    onChange={(event) => setShareUsername(event.target.value)}
+                    disabled={shareLoading}
+                  />
+                  <label className="dmtools-label" htmlFor="share-role">Role</label>
+                  <select
+                    id="share-role"
+                    className="dmtools-input"
+                    value={shareRole}
+                    onChange={(event) => setShareRole(event.target.value)}
+                    disabled={shareLoading}
+                  >
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                  </select>
+                  <button
+                    className="dmtools-action"
+                    onClick={handleShareInvite}
+                    disabled={shareLoading || !shareUsername.trim()}
+                  >
+                    {shareLoading ? 'Saving...' : 'Share'}
+                  </button>
+                  {!!shareError && (
+                    <div style={{ color: '#ff9c9c', fontSize: 12 }}>
+                      {shareError}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ fontWeight: 600, marginBottom: 8 }}>Shared with</div>
+                {shareList.length === 0 && (
+                  <div style={{ fontSize: 12, opacity: 0.7 }}>No shares yet.</div>
+                )}
+                {shareList.length > 0 && (
+                  <div style={{ display: 'grid', gap: 10 }}>
+                    {shareList.map((share) => (
+                      <div
+                        key={share.userId}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 160px 120px',
+                          gap: 10,
+                          alignItems: 'center'
+                        }}
+                      >
+                        <div style={{ fontWeight: 600 }}>{share.username}</div>
+                        <select
+                          className="dmtools-input"
+                          value={share.role}
+                          onChange={(event) => handleUpdateShareRole(share.userId, event.target.value)}
+                          disabled={shareLoading}
+                        >
+                          <option value="viewer">Viewer</option>
+                          <option value="editor">Editor</option>
+                        </select>
+                        <button
+                          className="dmtools-action dmtools-danger"
+                          onClick={() => handleRemoveShare(share.userId)}
+                          disabled={shareLoading}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>,
+            portalTarget
+          )}
 
         {drawerOpen && selectedNode &&
           createPortal(
@@ -1633,7 +1977,7 @@ export default function DmtoolsMaps() {
                   type="text"
                   value={selectedNode.data?.label || ''}
                   onChange={(event) => updateNodeData(selectedNode.id, { label: event.target.value })}
-                  disabled={loading}
+                  disabled={loading || !canEdit}
                 />
 
                 <label className="dmtools-label" htmlFor="dmtools-node-type">
@@ -1651,7 +1995,7 @@ export default function DmtoolsMaps() {
                       updateNodeData(selectedNode.id, { type: newType })
                     }
                   }}
-                  disabled={loading}
+                  disabled={loading || !canEdit}
                 >
                   {NODE_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -1673,7 +2017,7 @@ export default function DmtoolsMaps() {
                         if (file) handleUploadNodeImage(file)
                         e.target.value = ''
                       }}
-                      disabled={loading}
+                      disabled={loading || !canEdit}
                     />
                   </label>
 
@@ -1681,7 +2025,7 @@ export default function DmtoolsMaps() {
                     <button
                       className="dmtools-action dmtools-danger"
                       onClick={handleRemoveNodeImage}
-                      disabled={loading}
+                      disabled={loading || !canEdit}
                     >
                       Remove
                     </button>
@@ -1704,14 +2048,14 @@ export default function DmtoolsMaps() {
                         .filter(Boolean)
                     })
                   }
-                  disabled={loading}
+                  disabled={loading || !canEdit}
                 />
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <label className="dmtools-label" htmlFor="dmtools-node-notes">
                     Notes
                   </label>
-                  <button className="dmtools-action" onClick={handleInsertNpcDraft} disabled={loading}>
+                  <button className="dmtools-action" onClick={handleInsertNpcDraft} disabled={loading || !canEdit}>
                     Insert NPC draft
                   </button>
                 </div>
@@ -1721,7 +2065,7 @@ export default function DmtoolsMaps() {
                   value={selectedNode.data?.notes || ''}
                   onChange={(event) => updateNodeData(selectedNode.id, { notes: event.target.value })}
                   rows={6}
-                  disabled={loading}
+                  disabled={loading || !canEdit}
                 />
 
                 {(selectedNode.data?.type || '') === 'Monster' && (
@@ -1744,7 +2088,7 @@ export default function DmtoolsMaps() {
                           setErrorMsg('Statblock JSON invalid.')
                         }
                       }}
-                      disabled={loading}
+                      disabled={loading || !canEdit}
                     />
                     <div style={{ fontSize: 12, opacity: 0.75, marginTop: 6 }}>
                       Tipp: ide barmilyen JSON-t irhatsz (AC, HP, actions, stb.). Autosave menti a kampanyba.
@@ -1753,10 +2097,10 @@ export default function DmtoolsMaps() {
                 )}
 
                 <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                  <button className="dmtools-action" onClick={handleDuplicateNode} disabled={loading}>
+                  <button className="dmtools-action" onClick={handleDuplicateNode} disabled={loading || !canEdit}>
                     Duplicate
                   </button>
-                  <button className="dmtools-action dmtools-danger" onClick={handleDeleteNode} disabled={loading}>
+                  <button className="dmtools-action dmtools-danger" onClick={handleDeleteNode} disabled={loading || !canDeleteNodes}>
                     Delete Node
                   </button>
                 </div>
@@ -1779,7 +2123,7 @@ export default function DmtoolsMaps() {
             event.target.value = ''
             contextImageNodeIdRef.current = null
           }}
-          disabled={loading}
+          disabled={loading || !canEdit}
         />
 
         {lightboxUrl &&
