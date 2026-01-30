@@ -1362,11 +1362,7 @@ export default function DmtoolsMaps() {
 
               <section
                 className="dmtools-map-canvas"
-                style={{
-                  position: 'relative',
-                  background:
-                    'radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 55%), linear-gradient(120deg, rgba(35,35,35,0.4), rgba(10,10,10,0.9))'
-                }}
+                style={{ position: 'relative' }}
               >
                 {loading && (
                   <div style={{ padding: 16, display: 'grid', gap: 12 }}>

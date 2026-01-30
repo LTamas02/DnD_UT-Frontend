@@ -14,7 +14,9 @@ export const DEFAULT_THEME = {
   panelText: "#ffe7c2",
   buttonBg: "#795548",
   buttonText: "#fff8e1",
-  friendBg: "#5d4037"
+  friendBg: "#5d4037",
+  dmtoolsMapBg: "#2b1a10",
+  dmtoolsPanelBg: "#3b2417"
 };
 
 const normalizeHex = (value) => {
@@ -85,7 +87,9 @@ export const applyTheme = (theme) => {
     "--profile-panel-text": merged.panelText,
     "--profile-button-bg": merged.buttonBg,
     "--profile-button-text": merged.buttonText,
-    "--profile-friend-bg": merged.friendBg
+    "--profile-friend-bg": merged.friendBg,
+    "--dmtools-map-bg": merged.dmtoolsMapBg,
+    "--dmtools-panel-bg": merged.dmtoolsPanelBg
   };
 
   Object.entries(vars).forEach(([key, value]) => {

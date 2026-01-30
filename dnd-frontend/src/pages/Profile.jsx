@@ -44,7 +44,9 @@ const THEME_PRESETS = [
             buttonText: "#fff7ef",
             buttonBorder: "rgba(0,0,0,0.15)",
             buttonHover: "#a05a42",
-            friendBg: "rgba(88,39,24,0.18)"
+            friendBg: "rgba(88,39,24,0.18)",
+            dmtoolsMapBg: "#2b1611",
+            dmtoolsPanelBg: "#3b2417"
         }
     },
     {
@@ -65,7 +67,9 @@ const THEME_PRESETS = [
             buttonText: "#eefbf6",
             buttonBorder: "rgba(0,0,0,0.12)",
             buttonHover: "#3f7d68",
-            friendBg: "#16382f"
+            friendBg: "#16382f",
+            dmtoolsMapBg: "#081611",
+            dmtoolsPanelBg: "#122a24"
         }
     },
     {
@@ -86,7 +90,9 @@ const THEME_PRESETS = [
             buttonText: "#fff6ff",
             buttonBorder: "rgba(0,0,0,0.14)",
             buttonHover: "#5a4286",
-            friendBg: "#2b2340"
+            friendBg: "#2b2340",
+            dmtoolsMapBg: "#0e0b16",
+            dmtoolsPanelBg: "#271f34"
         }
     },
     {
@@ -107,7 +113,9 @@ const THEME_PRESETS = [
             buttonText: "#fff1df",
             buttonBorder: "rgba(0,0,0,0.06)",
             buttonHover: "#a15b41",
-            friendBg: "#f3dfc8"
+            friendBg: "#f3dfc8",
+            dmtoolsMapBg: "#f7e9d7",
+            dmtoolsPanelBg: "#fff8f1"
         }
     }
 ];
@@ -587,6 +595,26 @@ const Profile = ({ onStartTutorial }) => {
                             />
                         </label>
                         <label className="profile-field">
+                            DM Tools Map
+                            <input
+                                type="color"
+                                value={theme.dmtoolsMapBg}
+                                onChange={(event) =>
+                                    setTheme((prev) => ({ ...prev, dmtoolsMapBg: event.target.value }))
+                                }
+                            />
+                        </label>
+                        <label className="profile-field">
+                            DM Tools Panel
+                            <input
+                                type="color"
+                                value={theme.dmtoolsPanelBg}
+                                onChange={(event) =>
+                                    setTheme((prev) => ({ ...prev, dmtoolsPanelBg: event.target.value }))
+                                }
+                            />
+                        </label>
+                        <label className="profile-field">
                             Buttons
                             <input
                                 type="color"
@@ -947,6 +975,32 @@ const Profile = ({ onStartTutorial }) => {
                                                     setTheme((prev) => ({
                                                         ...prev,
                                                         panelBg: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            DM Tools Map
+                                            <input
+                                                type="color"
+                                                value={theme.dmtoolsMapBg}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        dmtoolsMapBg: event.target.value
+                                                    }))
+                                                }
+                                            />
+                                        </label>
+                                        <label className="profile-field">
+                                            DM Tools Panel
+                                            <input
+                                                type="color"
+                                                value={theme.dmtoolsPanelBg}
+                                                onChange={(event) =>
+                                                    setTheme((prev) => ({
+                                                        ...prev,
+                                                        dmtoolsPanelBg: event.target.value
                                                     }))
                                                 }
                                             />
