@@ -1,4 +1,4 @@
-/* Import a medieval font */
+﻿/* Import a medieval font */
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&display=swap');
 
 /* Global & Body */
@@ -9,9 +9,9 @@ body, html {
   font-family:'IM Fell English SC', serif;
   height:100%;
   /* Use the dark wood/parchment background */
-  /* !!! FONTOS: !important a felülírás megakadályozására !!! */
+  /* !!! FONTOS: !important a felĂĽlĂ­rĂˇs megakadĂˇlyozĂˇsĂˇra !!! */
   background-image: var(--app-bg-gradient, none), var(--app-bg-image, url('https://www.transparenttextures.com/patterns/aged-paper.png')) !important;
-  background-color: var(--app-bg, #2d1a0d) !important; /* SÖTÉT BARNA ALAPSZÍN */
+  background-color: var(--app-bg, #2d1a0d) !important; /* SĂ–TĂ‰T BARNA ALAPSZĂŤN */
   background-size: auto !important;
   animation: none !important; /* Remove background animation */
   color: var(--app-text, #e4c590); /* Light gold for medieval feel */
@@ -95,6 +95,8 @@ body, html {
   --app-text: #ffedc4;
   --app-accent: #d4af37;
   --app-panel: rgba(255, 255, 255, 0.05);
+  --app-sidebar-bg: rgba(69, 37, 16, 0.88);
+  --app-sidebar-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
 .character-app.character-theme.theme-shadowfell {
@@ -105,6 +107,8 @@ body, html {
   --app-text: #d6c3e6;
   --app-accent: #9d7ce4;
   --app-panel: rgba(82, 49, 89, 0.35);
+  --app-sidebar-bg: rgba(24, 11, 36, 0.9);
+  --app-sidebar-shadow: 0 0 14px rgba(157, 124, 228, 0.45);
 }
 
 .character-app.character-theme.theme-elven {
@@ -115,6 +119,8 @@ body, html {
   --app-text: #d3f4e1;
   --app-accent: #80d8c5;
   --app-panel: rgba(17, 77, 64, 0.5);
+  --app-sidebar-bg: rgba(10, 53, 41, 0.88);
+  --app-sidebar-shadow: 0 0 14px rgba(128, 216, 197, 0.4);
 }
 
 .theme-shadowfell .input-dark,
@@ -161,12 +167,12 @@ body, html {
 .sidebar {
   width:220px;
   /* Dark wood/leather background */
-  background: rgba(69, 37, 16, 0.85); 
+  background: var(--app-sidebar-bg, rgba(69, 37, 16, 0.85)); 
   padding:15px 10px;
   display:flex;
   flex-direction:column;
   /* Dark brown border with gold glow */
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); 
+  box-shadow: var(--app-sidebar-shadow, 0 0 10px rgba(212, 175, 55, 0.5)); 
   border-radius:0;
   border-right: 3px solid var(--app-border, #6b4226); 
   position: sticky; /* Keep sidebar visible */
@@ -244,18 +250,18 @@ body, html {
 .card {
   /* Parchment background from LogReg.css */
   background: url('https://www.transparenttextures.com/patterns/old-map.png'); 
-  background-color: var(--app-card, #4a321e); /* MÉLYEBB, SÖTÉTEBB BARNA A KONTÉNERNEK */
+  background-color: var(--app-card, #4a321e); /* MĂ‰LYEBB, SĂ–TĂ‰TEBB BARNA A KONTĂ‰NERNEK */
   background-blend-mode: multiply; 
   padding:15px;
   margin-bottom:20px;
   border: 6px solid var(--app-border, #6b4226); /* Dark brown border */
   border-radius:10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  color: var(--app-text, #ffdd99); /* VILÁGOSABB SZÖVEG a sötét kártyán */
+  color: var(--app-text, #ffdd99); /* VILĂGOSABB SZĂ–VEG a sĂ¶tĂ©t kĂˇrtyĂˇn */
 }
 
 .card h2.section-title, .card h3 {
-    color: var(--app-text, #e4c590); /* VILÁGOSABB címszín */
+    color: var(--app-text, #e4c590); /* VILĂGOSABB cĂ­mszĂ­n */
     border-bottom: 2px solid var(--app-border, #6b4226);
     padding-bottom: 5px;
     margin-top: 0;
@@ -266,9 +272,9 @@ body, html {
 /* Inputs and Textareas */
 .input-dark, .textarea-dark, .computed {
   /* Input style from LogReg.css */
-  background: rgba(255, 240, 200, 0.9); /* A beviteli mezőket meghagyjuk világosnak a jó láthatóságért */
+  background: rgba(255, 240, 200, 0.9); /* A beviteli mezĹ‘ket meghagyjuk vilĂˇgosnak a jĂł lĂˇthatĂłsĂˇgĂ©rt */
   border: 2px solid var(--app-border, #6b4226);
-  color: #3a1d0f; /* SÖTÉT SZÖVEG AZ INPUTON BELÜL */
+  color: #3a1d0f; /* SĂ–TĂ‰T SZĂ–VEG AZ INPUTON BELĂśL */
   font-weight: bold;
   font-family: 'IM Fell English SC', serif;
   padding: 8px 12px;
@@ -290,7 +296,7 @@ body, html {
     resize: vertical;
     margin-top: 5px;
 }
-/* Különleges stílus a kis inputoknak, ahol szükség van rá (pl. Abilities) */
+/* KĂĽlĂ¶nleges stĂ­lus a kis inputoknak, ahol szĂĽksĂ©g van rĂˇ (pl. Abilities) */
 .ability input.input-dark, .passive-line input.input-dark {
     width: 60px !important;
     text-align: center;
@@ -307,7 +313,7 @@ body, html {
     grid-template-columns: 1fr;
     gap: 15px;
 }
-/* FIX: Money Grid - grid-5 a 5 pénznek egymás mellett */
+/* FIX: Money Grid - grid-5 a 5 pĂ©nznek egymĂˇs mellett */
 .grid-5 {
     display: grid;
     grid-template-columns: repeat(5, 1fr); 
@@ -326,7 +332,7 @@ body, html {
 .ability-label {
     flex-grow: 1;
     font-weight: bold;
-    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILĂGOSABB */
 }
 .mod-pill {
     background: var(--app-button-bg, #8b5a2b);
@@ -344,7 +350,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILĂGOSABB */
     font-weight: bold;
 }
 
@@ -379,7 +385,7 @@ body, html {
 
 /* Attack Table Specifics */
 .attack-header, .attack-row {
-    color: var(--app-text, #ffdd99); /* VILÁGOSABB text for table content */
+    color: var(--app-text, #ffdd99); /* VILĂGOSABB text for table content */
 }
 .attack-header {
     border-bottom: 2px solid var(--app-border, #6b4226) !important;
@@ -437,7 +443,7 @@ body, html {
     /* Uses .card style */
 }
 .action-bar h1 {
-    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILĂGOSABB */
     font-size: 1.8em;
     margin: 0;
 }
@@ -450,7 +456,7 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: var(--app-text, #ffdd99); /* VILÁGOSABB */
+    color: var(--app-text, #ffdd99); /* VILĂGOSABB */
     font-weight: bold;
 }
 .prof-bonus-line input {
@@ -483,7 +489,7 @@ body, html {
 .p-3 { padding: 15px; }
 .small-input { padding: 3px 5px !important; }
 
-/* Különleges stílus a kis inputokhoz a Spell táblában (a 100% width felülírása) */
+/* KĂĽlĂ¶nleges stĂ­lus a kis inputokhoz a Spell tĂˇblĂˇban (a 100% width felĂĽlĂ­rĂˇsa) */
 .small-input {
     width: auto !important;
     min-width: 50px;
@@ -550,3 +556,4 @@ body, html {
         grid-template-columns: 1.5fr 60px 80px 80px 60px;
     }
 }
+

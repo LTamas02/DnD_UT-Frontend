@@ -9,7 +9,6 @@ import { Navbar, NavbarProfile } from "./components/Navbar";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import LogReg from "./pages/LogReg";
-import Friends from "./pages/Friends";
 
 
 // _____Character pages_____
@@ -61,6 +60,7 @@ import Conditions from "./pages/wikiPages/Conditions";
 import DamageTypes from "./pages/wikiPages/DamageTypes";
 import Languages from "./pages/wikiPages/Languages";
 import Language from "./pages/wikiPages/Language";
+import Skills from "./pages/wikiPages/Skills";
 
 
 
@@ -210,7 +210,7 @@ function AppWithRouter({
         <Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="*" element={isAuthenticated ? <Home /> : <Navigate to="/logreg" />} />
         <Route path="/profile" element={isAuthenticated ? <Profile onStartTutorial={onTutorialStart} /> : <Navigate to="/logreg" />} />
-        <Route path="/friends" element={isAuthenticated ? <Friends /> : <Navigate to="/logreg" />} />
+        <Route path="/friends" element={<Navigate to={isAuthenticated ? "/profile" : "/logreg"} />} />
 
         {/*__________Character Routes__________*/}
         <Route path="/characters" element={isAuthenticated ? <Characters /> : <Navigate to="/logreg" />} />
@@ -276,6 +276,7 @@ function AppWithRouter({
         <Route path="/wiki/damage-types" element={isAuthenticated ? <DamageTypes /> : <Navigate to="/logreg" />} />
         <Route path="/wiki/languages" element={isAuthenticated ? <Languages /> : <Navigate to="/logreg" />} />
         <Route path="/language/:index" element={isAuthenticated ? <Language /> : <Navigate to="/logreg" />} />
+        <Route path="/wiki/skills" element={isAuthenticated ? <Skills /> : <Navigate to="/logreg" />} />
 
 
       </Routes>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../assets/styles/Profile.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "../assets/styles/Login.css";
@@ -13,6 +13,8 @@ import {
     deleteFriend,
     searchFriends,
     addFriend,
+    blockFriend,
+    unblockFriend,
     getSalt,
     getFriendRequests,
     respondFriendRequest,
@@ -294,9 +296,37 @@ const Profile = ({ onStartTutorial }) => {
 
         deleteFriend(token, friendId)
             .then(() => {
-                setFriends(friends.filter(f => f.id !== friendId));
+                setFriends((prev) => prev.filter(f => f.id !== friendId));
             })
             .catch(err => console.error("Error removing friend:", err));
+    };
+
+    const refreshFriends = () => {
+        getFriends(token)
+            .then((res) => setFriends(Array.isArray(res.data) ? res.data : []))
+            .catch((err) => console.error("Error loading friends:", err));
+    };
+
+    const toggleBlockFriend = (friend) => {
+        const isBlocked = !!(friend?.blocked ?? friend?.isBlocked);
+        const username = friend?.username || "this user";
+        const message = isBlocked
+            ? `Are you sure you want to unblock ${username}?`
+            : `Are you sure you want to block ${username}?`;
+        if (!window.confirm(message)) return;
+
+        const action = isBlocked
+            ? unblockFriend(token, friend.id)
+            : blockFriend(token, friend.id);
+
+        action
+            .then(() => {
+                if (!isBlocked && activeChat?.id === friend.id) {
+                    setActiveChat(null);
+                }
+                refreshFriends();
+            })
+            .catch((err) => console.error(`${isBlocked ? "Unblock" : "Block"} friend error:`, err));
     };
 
     const openSettings = () => {
@@ -690,32 +720,46 @@ const Profile = ({ onStartTutorial }) => {
                                             <span className="friend-request-badge">{friendRequests.length}</span>
                                         )}
                                     </button>
-                                    <Link to="/friends" className="btn btn-primary mb-3">
-                                        Friends Page
-                                    </Link>
                                     <ul className="friends-list list-unstyled">
-                                        {friends.map(friend => (
+                                        {friends.map(friend => {
+                                            const isBlocked = !!(friend.blocked ?? friend.isBlocked);
+                                            return (
                                             <li key={friend.id} className="friend d-flex align-items-center mb-3">
                                                 <img
                                                     src={toAbsUrl(friend.profilePictureUrl || friend.profilePicture || friend.profile_picture || DEFAULT_PROFILE_IMAGE)}
                                                     alt="Friend"
                                                     className="friend-pic rounded-circle"
                                                 />
-                                                <span className="ms-2 flex-grow-1">{friend.username}</span>
-                                                <button
-                                                    className="btn btn-danger btn-sm me-2"
-                                                    onClick={() => removeFriend(friend.id)}
-                                                >
-                                                    Remove
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary btn-sm"
-                                                    onClick={() => setActiveChat(friend)}
-                                                >
-                                                    Chat
-                                                </button>
+                                                <div className="ms-2 flex-grow-1">
+                                                    <span className="friend-name">{friend.username}</span>
+                                                    {isBlocked && (
+                                                        <div className="profile-settings-hint">Blocked</div>
+                                                    )}
+                                                </div>
+                                                <div className="friend-actions">
+                                                    <button
+                                                        className="friend-action danger"
+                                                        onClick={() => removeFriend(friend.id)}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                    <button
+                                                        className={`friend-action ${isBlocked ? "" : "danger"}`}
+                                                        onClick={() => toggleBlockFriend(friend)}
+                                                    >
+                                                        {isBlocked ? "Unblock" : "Block"}
+                                                    </button>
+                                                    <button
+                                                        className="friend-action"
+                                                        onClick={() => setActiveChat(friend)}
+                                                        disabled={isBlocked}
+                                                        title={isBlocked ? "Unblock to chat" : "Open chat"}
+                                                    >
+                                                        Chat
+                                                    </button>
+                                                </div>
                                             </li>
-                                        ))}
+                                        )})}
                                     </ul>
                                 </>
                             )}

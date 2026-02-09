@@ -460,6 +460,13 @@
     color: #2b1a12;
 }
 
+.friend-action:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .friend-action.danger {
     background: rgba(150, 60, 46, 0.85);
     border-color: rgba(200, 120, 100, 0.4);

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -349,7 +349,7 @@ const BooksRules = () => {
 
   return (
     <div
-      className={`books-rules-page${focusMode ? " is-focus" : ""}`}
+      className={`books-rules-page${focusMode ? " is-focus" : ""}${widthMode === "wide" ? " is-wide" : ""}`}
     >
       <header className="books-rules-topbar">
         <Link className="books-rules-back" to="/books">
@@ -403,13 +403,6 @@ const BooksRules = () => {
               Wide
             </button>
           </div>
-          <button
-            className={`books-rules-button${focusMode ? " is-active" : ""}`}
-            type="button"
-            onClick={() => setFocusMode((prev) => !prev)}
-          >
-            Focus
-          </button>
         </div>
       </header>
 
@@ -480,4 +473,5 @@ const BooksRules = () => {
 };
 
 export default BooksRules;
+
 

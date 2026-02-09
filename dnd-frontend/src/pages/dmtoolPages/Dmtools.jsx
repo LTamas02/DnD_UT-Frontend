@@ -21,25 +21,28 @@ export default function Dmtools() {
       description: 'Spin up memorable NPCs with quick details.',
       path: '/dmtools/npcs',
       image: npcImage
-    },
-    {
-      name: 'Treasure Vault',
-      description: 'Curate loot tables and hoards in minutes.',
-      path: '/dmtools/loot',
-      image: lootImage
-    },
+    }
+    // ,
+    // {
+    //   name: 'Treasure Vault',
+    //   description: 'Curate loot tables and hoards in minutes.',
+    //   path: '/dmtools/loot',
+    //   image: lootImage
+    // }
+    ,
     {
       name: 'Map Forge',
       description: 'Sketch locations and keep notes organized.',
       path: '/dmtools/maps',
       image: mapImage
-    },
-    {
-      name: 'Virtual Tabletop',
-      description: 'Run battles with maps, tokens, chat, and dice.',
-      path: '/vtt',
-      image: vttImage
     }
+    //,
+    // {
+    //   name: 'Virtual Tabletop',
+    //   description: 'Run battles with maps, tokens, chat, and dice.',
+    //   path: '/vtt',
+    //   image: vttImage
+    // }
   ]
 
   return (
