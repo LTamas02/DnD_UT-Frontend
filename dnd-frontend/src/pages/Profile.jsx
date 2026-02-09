@@ -15,6 +15,7 @@ import {
     addFriend,
     blockFriend,
     unblockFriend,
+    getBlockedUsers,
     getSalt,
     getFriendRequests,
     respondFriendRequest,
@@ -165,7 +166,11 @@ const Profile = ({ onStartTutorial }) => {
     });
     const [friendSearchModal, setFriendSearchModal] = useState(false);
     const [friendRequestsModal, setFriendRequestsModal] = useState(false);
+    const [blockedUsersModal, setBlockedUsersModal] = useState(false);
     const [friendRequests, setFriendRequests] = useState([]);
+    const [blockedUsers, setBlockedUsers] = useState([]);
+    const [loadingBlockedUsers, setLoadingBlockedUsers] = useState(false);
+    const [blockedUsersError, setBlockedUsersError] = useState("");
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
@@ -341,6 +346,38 @@ const Profile = ({ onStartTutorial }) => {
     const closeFriendSearch = () => setFriendSearchModal(false);
 
     const toggleFriendRequestsModal = () => setFriendRequestsModal(!friendRequestsModal);
+
+    const openBlockedUsersModal = async () => {
+        setBlockedUsersModal(true);
+        setLoadingBlockedUsers(true);
+        setBlockedUsersError("");
+        try {
+            const list = await getBlockedUsers(token);
+            setBlockedUsers(Array.isArray(list) ? list : []);
+        } catch (err) {
+            console.error("Error loading blocked users:", err);
+            setBlockedUsers([]);
+            setBlockedUsersError("Failed to load blocked users.");
+        } finally {
+            setLoadingBlockedUsers(false);
+        }
+    };
+
+    const closeBlockedUsersModal = () => setBlockedUsersModal(false);
+
+    const handleUnblockFromModal = (blockedUser) => {
+        const id = blockedUser?.id ?? blockedUser?.userId ?? blockedUser?.blockedUserId;
+        const username = blockedUser?.username || "this user";
+        if (!id) return;
+        if (!window.confirm(`Are you sure you want to unblock ${username}?`)) return;
+
+        unblockFriend(token, id)
+            .then(() => {
+                setBlockedUsers((prev) => prev.filter((u) => (u?.id ?? u?.userId ?? u?.blockedUserId) !== id));
+                refreshFriends();
+            })
+            .catch((err) => console.error("Error unblocking user:", err));
+    };
 
     const selectImage = async (imageName) => {
         if (!window.confirm("Are you sure you want to select this picture?")) return;
@@ -708,6 +745,9 @@ const Profile = ({ onStartTutorial }) => {
                                             <span className="friend-request-badge">{friendRequests.length}</span>
                                         )}
                                     </button>
+                                    <button className="btn btn-outline-warning" onClick={openBlockedUsersModal}>
+                                        Blocked
+                                    </button>
                                 </>
                             ) : (
                                 <>
@@ -719,6 +759,9 @@ const Profile = ({ onStartTutorial }) => {
                                         {friendRequests.length > 0 && (
                                             <span className="friend-request-badge">{friendRequests.length}</span>
                                         )}
+                                    </button>
+                                    <button className="btn btn-outline-warning mb-3" onClick={openBlockedUsersModal}>
+                                        Blocked
                                     </button>
                                     <ul className="friends-list list-unstyled">
                                         {friends.map(friend => {
@@ -1215,6 +1258,42 @@ const Profile = ({ onStartTutorial }) => {
                                 </li>
                             ))}
                         </ul>
+                    </div>
+                </div>
+            )}
+
+            {blockedUsersModal && (
+                <div className="profile-modal friend-requests-modal">
+                    <div className="profile-modal-content">
+                        <span className="close-btn" onClick={closeBlockedUsersModal}>&times;</span>
+                        <h2>Blocked Users</h2>
+                        {loadingBlockedUsers && <p>Loading blocked users...</p>}
+                        {!loadingBlockedUsers && blockedUsersError && <p>{blockedUsersError}</p>}
+                        {!loadingBlockedUsers && !blockedUsersError && (
+                            <ul className="list-unstyled friend-requests-list">
+                                {blockedUsers.length === 0 ? (
+                                    <li className="request-item">No blocked users.</li>
+                                ) : blockedUsers.map((blockedUser) => {
+                                    const blockedId = blockedUser?.id ?? blockedUser?.userId ?? blockedUser?.blockedUserId;
+                                    return (
+                                        <li key={blockedId} className="d-flex align-items-center mb-2 request-item">
+                                            <img
+                                                src={toAbsUrl(blockedUser.profilePictureUrl || blockedUser.profilePicture || blockedUser.profile_picture || DEFAULT_PROFILE_IMAGE)}
+                                                alt="Blocked user"
+                                                className="friend-request-pic"
+                                            />
+                                            <span className="flex-grow-1 ms-2">{blockedUser.username || "Unknown"}</span>
+                                            <button
+                                                className="btn btn-secondary btn-sm"
+                                                onClick={() => handleUnblockFromModal(blockedUser)}
+                                            >
+                                                Unblock
+                                            </button>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
                     </div>
                 </div>
             )}

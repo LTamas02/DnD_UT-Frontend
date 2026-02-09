@@ -165,6 +165,41 @@ export const unblockFriend = (token, userIdToUnblock) =>
         params: { userIdToUnblock }
     });
 
+export const getBlockedUsers = async (token) => {
+    const headers = { "Authorization": `Bearer ${token}` };
+    const candidates = [
+        "/friend/blocked",
+        "/friend/blocked-users",
+        "/friend/blocked/list"
+    ];
+
+    let lastError = null;
+    for (const endpoint of candidates) {
+        try {
+            const res = await api.get(endpoint, { headers });
+            if (Array.isArray(res?.data)) {
+                return res.data;
+            }
+            if (Array.isArray(res?.data?.data)) {
+                return res.data.data;
+            }
+            return [];
+        } catch (err) {
+            lastError = err;
+        }
+    }
+
+    try {
+        const res = await api.get("/friend/list", { headers });
+        const list = Array.isArray(res?.data) ? res.data : [];
+        return list.filter((u) => !!(u?.blocked ?? u?.isBlocked));
+    } catch {
+        // ignore fallback errors and throw the original endpoint failure below
+    }
+
+    throw lastError || new Error("Failed to load blocked users.");
+};
+
 export const getMutualFriends = (token, otherUserId) =>
     api.get(`/friend/mutual/${otherUserId}`, {
         headers: { "Authorization": `Bearer ${token}` }
