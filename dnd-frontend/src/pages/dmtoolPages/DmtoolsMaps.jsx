@@ -1713,7 +1713,13 @@ export default function DmtoolsMaps() {
                       <img
                         src={toAbsUrl(hoveredNode.data.imageUrl)}
                         alt="thumb"
-                        style={{ width: '100%', height: 100, objectFit: 'cover', borderRadius: 10 }}
+                        style={{
+                          width: '100%',
+                          height: 100,
+                          objectFit: 'contain',
+                          borderRadius: 10,
+                          background: 'rgba(0,0,0,0.25)'
+                        }}
                       />
                     ) : (
                       <div
