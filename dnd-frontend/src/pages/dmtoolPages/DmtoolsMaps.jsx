@@ -140,6 +140,7 @@ export default function DmtoolsMaps() {
   const [snapToGrid, setSnapToGrid] = useState(true)
   const [gridSize, setGridSize] = useState(20)
   const [contextMenu, setContextMenu] = useState(null)
+  const [paneMenu, setPaneMenu] = useState(null)
   const [layoutMode, setLayoutMode] = useState('tree-vertical')
   const [leftPanelOpen, setLeftPanelOpen] = useState(true)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -609,6 +610,26 @@ export default function DmtoolsMaps() {
     setSelectedNodeId(newNode.id)
     setDrawerOpen(true)
   }, [ensureCanEdit, setNodes])
+
+  const handleCreateNodeAt = useCallback(
+    (position) => {
+      if (!ensureCanEdit()) return
+      const newNode = {
+        id: createId(),
+        position,
+        data: {
+          label: 'New Node',
+          type: 'Location',
+          tags: [],
+          notes: '',
+          imageUrl: null,
+          statblock: null
+        }
+      }
+      setNodes((prev) => [...prev, newNode])
+    },
+    [ensureCanEdit, setNodes]
+  )
 
   const handleConnect = useCallback((params) => {
     if (!ensureCanEdit()) return
@@ -1633,6 +1654,28 @@ export default function DmtoolsMaps() {
                       setDrawerOpen(false)
                       setSelectedEdgeId(null)
                       setContextMenu(null)
+                      setPaneMenu(null)
+                    }}
+                    onPaneContextMenu={(event) => {
+                      event.preventDefault()
+                      if (!ensureCanEdit()) return
+                      const instance = reactFlowInstanceRef.current
+                      let position = { x: 0, y: 0 }
+                      if (instance?.screenToFlowPosition) {
+                        position = instance.screenToFlowPosition({
+                          x: event.clientX,
+                          y: event.clientY
+                        })
+                      } else if (instance?.project) {
+                        const bounds = event.currentTarget.getBoundingClientRect()
+                        position = instance.project({
+                          x: event.clientX - bounds.left,
+                          y: event.clientY - bounds.top
+                        })
+                      }
+                      setPaneMenu({ x: event.clientX, y: event.clientY, position })
+                      setSelectedEdgeId(null)
+                      setContextMenu(null)
                     }}
                     snapToGrid={snapToGrid}
                     snapGrid={[gridSize, gridSize]}
@@ -1742,6 +1785,37 @@ export default function DmtoolsMaps() {
                       disabled={loading || !canDeleteNodes}
                     >
                       Delete
+                    </button>
+                  </div>
+                )}
+
+                {paneMenu && (
+                  <div
+                    onClick={(event) => event.stopPropagation()}
+                    style={{
+                      position: 'fixed',
+                      left: paneMenu.x,
+                      top: paneMenu.y,
+                      zIndex: 40,
+                      background: 'var(--app-panel, rgba(16,16,16,0.96))',
+                      border: '1px solid var(--app-border, rgba(255,255,255,0.12))',
+                      borderRadius: 12,
+                      padding: 8,
+                      display: 'grid',
+                      gap: 6,
+                      minWidth: 140,
+                      boxShadow: '0 16px 32px rgba(0,0,0,0.4)'
+                    }}
+                  >
+                    <button
+                      className="dmtools-action"
+                      onClick={() => {
+                        handleCreateNodeAt(paneMenu.position)
+                        setPaneMenu(null)
+                      }}
+                      disabled={loading || !canEdit}
+                    >
+                      Add Node
                     </button>
                   </div>
                 )}
