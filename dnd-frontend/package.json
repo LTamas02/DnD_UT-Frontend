@@ -30,6 +30,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:vitest": "vitest",
+    "test:vitest:watch": "vitest --watch",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -56,6 +58,8 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-webpack-plugin": "^5.0.0"
+    "eslint-webpack-plugin": "^5.0.0",
+    "jsdom": "^24.0.0",
+    "vitest": "^2.1.9"
   }
 }

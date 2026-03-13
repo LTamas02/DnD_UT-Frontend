@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getAllBackgrounds } from '../../assets/api/wikiapi';
 import '../../assets/styles/WikiTheme.css';
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 
 export default function Backgrounds() {
   const [backgrounds, setBackgrounds] = useState([]);
@@ -9,6 +10,7 @@ export default function Backgrounds() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchBackgrounds = async () => {
@@ -74,6 +76,7 @@ export default function Backgrounds() {
                 to={`/background/${background.index}`}
                 key={background.index}
                 className="wiki-card"
+                onClick={saveNow}
               >
                 <h3>{background.name}</h3>
                 <p>D&D 5th Edition Character Background.</p>

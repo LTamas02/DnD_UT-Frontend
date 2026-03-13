@@ -7,6 +7,7 @@ import {
   getMagicItemRarities,
 } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
 
@@ -38,6 +39,7 @@ export default function MagicItems() {
   const [selectedCategory, setSelectedCategory] = useState(""); // name string
   const [selectedRarity, setSelectedRarity] = useState(""); // name string
   const [filterTag, setFilterTag] = useState("All"); // All | Attunement | Cursed
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -184,7 +186,10 @@ export default function MagicItems() {
               <div
                 key={item.index}
                 className="monster-card"
-                onClick={() => navigate(`/magic-item/${item.index}`)}
+                onClick={() => {
+                  saveNow();
+                  navigate(`/magic-item/${item.index}`);
+                }}
                 style={{ cursor: "pointer" }}
               >
                 <div className="monster-header">

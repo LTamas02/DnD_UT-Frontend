@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllMonsters } from "../../assets/api/wikiapi";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/WikiTheme.css";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 
 export default function Monsters() {
   const [monsters, setMonsters] = useState([]);
@@ -15,6 +16,7 @@ export default function Monsters() {
   const [filterXP, setFilterXP] = useState("All");
 
   const navigate = useNavigate();
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +32,7 @@ export default function Monsters() {
     };
     fetchData();
   }, []);
+
 
   // Filter monsters reactively
   useEffect(() => {
@@ -146,7 +149,10 @@ export default function Monsters() {
               <div
                 key={monster.index}
                 className="monster-card"
-                onClick={() => navigate(`/monster/${monster.index}`)}
+                onClick={() => {
+                  saveNow();
+                  navigate(`/monster/${monster.index}`);
+                }}
               >
                 <div className="monster-header">
                   <h3 className="monster-name">{monster.name || "Unknown"}</h3>

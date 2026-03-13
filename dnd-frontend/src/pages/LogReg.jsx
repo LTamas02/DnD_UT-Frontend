@@ -24,6 +24,7 @@ const passwordRules = {
 
 const LogReg = ({ setIsAuthenticated }) => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Login states
   const [email, setEmail] = useState("");
@@ -88,7 +89,30 @@ const LogReg = ({ setIsAuthenticated }) => {
 
   useEffect(() => {
     setErrorMessage("");
+    setSuccessMessage("");
   }, [email, password, registerUsername, registerEmail, pwd, matchPwd]);
+
+  const getLoginErrorMessage = (error) => {
+    const status = error?.response?.status;
+    if (status === 401 || status === 403) {
+      return "Invalid email or password.";
+    }
+    if (status === 404) {
+      return "Account not found.";
+    }
+    return "Login failed. Please try again.";
+  };
+
+  const getRegisterErrorMessage = (error) => {
+    const status = error?.response?.status;
+    if (status === 409) {
+      return "An account with these details already exists.";
+    }
+    if (status === 400) {
+      return "Registration failed. Please check your details.";
+    }
+    return "Registration failed. Please try again.";
+  };
 
   const strengthLabel = () => {
     if (passwordStrength <= 2) return { text: "Weak", class: "text-danger" };
@@ -116,6 +140,7 @@ const LogReg = ({ setIsAuthenticated }) => {
   // ==============================
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setSuccessMessage("");
 
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
@@ -128,7 +153,7 @@ const LogReg = ({ setIsAuthenticated }) => {
       const salt = saltResponse?.data?.salt;
 
       if (!salt) {
-        setErrorMessage("Salt not found for this user.");
+        setErrorMessage("Invalid email or password.");
         errRef.current?.focus?.();
         return;
       }
@@ -152,8 +177,7 @@ const LogReg = ({ setIsAuthenticated }) => {
 
       navigate("/");
     } catch (error) {
-      const msg = error?.response?.data || error?.message || "Unknown error";
-      setErrorMessage("Login failed: " + msg);
+      setErrorMessage(getLoginErrorMessage(error));
       errRef.current?.focus?.();
     }
   };
@@ -163,6 +187,7 @@ const LogReg = ({ setIsAuthenticated }) => {
   // ==============================
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    setSuccessMessage("");
 
     if (!validUsername || !validEmail || !validPwd || !validMatch) {
       setErrorMessage("Please complete all fields correctly.");
@@ -185,11 +210,10 @@ const LogReg = ({ setIsAuthenticated }) => {
       setPwd("");
       setMatchPwd("");
 
-      alert("Registration successful! Please log in.");
+      setSuccessMessage("Registration successful! Please log in.");
       toggleForms();
     } catch (error) {
-      const msg = error?.response?.data || error?.message || "Unknown error";
-      setErrorMessage("Registration failed: " + msg);
+      setErrorMessage(getRegisterErrorMessage(error));
       errRef.current?.focus?.();
     }
   };
@@ -207,6 +231,7 @@ const LogReg = ({ setIsAuthenticated }) => {
       signInForm.style.display = "block";
     }
     setErrorMessage("");
+    setSuccessMessage("");
   };
 
   const strength = strengthLabel();
@@ -221,6 +246,9 @@ const LogReg = ({ setIsAuthenticated }) => {
         aria-live="assertive"
       >
         {errorMessage}
+      </p>
+      <p className={successMessage ? "successmsg" : "offscreen"} aria-live="polite">
+        {successMessage}
       </p>
 
       <div className="container my-5" id="authForm">

@@ -2,12 +2,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAllClasses } from "../../assets/api/wikiapi";
 import "../../assets/styles/WikiTheme.css";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchClasses = async () => {
@@ -46,6 +48,7 @@ export default function Classes() {
                 to={`/class/${cls.index}`}
                 key={cls.index}
                 className={`class-card`}
+                onClick={saveNow}
                 style={{
                   backgroundImage: `url(${require(`../../assets/img/BG/classes/${cls.index}.jpg`)})`,
                   backgroundSize: 'cover',

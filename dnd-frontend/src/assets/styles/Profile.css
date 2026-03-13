@@ -682,3 +682,15 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+.friend-request-pic {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--profile-accent, var(--app-accent, #ffcc80));
+    box-shadow: 0 0 8px rgba(255, 204, 128, 0.35);
+}
+

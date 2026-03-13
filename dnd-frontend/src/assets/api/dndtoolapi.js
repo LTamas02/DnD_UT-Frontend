@@ -10,13 +10,35 @@ const apiSilent = axios.create({
     }
 });
 
+const dndCache = {
+    markdownBooks: null,
+    markdownBooksPromise: null,
+    monsters: null,
+    monstersPromise: null
+};
 
 // =========================
 // === Books (markdown) endpoints
 // =========================
 
-export const getMarkdownBooks = () =>
-    api.get("/books/markdown");
+export const getMarkdownBooks = () => {
+    if (dndCache.markdownBooks) {
+        return Promise.resolve({ data: dndCache.markdownBooks });
+    }
+    if (dndCache.markdownBooksPromise) {
+        return dndCache.markdownBooksPromise;
+    }
+    dndCache.markdownBooksPromise = api
+        .get("/books/markdown")
+        .then((res) => {
+            dndCache.markdownBooks = res.data;
+            return res;
+        })
+        .finally(() => {
+            dndCache.markdownBooksPromise = null;
+        });
+    return dndCache.markdownBooksPromise;
+};
 
 export const getMarkdownBookContent = (fileName) =>
     api.get(`/books/markdown/${encodeURIComponent(fileName)}`, {
@@ -505,14 +527,26 @@ export const getRacesByMinSpeed = async (minSpeed) => {
 // =========================
 
 export const getAllMonsters = async () => {
-    try {
-        const res = await api.get("/monsters");
-        console.log("getAllMonsters response:", res.data);
-        return res.data;
-    } catch (err) {
-        console.error("Failed to fetch monsters:", err);
-        return [];
+    if (dndCache.monsters) {
+        return dndCache.monsters;
     }
+    if (dndCache.monstersPromise) {
+        return dndCache.monstersPromise;
+    }
+    dndCache.monstersPromise = api
+        .get("/monsters")
+        .then((res) => {
+            dndCache.monsters = res.data;
+            return res.data;
+        })
+        .catch((err) => {
+            console.error("Failed to fetch monsters:", err);
+            return [];
+        })
+        .finally(() => {
+            dndCache.monstersPromise = null;
+        });
+    return dndCache.monstersPromise;
 };
 
 export const getMonsterByIndex = async (index) => {

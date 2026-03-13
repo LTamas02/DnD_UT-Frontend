@@ -9,7 +9,6 @@ const PdfUpload = () => {
   const onDrop = (acceptedFiles) => {
     const pdf = acceptedFiles[0];
     setFile(pdf);
-    console.log("Selected file:", pdf.name); // just logs, no backend call
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

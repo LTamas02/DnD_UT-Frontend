@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "../assets/styles/BooksLibrary.css";
 import { API_BASE, getMarkdownBooks, getMarkdownBookContentSilent } from "../assets/api/dndtoolapi";
 import { hasCachedBookContent, setCachedBookContent } from "../bookCache";
+import { useScrollRestoration } from "../hooks/useScrollRestoration";
 
 const normalizeTitle = (title) =>
   String(title || "")
@@ -52,6 +53,7 @@ const BooksLibrary = () => {
   const [prefetchTotal, setPrefetchTotal] = useState(0);
   const [prefetchLoaded, setPrefetchLoaded] = useState(0);
   const [prefetchErrors, setPrefetchErrors] = useState(0);
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     let isActive = true;
@@ -334,6 +336,7 @@ const BooksLibrary = () => {
                             key={book.fileName}
                             to={`/books/rules/${encodeURIComponent(book.fileName)}`}
                             className="books-library-book"
+                            onClick={saveNow}
                           >
                             <div className="books-library-book-cover">
                               {coverUrl ? (

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllMagicSchools } from "../../assets/api/wikiapi"; // adjust path
 import "../../assets/styles/WikiTheme.css";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
 
@@ -13,6 +14,7 @@ export default function MagicSchools() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,7 +110,10 @@ export default function MagicSchools() {
               <div
                 key={school.index}
                 className="monster-card"
-                onClick={() => navigate(`/magic-school/${school.index}`)}
+                onClick={() => {
+                  saveNow();
+                  navigate(`/magic-school/${school.index}`);
+                }}
                 style={{ cursor: "pointer" }}
               >
                 <div className="monster-header">

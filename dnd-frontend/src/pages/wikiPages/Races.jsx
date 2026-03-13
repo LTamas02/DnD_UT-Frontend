@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getAllRaces, getRaceSizes } from "../../assets/api/wikiapi";
 import { useNavigate } from "react-router-dom";
 import "../../assets/styles/WikiTheme.css";
+import { useScrollRestoration } from "../../hooks/useScrollRestoration";
 
 const norm = (v) => (v ?? "").toString().trim().toLowerCase();
 
@@ -16,6 +17,7 @@ export default function Races() {
   const [filters, setFilters] = useState({ size: "", speed: "" }); // speed is min speed number as string
 
   const navigate = useNavigate();
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -121,7 +123,10 @@ export default function Races() {
               <div
                 key={race.index}
                 className="race-card"
-                onClick={() => navigate(`/race/${race.index}`)}
+                onClick={() => {
+                  saveNow();
+                  navigate(`/race/${race.index}`);
+                }}
                 style={{ cursor: "pointer" }}
               >
                 <div className="race-header" style={{ backgroundColor: "var(--app-border, #878787)" }}>

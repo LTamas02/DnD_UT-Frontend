@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/WikiTheme.css';
 import { getSpellsByLevel } from '../../assets/api/wikiapi';
+import { useScrollRestoration } from '../../hooks/useScrollRestoration';
 
 const levels = [
   { label: 'Cantrip', value: 0 },
@@ -22,6 +23,7 @@ const Spells = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // useNavigate for routing
+  const { saveNow } = useScrollRestoration({ ready: !loading });
 
   useEffect(() => {
     const fetchSpells = async () => {
@@ -44,6 +46,7 @@ const Spells = () => {
   }, [selectedLevel]);
 
   const handleSpellClick = (index) => {
+    saveNow();
     navigate(`/spell/${index}`); // Navigate to spell detail page
   };
 
