@@ -13,7 +13,7 @@ const buildSteps = (username) => [
   },
   {
     title: "Characters",
-    description: "Create and manage heroes, track sheets, and spawn tokens in the VTT.",
+    description: "Create and manage heroes, and keep character sheets organized.",
     path: "/characters",
     target: "nav-characters",
     actionLabel: "Open Characters"
@@ -24,12 +24,6 @@ const buildSteps = (username) => [
     path: "/dmtools",
     target: "nav-dmtools",
     actionLabel: "Open DM Tools"
-  },
-  {
-    title: "Virtual Tabletop",
-    description: "Run sessions with maps, tokens, dice, chat, and live tools.",
-    path: "/vtt",
-    actionLabel: "Open VTT"
   },
   {
     title: "Books & Rules",

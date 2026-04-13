@@ -1421,11 +1421,6 @@ export default function DmtoolsMaps() {
                   )}
                   <p>
                     Drag nodes, connect ideas, and filter the web.
-                    {saving && <span style={{ marginLeft: 10, opacity: 0.8 }}>Saving...</span>}
-                    {saveQueued && !saving && <span style={{ marginLeft: 10, opacity: 0.7 }}>Queued</span>}
-                    {!saving && hydratedRef.current && (
-                      <span style={{ marginLeft: 10, opacity: 0.6 }}>Saved</span>
-                    )}
                     {isDirty && !saving && (
                       <span style={{ marginLeft: 10, color: 'var(--app-accent, #ffcf6f)', fontWeight: 600 }}>Unsaved changes</span>
                     )}

@@ -233,16 +233,6 @@ export const inviteMultipleFriends = (token, userIds) =>
         params: { userIds: userIds.join(",") }
     });
 
-// =========================
-// === Chat endpoints
-// =========================
-
-export const getMessages = (roomId) =>
-    api.get("/chat/messages", { params: { channelId: roomId } });
-
-export const sendMessage = (roomId, content) =>
-    api.post("/chat/send", content, { params: { roomId } });
-
 export const getDmHistory = (token, friendId) =>
     api.get(`/dm/with/${friendId}`, {
         headers: { "Authorization": `Bearer ${token}` }
@@ -313,62 +303,6 @@ export const CharacterApi = {
 
     async remove(id) {
         const res = await api.delete(`/characters/${id}`, withAuth());
-        return res.data;
-    }
-};
-
-// =========================
-// === VTT endpoints
-// =========================
-
-export const VttApi = {
-    async listSessions() {
-        const res = await api.get("/vtt/sessions", withAuth());
-        return res.data;
-    },
-
-    async createSession(name) {
-        const res = await api.post("/vtt/sessions", { name }, withAuth());
-        return res.data;
-    },
-
-    async joinSession(id) {
-        const res = await api.post(`/vtt/sessions/${id}/join`, null, withAuth());
-        return res.data;
-    },
-
-    async getState(id) {
-        const res = await api.get(`/vtt/sessions/${id}/state`, withAuth());
-        return res.data;
-    },
-
-    async updateMap(id, payload) {
-        const res = await api.put(`/vtt/sessions/${id}/map`, payload, withAuth());
-        return res.data;
-    },
-
-    async uploadMapImage(id, file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const config = withAuth();
-        config.headers = {
-            ...(config.headers || {}),
-            "Content-Type": "multipart/form-data"
-        };
-        const res = await api.post(`/vtt/sessions/${id}/map/image`, formData, config);
-        return res.data;
-    },
-
-    async uploadAsset(id, file, kind = "misc") {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("kind", kind);
-        const config = withAuth();
-        config.headers = {
-            ...(config.headers || {}),
-            "Content-Type": "multipart/form-data"
-        };
-        const res = await api.post(`/vtt/sessions/${id}/assets`, formData, config);
         return res.data;
     }
 };

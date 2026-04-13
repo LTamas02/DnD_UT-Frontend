@@ -28,9 +28,6 @@ import DmtoolsEncounters from "./pages/dmtoolPages/DmtoolsEncounters";
 import DmtoolsNpcs from "./pages/dmtoolPages/DmtoolsNpcs";
 import DmtoolsLoot from "./pages/dmtoolPages/DmtoolsLoot";
 import DmtoolsMaps from "./pages/dmtoolPages/DmtoolsMaps";
-// VTT pages
-import VttLobby from "./pages/dmtoolPages/VttLobby";
-import VttSession from "./pages/dmtoolPages/VttSession";
 
 // _____ Wiki page _____
 import Wiki from "./pages/Wiki";
@@ -230,12 +227,6 @@ function AppWithRouter({
         <Route path="/dmtools/npcs" element={isAuthenticated ? <DmtoolsNpcs /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/loot" element={isAuthenticated ? <DmtoolsLoot /> : <Navigate to="/logreg" />} />
         <Route path="/dmtools/maps" element={isAuthenticated ? <DmtoolsMaps /> : <Navigate to="/logreg" />} />
-
-        {/* _____VTT Routes_____ */}
-        <Route path="/vtt" element={isAuthenticated ? <VttLobby /> : <Navigate to="/logreg" />} />
-        <Route path="/vtt/:sessionId" element={isAuthenticated ? <VttSession /> : <Navigate to="/logreg" />} />
-
-
 
         {/*__________Wiki Routes__________ */}
         <Route path="/wiki" element={isAuthenticated ? <Wiki /> : <Navigate to="/logreg" />} />

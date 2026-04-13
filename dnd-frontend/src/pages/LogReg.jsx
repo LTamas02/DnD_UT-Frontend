@@ -199,19 +199,28 @@ const LogReg = ({ setIsAuthenticated }) => {
       const salt = generateSalt();
       const clientHash = computeClientHash(pwd, salt);
 
-      // Assuming register(email, username, passwordHash)
       await register(registerEmail, registerUsername, clientHash);
-
-      // Assuming saltSend(email, salt)
       await saltSend(registerEmail, salt);
+
+      const loginResponse = await login(registerEmail, clientHash);
+      const token = loginResponse?.data?.token;
+
+      if (!token) {
+        setErrorMessage("Registration succeeded, but automatic login failed. Please log in.");
+        toggleForms();
+        errRef.current?.focus?.();
+        return;
+      }
+
+      localStorage.setItem("token", token);
+      setIsAuthenticated(true);
 
       setRegisterUsername("");
       setRegisterEmail("");
       setPwd("");
       setMatchPwd("");
 
-      setSuccessMessage("Registration successful! Please log in.");
-      toggleForms();
+      navigate("/");
     } catch (error) {
       setErrorMessage(getRegisterErrorMessage(error));
       errRef.current?.focus?.();
