@@ -143,7 +143,7 @@ const Race = () => {
                       <div
                         key={sr.index}
                         className="monster-card"
-                        onClick={() => navigate(`/race/${raceData.index}/subrace/${sr.index}`)}
+                        onClick={() => navigate(`/subrace/${sr.index}`)}
                         style={{ cursor: "pointer" }}
                       >
                         <div className="monster-header">

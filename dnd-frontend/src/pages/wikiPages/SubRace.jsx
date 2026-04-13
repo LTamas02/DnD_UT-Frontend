@@ -11,17 +11,23 @@ const toLabel = (x) => {
 };
 
 export default function SubRace() {
-  const { raceIndex, subraceIndex } = useParams();
+  const { index, raceIndex, subraceIndex } = useParams();
   const navigate = useNavigate();
 
+  const resolvedSubraceIndex = subraceIndex || index;
   const [subrace, setSubrace] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSubrace = async () => {
+      if (!resolvedSubraceIndex) {
+        setSubrace(null);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
-        const res = await getSubraceByIndex(subraceIndex);
+        const res = await getSubraceByIndex(resolvedSubraceIndex);
         setSubrace(res?.data ?? null);
       } catch {
         setSubrace(null);
@@ -31,16 +37,22 @@ export default function SubRace() {
     };
 
     fetchSubrace();
-  }, [subraceIndex]);
+  }, [resolvedSubraceIndex]);
 
-  if (loading) return <div className="loading">Loading subrace...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
   if (!subrace) return <div className="error">Subrace not found.</div>;
 
   return (
     <div id="subrace-comp" className="monster-page-container">
       <div className="monster-overlay">
-        <button className="back-button" onClick={() => navigate(`/race/${raceIndex}`)}>
-          ← Back to Race
+        <button
+          className="back-button"
+          onClick={() => {
+            const target = raceIndex || subrace?.race?.index;
+            navigate(target ? `/race/${target}` : "/wiki/races");
+          }}
+        >
+          {"<- Back to Race"}
         </button>
 
         <div className="monster-detail-card">

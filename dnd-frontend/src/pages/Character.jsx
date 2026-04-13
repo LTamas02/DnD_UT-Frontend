@@ -1134,6 +1134,7 @@ export default function Character() {
                             onChange={handleSpellSearchSelect} 
                             value=""
                             size={Math.min(filteredSpells.length, 10)} 
+                            className="input-dark"
                             style={{ width: '100%', marginTop: '5px', maxHeight: '200px', overflowY: 'auto' }}
                         >
                             <option value="" disabled>Select a Spell</option>
